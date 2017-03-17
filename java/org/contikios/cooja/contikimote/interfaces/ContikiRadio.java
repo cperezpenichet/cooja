@@ -105,6 +105,8 @@ public class ContikiRadio extends Radio implements ContikiMoteInterface, PolledA
   private RadioPacket packetFromMote = null;
 
   private boolean radioOn = true;
+  /* New Addition */
+  private boolean isGeneratingCarrier = false;
 
   private boolean isTransmitting = false;
 
@@ -161,7 +163,13 @@ public class ContikiRadio extends Radio implements ContikiMoteInterface, PolledA
   public boolean isRadioOn() {
     return radioOn;
   }
-
+  
+  /* New Addition */  
+  public boolean isGeneratingCarrier() {
+	  return isGeneratingCarrier;
+  }
+  /* New Addition */
+  
   public boolean isTransmitting() {
     return isTransmitting;
   }

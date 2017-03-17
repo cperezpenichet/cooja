@@ -73,6 +73,7 @@ public class ApplicationRadio extends Radio implements NoiseSourceRadio, Directi
   private RadioPacket packetFromMote = null;
   private RadioPacket packetToMote = null;
 
+  private boolean isGeneratingCarrier = false;
   private boolean isTransmitting = false;
   private boolean isReceiving = false;
   private boolean isInterfered = false;
@@ -142,6 +143,12 @@ public class ApplicationRadio extends Radio implements NoiseSourceRadio, Directi
     this.setChanged();
     this.notifyObservers();
   }
+  
+  /* New Addition */  
+  public boolean isGeneratingCarrier() {
+	  return isGeneratingCarrier;
+  }
+  /* New Addition */
 
   public boolean isTransmitting() {
     return isTransmitting;

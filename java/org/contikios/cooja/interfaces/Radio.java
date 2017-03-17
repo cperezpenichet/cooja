@@ -67,7 +67,7 @@ public abstract class Radio extends MoteInterface {
     UNKNOWN, HW_OFF, HW_ON,
     RECEPTION_STARTED, RECEPTION_FINISHED, RECEPTION_INTERFERED,
     TRANSMISSION_STARTED, TRANSMISSION_FINISHED,
-    PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED
+    PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED
   }
 
   /**
@@ -111,6 +111,14 @@ public abstract class Radio extends MoteInterface {
    * @return Last radio event
    */
   public abstract RadioEvent getLastEvent();
+  
+  /**
+   * Returns true if this radio is generating a carrier, or just finished generating one.
+   * 
+   * @see isTranmsitting()
+   * @return True if radio is generating a carrier.
+   */
+  public abstract boolean isGeneratingCarrier();
 
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,

@@ -42,6 +42,7 @@ import org.contikios.cooja.Simulation;
 import org.contikios.cooja.interfaces.CustomDataRadio;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.Radio;
+import org.contikios.cooja.interfaces.Radio.RadioEvent;
 import org.contikios.cooja.mspmote.MspMote;
 import org.contikios.cooja.mspmote.MspMoteTimeEvent;
 import se.sics.mspsim.chip.CC2420;
@@ -274,7 +275,12 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     return isTransmitting;
   }
   
-  /* New Addition */  
+  /* New Addition */
+  /**
+   * Returns true if this radio is generating a carrier, or just finished generating one.
+   * 
+   * @return True if radio is generating a carrier.
+   */
   public boolean isGeneratingCarrier() {
 	  return isGeneratingCarrier;
   }
@@ -315,9 +321,9 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     setChanged();
     notifyObservers();
   }
-
+  
   public RadioEvent getLastEvent() {
-    return lastEvent;
+	    return lastEvent;
   }
 
   public void interfereAnyReception() {
@@ -327,9 +333,33 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
     lastEvent = RadioEvent.RECEPTION_INTERFERED;
     /*logger.debug("----- 802.15.4 RECEPTION INTERFERED -----");*/
-    setChanged();
-    notifyObservers();
+	    setChanged();
+	    notifyObservers();
   }
+  
+  /* New Addition */
+  public void carrrierGenerationStart() {
+	  isGeneratingCarrier= true;
+	  isTransmitting = false;
+	  
+	  lastEvent = RadioEvent.CARRIER_STARTED;
+	  /* logger.debug("----- 802.15.4 CARRIER STARTED -----"); */
+	  setChanged();
+	  notifyObservers();
+  }
+  /* New Addition */
+  
+  /* New Addition */
+  public void carrierGenerationStopped() {
+	  isGeneratingCarrier = false;
+	  
+	  lastEvent = RadioEvent.CARRIER_STOPPED;
+	  /*logger.debug("-----802.15.4 CARRIER STOPPED -----")*/
+	  setChanged();
+	  notifyObservers();	  
+  }
+  /* New Addition */
+
 
   public double getCurrentOutputPower() {
     return radio.getOutputPower();

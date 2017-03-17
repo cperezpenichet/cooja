@@ -274,12 +274,6 @@ public class MspBackRadio extends Radio implements CustomDataRadio {
     return isTransmitting;
   }
   
-  /* New Addition */  
-  public boolean isGeneratingCarrier() {
-	  return isGeneratingCarrier;
-  }
-  /* New Addition */
-  
   public boolean isReceiving() {
     return isReceiving;
   }
@@ -316,29 +310,6 @@ public class MspBackRadio extends Radio implements CustomDataRadio {
     notifyObservers();
   }
   
-  /* New Addition */
-  public void carrrierGenerationStart() {
-	  isGeneratingCarrier= true;
-	  isTransmitting = false;
-	  
-	  lastEvent = RadioEvent.CARRIER_STARTED;
-	  /* logger.debug("----- 802.15.4 CARRIER STARTED -----"); */
-	  setChanged();
-	  notifyObservers();
-  }
-  /* New Addition */
-  
-  /* New Addition */
-  public void carrierGenerationStopped() {
-	  isGeneratingCarrier = false;
-	  
-	  lastEvent = RadioEvent.CARRIER_STOPPED;
-	  /*logger.debug("-----802.15.4 CARRIER STOPPED -----")*/
-	  setChanged();
-	  notifyObservers();	  
-  }
-  /* New Addition */
-
   public RadioEvent getLastEvent() {
     return lastEvent;
   }

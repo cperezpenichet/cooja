@@ -75,7 +75,6 @@ public class TR1001Radio extends Radio implements USARTListener, CustomDataRadio
 
   private MspMote mote;
   
-  private boolean isGeneratingCarrier = false;
   private boolean isTransmitting = false;
   private boolean isReceiving = false;
   private boolean isInterfered = false;
@@ -248,12 +247,6 @@ public class TR1001Radio extends Radio implements USARTListener, CustomDataRadio
   public boolean isTransmitting() {
     return isTransmitting;
   }
-  
-  /* New Addition */  
-  public boolean isGeneratingCarrier() {
-	  return isGeneratingCarrier;
-  }
-  /* New Addition */
 
   public boolean isReceiving() {
     return isReceiving;

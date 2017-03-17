@@ -118,7 +118,7 @@ public abstract class Radio extends MoteInterface {
    * @see isTranmsitting()
    * @return True if radio is generating a carrier.
    */
-  public abstract boolean isGeneratingCarrier();
+  //public abstract boolean isGeneratingCarrier();
 
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,

@@ -69,7 +69,6 @@ public class CC1101Radio extends Radio implements CustomDataRadio {
 	private final MspMote mote;
 	private final CC1101 cc1101;
 
-	private boolean isGeneratingCarrier = false;
 	private boolean isInterfered = false;
 	private boolean isTransmitting = false;
 	private boolean isReceiving = false;
@@ -284,13 +283,7 @@ public class CC1101Radio extends Radio implements CustomDataRadio {
 	public boolean isTransmitting() {
 		return isTransmitting;
 	}
-	
-	/* New Addition */  
-	public boolean isGeneratingCarrier() {
-		return isGeneratingCarrier;
-	}
-	/* New Addition */
-	
+
 	public boolean isReceiving() {
 		return isReceiving;
 	}

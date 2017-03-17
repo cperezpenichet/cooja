@@ -244,6 +244,9 @@ public class UDGMBS extends AbstractRadioMedium {
 				}
 				else if(carrierGen.isInterfered()) {
 					newConnection.addInterfered(carrierGen);
+				}/* New addition */
+				else if(carrierGen.isGeneratingCarrier()) {
+					newConnection.addInterfered(carrierGen);
 				}
 				else if(carrierGen.isTransmitting()) {
 					newConnection.addInterfered(carrierGen);

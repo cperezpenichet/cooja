@@ -834,6 +834,7 @@ public class Simulation extends Observable implements Runnable {
   public void addMote(final Mote mote) {
     Runnable addMote = new Runnable() {
       public void run() {
+    	System.out.println("Add NEW MOTE");
         if (mote.getInterfaces().getClock() != null) {
           if (maxMoteStartupDelay > 0) {
             mote.getInterfaces().getClock().setDrift(

@@ -239,5 +239,10 @@ public class RadioConnection {
     return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.size() + " motes";
 
   }
+  
+  /* Testing Purposes */
+  public int getID() {
+	  return id;
+  }
 
 }

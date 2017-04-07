@@ -230,10 +230,14 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 			
 			final Radio.RadioEvent event = radio.getLastEvent();
 			
+			System.out.println("event= " + event);
+			
 			switch (event) {
 				case RECEPTION_STARTED:
 				case RECEPTION_INTERFERED:
 				case RECEPTION_FINISHED:
+				case CARRIER_RECEPTION_STARTED:
+				case CARRIER_RECEPTION_STOPPED:
 					break;
 
 				case UNKNOWN:
@@ -250,6 +254,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_STARTED: {
+					System.out.println("TRANSMISSION_STARTED");
 					/* Create new radio connection */
 					if (radio.isReceiving()) {
 						/*
@@ -290,6 +295,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_FINISHED: {
+					System.out.println("TRANSMISSION_FINISHED");
 					/* Remove radio connection */
 
 					/* Connection */
@@ -420,6 +426,92 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						}
 						
 					}
+				}
+				break;
+				case CARRIER_STARTED: {
+					System.out.println("CARRIER_STARTED");
+					
+//					if(radio.isTransmitting()) { 						
+//						for(RadioConnection conn: activeConnections) {
+//							if(conn.getSource() == radio) { 
+//								conn.addInterfered(radio);
+//								//return;
+//							}
+//						}
+//					}
+//					else if(radio.isReceiving()) {
+//						radio.interfereAnyReception();
+//						for(RadioConnection conn: activeConnections) {
+//							if(conn.isDestination(radio)) {
+//								conn.addInterfered(radio);
+//							}
+//						}
+//					}
+//					
+//					RadioConnection newConnection = createConnections(radio);
+//					activeConnections.add(newConnection);
+//					//radio.carrrierGenerationStart();
+//					radio.carrrierGenerationStart();
+//					
+//					if(newConnection.getDestinationDelay(radio) == 0) {
+//						radio.carrierReceptionStart();
+//					}
+//					else {
+//						final Radio delayedRadio = radio;
+//						TimeEvent delayedEvent = new TimeEvent(0) {
+//							public void execute(long t) {
+//								delayedRadio.carrierReceptionStart();
+//							}
+//						};
+//						simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(radio));
+//					}
+//				
+//					/* Update signal strength */
+//					updateSignalStrengths();
+//					
+//					/* Notify observers */
+//					lastConnection = null;
+//					radioTransmissionObservable.setChangedAndNotify();
+				}
+				break;
+				case CARRIER_STOPPED: {	
+					System.out.println("CARRIER_STOPPED");
+					
+//					RadioConnection connection = getActiveConnectionFrom(radio);
+//					if(connection == null) {
+//						logger.fatal("No radio connection found");
+//						return;
+//					}
+//					
+//					activeConnections.remove(connection);
+//					lastConnection = connection;
+//					
+//					for (Radio dstRadio: connection.getAllDestinations()) {
+//						if (connection.getDestinationDelay(dstRadio) == 0) {
+//							dstRadio.carrierReceptionEnd();
+//						}
+//						else {
+//							final Radio delayedRadio = dstRadio;
+//							TimeEvent delayedEvent = new TimeEvent(0) {
+//								public void execute(long t) {
+//									delayedRadio.carrierReceptionEnd();
+//								}
+//							};
+//							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + connection.getDestinationDelay(radio));
+//						}
+//					}
+//					
+//					for (Radio intfRadio: connection.getInterferedNonDestinations()) {
+//						
+//						if (intfRadio.isInterfered()) {
+//							intfRadio.carrierReceptionEnd();
+//						}
+//					}
+//					
+//					updateSignalStrengths();
+//					lastConnection = null;
+//					radioTransmissionObservable.setChangedAndNotify();
+//					
 				}
 				break;
 				default:

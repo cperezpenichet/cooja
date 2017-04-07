@@ -8,7 +8,7 @@
   <property name="cooja" location="../.."/>
   
   <property name="cooja_jar" value="${cooja}/dist/cooja.jar"/>
-  <property name="mspsim" location="${cooja}/../mspsim"/>
+  <property name="mspsim" location="/home/george/UbuntuMasterThesis/mspsim-test/mspsim"/>
   <property name="mspsim_jar" value="${mspsim}/mspsim.jar"/>
   <property name="coffee" location="../../../coffee-manager"/>
   <property name="coffee_jar" value="${lib}/coffee.jar"/>
@@ -45,8 +45,7 @@ Could not find the MSPSim build file. Did you run &quot;git submodule update --i
   </target>
 
   <target name="compile" depends="init,mspsim,coffee">
-    <javac srcdir="${src}" destdir="${build}" debug="on"
-           includeantruntime="false">
+    <javac srcdir="${src}" destdir="${build}" debug="on" includeantruntime="false">
       <classpath>
         <pathelement location="${mspsim_jar}"/>
         <pathelement location="${coffee_jar}"/>

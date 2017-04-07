@@ -46,6 +46,7 @@ import org.contikios.cooja.Mote;
 import org.contikios.cooja.MoteInterface;
 import org.contikios.cooja.RadioPacket;
 import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
+//import org.contikios.cooja.interfaces.Radio.RadioEvent;
 
 /**
  * A mote radio transceiver.
@@ -59,6 +60,22 @@ import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
 @ClassDescription("Radio")
 public abstract class Radio extends MoteInterface {
   private static Logger logger = Logger.getLogger(Radio.class);
+  
+  
+  
+  //private RadioEvent lastEvent = RadioEvent.UNKNOWN;
+  
+//  /* New addition */
+//  public boolean isGeneratingCarrier = false;
+//  public boolean isReceivingCarrier = false;
+//  /* New addition */
+//  
+//  
+//  
+//  private boolean isInterfered = false;
+//  private boolean isTransmitting = false;
+//  private boolean isReceiving = false;
+//  private boolean isSynchronized = false;
 
   /**
    * Events that radios should notify observers about.
@@ -67,7 +84,8 @@ public abstract class Radio extends MoteInterface {
     UNKNOWN, HW_OFF, HW_ON,
     RECEPTION_STARTED, RECEPTION_FINISHED, RECEPTION_INTERFERED,
     TRANSMISSION_STARTED, TRANSMISSION_FINISHED,
-    PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED
+    PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED,
+    CARRIER_RECEPTION_STARTED, CARRIER_RECEPTION_STOPPED
   }
 
   /**
@@ -103,6 +121,43 @@ public abstract class Radio extends MoteInterface {
    * @see #signalReceptionStart()
    */
   public abstract void signalReceptionEnd();
+  
+//  /* New Addition */
+//  public void carrrierGenerationStart() {
+//	  isGeneratingCarrier= true;
+//	  isTransmitting = false;
+//	  
+//	  lastEvent = RadioEvent.CARRIER_STARTED;
+//	  /* logger.debug("----- CARRIER STARTED -----"); */
+//	  setChanged();
+//	  notifyObservers();
+//  }
+//  
+//  public void carrierGenerationEnd() {
+//	  isGeneratingCarrier = false;
+//	  
+//	  lastEvent = RadioEvent.CARRIER_STOPPED;
+//	  /* logger.debug("----- CARRIER STOPPED -----"); */
+//	  setChanged();
+//	  notifyObservers();	  
+//  }
+//  
+//  public void carrierReceptionStart() {
+//	  isReceivingCarrier = true;
+//	  lastEvent = RadioEvent.CARRIER_RECEPTION_STARTED;
+//	  setChanged();
+//	  notifyObservers();
+//  }
+//  
+//  public void carrierReceptionEnd() {
+//	  isReceivingCarrier = false;
+//	  lastEvent = RadioEvent.CARRIER_RECEPTION_STOPPED;
+//	  setChanged();
+//	  notifyObservers();
+//  }
+//  
+//  /* New Addition */
+  
 
   /**
    * Returns last event at this radio. This method should be used to learn the
@@ -112,13 +167,17 @@ public abstract class Radio extends MoteInterface {
    */
   public abstract RadioEvent getLastEvent();
   
-  /**
-   * Returns true if this radio is generating a carrier, or just finished generating one.
-   * 
-   * @see isTranmsitting()
-   * @return True if radio is generating a carrier.
-   */
-  //public abstract boolean isGeneratingCarrier();
+
+//  /* New Addition */
+//  /**
+//   * Returns true if this radio is generating a carrier, or just finished generating one.
+//   * 
+//   * @return True if radio is generating a carrier.
+//   */
+//  public boolean isGeneratingCarrier() {
+//	  return isGeneratingCarrier;
+//  }
+//  /* New Addition */  
 
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,

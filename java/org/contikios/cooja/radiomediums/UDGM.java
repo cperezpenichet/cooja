@@ -93,6 +93,7 @@ public class UDGM extends AbstractRadioMedium {
   
   public UDGM(Simulation simulation) {
     super(simulation);
+/**/System.out.println("UDGM");
     random = simulation.getRandomGenerator();
     dgrm = new DirectedGraphMedium() {
       protected void analyzeEdges() {
@@ -168,8 +169,8 @@ public class UDGM extends AbstractRadioMedium {
   public RadioConnection createConnections(Radio sender) {
     RadioConnection newConnection = new RadioConnection(sender);
     //System.out.println("NewConn George");
-    System.out.println("\nNewConnID: " + newConnection.getID());
-    System.out.printf("sender id = %d\n", sender.getMote().getID());
+/**/System.out.println("\nNewConnID: " + newConnection.getID());
+/**/System.out.printf("sender id = %d\n", sender.getMote().getID());
     
 
     /* Fail radio transmission randomly - no radios will hear this transmission */
@@ -192,7 +193,7 @@ public class UDGM extends AbstractRadioMedium {
     /* Loop through all potential destinations */
     Position senderPos = sender.getPosition();
     for (DestinationRadio dest: potentialDestinations) {
-    	System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
+/**/  System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
       Radio recv = dest.radio;
 
       /* Fail if radios are on different (but configured) channels */ 
@@ -226,17 +227,17 @@ public class UDGM extends AbstractRadioMedium {
 
       double distance = senderPos.getDistanceTo(recvPos);
       if (distance <= moteTransmissionRange) {
-    	  System.out.println("WithinTR");
+/**/	 System.out.println("WithinTR");
         /* Within transmission range */
 
         if (!recv.isRadioOn()) {
-          System.out.println("radio is off");
-          System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("radio is off");
+/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
           newConnection.addInterfered(recv);
           recv.interfereAnyReception();
         } else if (recv.isInterfered()) {
-          System.out.println("isInterfered");
-          System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("isInterfered");
+/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
           /* Was interfered: keep interfering */
           newConnection.addInterfered(recv);
         } 
@@ -248,13 +249,13 @@ public class UDGM extends AbstractRadioMedium {
         } 
         */
         else if (recv.isTransmitting()) {
-          System.out.println("isTransmitting");
-          System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("isTransmitting");
+/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
           newConnection.addInterfered(recv);
         } else if (recv.isReceiving() ||
             (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
-          System.out.println("isReceiving");
-          System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("isReceiving");
+/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
           /* Was receiving, or reception failed: start interfering */
           newConnection.addInterfered(recv);
           recv.interfereAnyReception();
@@ -271,8 +272,8 @@ public class UDGM extends AbstractRadioMedium {
           newConnection.addDestination(recv);
         }
       } else if (distance <= moteInterferenceRange) {
-    	  System.out.println("WithinIR");
-    	  System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/  	  System.out.println("WithinIR");
+/**/  	  System.out.printf("recv id = %d\n", recv.getMote().getID());
         /* Within interference range */
         newConnection.addInterfered(recv);
         recv.interfereAnyReception();
@@ -308,20 +309,20 @@ public class UDGM extends AbstractRadioMedium {
     /* Override: uses distance as signal strength factor */
     
     /* Reset signal strengths */
-	System.out.printf("Reset signal strength \n");
+/**/System.out.printf("Reset signal strength \n");
     for (Radio radio : getRegisteredRadios()) {
       radio.setCurrentSignalStrength(getBaseRssi(radio));      
-      System.out.printf("Reset Radio: %d, Signal strength: %.2f\n", radio.getMote().getID(), radio.getCurrentSignalStrength());
+/**/  System.out.printf("Reset Radio: %d, Signal strength: %.2f\n", radio.getMote().getID(), radio.getCurrentSignalStrength());
     }
 
     /* Set signal strength to below strong on destinations */
     RadioConnection[] conns = getActiveConnections();
     for (RadioConnection conn : conns) {
-    	System.out.println("\nSet signal strength to below strong on destinations");
-    	System.out.println("ActiveConnID: " + conn.getID());
+/**/   	System.out.println("\nSet signal strength to below strong on destinations");
+/**/  	System.out.println("ActiveConnID: " + conn.getID());
       if (conn.getSource().getCurrentSignalStrength() < SS_STRONG) {
         conn.getSource().setCurrentSignalStrength(SS_STRONG);
-        System.out.printf("source = %d , signal = %.2f\n", conn.getSource().getMote().getID(), conn.getSource().getCurrentSignalStrength());
+/**/    System.out.printf("source = %d , signal = %.2f\n", conn.getSource().getMote().getID(), conn.getSource().getCurrentSignalStrength());
       }
       for (Radio dstRadio : conn.getDestinations()) {
         if (conn.getSource().getChannel() >= 0 &&
@@ -331,29 +332,29 @@ public class UDGM extends AbstractRadioMedium {
         }
 
         double dist = conn.getSource().getPosition().getDistanceTo(dstRadio.getPosition());
-        System.out.printf("dist = %.2f\n", dist);
+/**/    System.out.printf("dist = %.2f\n", dist);
 
         double maxTxDist = TRANSMITTING_RANGE
         * ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-        System.out.printf("maxTxDist = %.2f\n", maxTxDist);
+/**/    System.out.printf("maxTxDist = %.2f\n", maxTxDist);
         
         double distFactor = dist/maxTxDist;
-        System.out.printf("distFactor = %.2f\n", distFactor);
+/**/    System.out.printf("distFactor = %.2f\n", distFactor);
 
         double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {
           dstRadio.setCurrentSignalStrength(signalStrength);
-          System.out.printf("dstRadio = %d , signal = %.2f\n", dstRadio.getMote().getID(), dstRadio.getCurrentSignalStrength());
+/**/      System.out.printf("dstRadio = %d , signal = %.2f\n", dstRadio.getMote().getID(), dstRadio.getCurrentSignalStrength());
         }
       }
     }
 
     /* Set signal strength to below weak on interfered */
     for (RadioConnection conn : conns) {
-    	System.out.println("\nSet signal strength to below weak on interfered");
-    	System.out.println("ActiveConnID: " + conn.getID());
+/**/   	System.out.println("\nSet signal strength to below weak on interfered");
+/**/   	System.out.println("ActiveConnID: " + conn.getID());
       for (Radio intfRadio : conn.getInterfered()) {
-    	  System.out.printf("intfRadio = %d\n", intfRadio.getMote().getID()) ;
+/**/   	  System.out.printf("intfRadio = %d\n", intfRadio.getMote().getID()) ;
         if (conn.getSource().getChannel() >= 0 &&
             intfRadio.getChannel() >= 0 &&
             conn.getSource().getChannel() != intfRadio.getChannel()) {
@@ -361,32 +362,32 @@ public class UDGM extends AbstractRadioMedium {
         }
 
         double dist = conn.getSource().getPosition().getDistanceTo(intfRadio.getPosition());
-        System.out.printf("dist = %.2f\n", dist);
+/**/    System.out.printf("dist = %.2f\n", dist);
 
         double maxTxDist = TRANSMITTING_RANGE
         * ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-        System.out.printf("maxTxDist = %.2f\n", maxTxDist);
+/**/    System.out.printf("maxTxDist = %.2f\n", maxTxDist);
         
         double distFactor = dist/maxTxDist;
-        System.out.printf("distFactor = %.2f\n", distFactor);
+/**/   System.out.printf("distFactor = %.2f\n", distFactor);
 
         if (distFactor < 1) {
           double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
           if (intfRadio.getCurrentSignalStrength() < signalStrength) {
             intfRadio.setCurrentSignalStrength(signalStrength);
-            System.out.printf("intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
+/**/        System.out.printf("intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
           }
         } else {
           intfRadio.setCurrentSignalStrength(SS_WEAK);
           if (intfRadio.getCurrentSignalStrength() < SS_WEAK) {
             intfRadio.setCurrentSignalStrength(SS_WEAK);
-            System.out.printf("intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
+/**/        System.out.printf("intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
           }
         }
 
         if (!intfRadio.isInterfered()) {
           /*logger.warn("Radio was not interfered: " + intfRadio);*/
-          System.out.printf("intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
+/**/      System.out.printf("intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
           intfRadio.interfereAnyReception();
         }
       }

@@ -106,6 +106,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	 * @param simulation Simulation
 	 */
 	public AbstractRadioMedium(Simulation simulation) {
+/**/   System.out.println("AbstractRadioMedium");
 		this.simulation = simulation;
 	}
 	
@@ -230,7 +231,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 			
 			final Radio.RadioEvent event = radio.getLastEvent();
 			
-			System.out.println("event= " + event);
+/**/		System.out.println("event= " + event);
 			
 			switch (event) {
 				case RECEPTION_STARTED:
@@ -254,7 +255,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_STARTED: {
-					System.out.println("TRANSMISSION_STARTED");
+/**/				System.out.println("TRANSMISSION_STARTED");
 					/* Create new radio connection */
 					if (radio.isReceiving()) {
 						/*
@@ -276,6 +277,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						if (newConnection.getDestinationDelay(r) == 0) {
 							r.signalReceptionStart();
 						} else {
+/**/						System.out.println("EXPERIMENTAL_TRANSMISSION_STARTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = r;
 							TimeEvent delayedEvent = new TimeEvent(0) {
@@ -295,7 +297,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_FINISHED: {
-					System.out.println("TRANSMISSION_FINISHED");
+/**/				System.out.println("TRANSMISSION_FINISHED");
 					/* Remove radio connection */
 
 					/* Connection */
@@ -312,7 +314,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							dstRadio.signalReceptionEnd();
 						} else {
-							
+/**/						System.out.println("EXPERIMENTAL_TRANSMISSION_FINISHED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							TimeEvent delayedEvent = new TimeEvent(0) {
@@ -366,7 +368,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							((CustomDataRadio) dstRadio).receiveCustomData(data);
 						} else {
-							
+/**/						System.out.println("EXPERIMENTAL_CUSTOM_DATA_TRANSMITTED");							
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final CustomDataRadio delayedRadio = (CustomDataRadio) dstRadio;
 							final Object delayedData = data;
@@ -412,7 +414,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							dstRadio.setReceivedPacket(packet);
 						} else {
-							
+/**/						System.out.println("EXPERIMENTAL_PACKET_TRANSMITTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							final RadioPacket delayedPacket = packet;
@@ -429,7 +431,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case CARRIER_STARTED: {
-					System.out.println("CARRIER_STARTED");
+/**/				System.out.println("CARRIER_STARTED");
+					//updateSignalStrengths();
 					
 //					if(radio.isTransmitting()) { 						
 //						for(RadioConnection conn: activeConnections) {
@@ -475,7 +478,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case CARRIER_STOPPED: {	
-					System.out.println("CARRIER_STOPPED");
+/**/				System.out.println("CARRIER_STOPPED");
 					
 //					RadioConnection connection = getActiveConnectionFrom(radio);
 //					if(connection == null) {

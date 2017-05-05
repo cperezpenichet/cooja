@@ -1081,14 +1081,18 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
     /* Radio OnOff, RXTX, and channels */
     final Radio moteRadio = mote.getInterfaces().getRadio();
     if (moteRadio != null) {
-      RadioChannelEvent startupChannel = new RadioChannelEvent(
+/**/  System.out.println("1.isRadioOn()");
+      RadioChannelEvent startupChannel = new RadioChannelEvent(         
           simulation.getSimulationTime(), moteRadio.getChannel(), moteRadio.isRadioOn());
+/**/  System.out.println("startupChannel: " + startupChannel.getClass());
       moteEvents.addRadioChannel(startupChannel);
       RadioHWEvent startupHW = new RadioHWEvent(
           simulation.getSimulationTime(), moteRadio.isRadioOn());
+/**/  System.out.println("startupHW: " + startupHW.getClass());
       moteEvents.addRadioHW(startupHW);
       RadioRXTXEvent startupRXTX = new RadioRXTXEvent(
           simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
+/**/  System.out.println("startupRXTX: " + startupRXTX.getClass());
       moteEvents.addRadioRXTX(startupRXTX);
       Observer observer = new Observer() {
         int lastChannel = -1;
@@ -1107,18 +1111,22 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
           int nowChannel = moteRadio.getChannel();
           if (nowChannel != lastChannel) {
             lastChannel = nowChannel;
+/**/        System.out.println("4.isRadioOn()");
             RadioChannelEvent ev = new RadioChannelEvent(
                 simulation.getSimulationTime(), nowChannel, moteRadio.isRadioOn());
             moteEvents.addRadioChannel(ev);
+/**/        System.out.println("ev: " + ev.getClass());
 
             ev.details = details;
           }
           
           if (radioEv == RadioEvent.HW_ON ||
               radioEv == RadioEvent.HW_OFF) {
+/**/        System.out.println("radioEv= " + radioEv);
             RadioHWEvent ev = new RadioHWEvent(
                 simulation.getSimulationTime(), moteRadio.isRadioOn());
             moteEvents.addRadioHW(ev);
+/**/        System.out.println("2.ev: " + ev.getClass());
 
             ev.details = details;
 
@@ -1126,6 +1134,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
             lastChannel = nowChannel;
             RadioChannelEvent ev2 = new RadioChannelEvent(
                 simulation.getSimulationTime(), nowChannel, moteRadio.isRadioOn());
+/**/        System.out.println("ev2: " + ev2.getClass());
             ev2.details = details;
             moteEvents.addRadioChannel(ev2);
           }
@@ -1136,22 +1145,30 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
               radioEv == RadioEvent.RECEPTION_STARTED ||
               radioEv == RadioEvent.RECEPTION_INTERFERED ||
               radioEv == RadioEvent.RECEPTION_FINISHED) {
+        	  
+/**/        System.out.println("Radio RXTX events");
+/**/        System.out.println("isGeneratingCarrier = " + moteRadio.isGeneratingCarrier());
 
             RadioRXTXEvent ev;
             /* Override events, instead show state */
             if (moteRadio.isTransmitting()) {
+/**/          System.out.println("RXTXRadioEvent.TRANSMITTING");
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.TRANSMITTING);
             } else if (!moteRadio.isRadioOn()) {
+/**/          System.out.println("1.RXTXRadioEvent.IDLE");
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
             } else if (moteRadio.isInterfered()) {
+/**/          System.out.println("RXTXRadioEvent.INTERFERED");            	
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.INTERFERED);
             } else if (moteRadio.isReceiving()) {
+/**/          System.out.println("RXTXRadioEvent.RECEIVING");
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.RECEIVING);
             } else {
+/**/          System.out.println("2.RXTXRadioEvent.IDLE");
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
             }

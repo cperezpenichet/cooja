@@ -2644,7 +2644,7 @@ public class Cooja extends Observable {
    * Add new mote to current simulation
    */
   public void doAddMotes(MoteType moteType) {
-	System.out.println("doAddMotes");
+/**/System.out.println("doAddMotes");
     if (mySimulation != null) {
       mySimulation.stopSimulation();
 

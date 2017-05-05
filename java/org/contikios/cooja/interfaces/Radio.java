@@ -168,16 +168,17 @@ public abstract class Radio extends MoteInterface {
   public abstract RadioEvent getLastEvent();
   
 
-//  /* New Addition */
-//  /**
-//   * Returns true if this radio is generating a carrier, or just finished generating one.
-//   * 
-//   * @return True if radio is generating a carrier.
-//   */
-//  public boolean isGeneratingCarrier() {
-//	  return isGeneratingCarrier;
-//  }
-//  /* New Addition */  
+  /* New Addition */
+  /**
+   * Returns true if this radio is generating a carrier, or just finished generating one.
+   * 
+   * @return True if radio is generating a carrier.
+   */
+  public boolean isGeneratingCarrier() {
+/**/  System.out.println("No this isGeneratingCarrier");
+	  return false;
+  }
+  /* New Addition */  
 
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,

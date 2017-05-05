@@ -168,7 +168,6 @@ public class UDGM extends AbstractRadioMedium {
 
   public RadioConnection createConnections(Radio sender) {
     RadioConnection newConnection = new RadioConnection(sender);
-    //System.out.println("NewConn George");
 /**/System.out.println("\nNewConnID: " + newConnection.getID());
 /**/System.out.printf("sender id = %d\n", sender.getMote().getID());
     
@@ -181,9 +180,15 @@ public class UDGM extends AbstractRadioMedium {
     /* Calculate ranges: grows with radio output power */
     double moteTransmissionRange = TRANSMITTING_RANGE
     * ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
+    
+/**/System.out.println("moteTransmissionRange: " + moteTransmissionRange);
+    
+    
     double moteInterferenceRange = INTERFERENCE_RANGE
     * ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
 
+/**/System.out.println("moteInterferenceRange: " + moteInterferenceRange);
+    
     /* Get all potential destination radios */
     DestinationRadio[] potentialDestinations = dgrm.getPotentialDestinations(sender);
     if (potentialDestinations == null) {
@@ -270,6 +275,7 @@ public class UDGM extends AbstractRadioMedium {
         } else {
           /* Success: radio starts receiving */
           newConnection.addDestination(recv);
+/**/      System.out.println("add new destination to newConnection");
         }
       } else if (distance <= moteInterferenceRange) {
 /**/  	  System.out.println("WithinIR");

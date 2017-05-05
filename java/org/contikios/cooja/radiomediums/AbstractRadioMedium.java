@@ -273,9 +273,21 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					RadioConnection newConnection = createConnections(radio);
 					activeConnections.add(newConnection);
 					
+/**/				System.out.println("ActiveConnection: " + activeConnections.size());
+					
+/**/				System.out.println("newConnectionID: " + newConnection.getID());
+					
+/**/				System.out.println("AllDestinations: \n" + newConnection.getAllDestinations().length);
+
+
 					for (Radio r : newConnection.getAllDestinations()) {
+						
+/**/					System.out.println("Radio r : transmission_started.getAllDestinations");
+						
 						if (newConnection.getDestinationDelay(r) == 0) {
 							r.signalReceptionStart();
+/**/					System.out.println("r: " + r.getMote().getID() + " signalReceptionStart");
+							 
 						} else {
 /**/						System.out.println("EXPERIMENTAL_TRANSMISSION_STARTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
@@ -283,6 +295,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
 									delayedRadio.signalReceptionStart();
+/**/								System.out.println("delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionStart");
 								}
 							};
 							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(r));
@@ -311,8 +324,12 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					lastConnection = connection;
 					COUNTER_TX++;
 					for (Radio dstRadio : connection.getAllDestinations()) {
+						
+/**/     				System.out.println("Radio dstRadio : transmission_finished.getAllDestinations");
+						
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							dstRadio.signalReceptionEnd();
+/**/						System.out.println("dstRadio: " + dstRadio.getMote().getID() + " signalReceptionEnd");							
 						} else {
 /**/						System.out.println("EXPERIMENTAL_TRANSMISSION_FINISHED");
 							/* EXPERIMENTAL: Simulating propagation delay */
@@ -320,6 +337,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
 									delayedRadio.signalReceptionEnd();
+/**/								System.out.println("delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionEnd");									
 								}
 							};
 							simulation.scheduleEvent(delayedEvent,
@@ -332,6 +350,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 
 					  if (intRadio.isInterfered()) {
 					    intRadio.signalReceptionEnd();
+/**/				    System.out.println("intfRadio: " + intRadio.getMote().getID() + " signalReceptionEnd");
 					  }
 					}
 					

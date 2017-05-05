@@ -491,7 +491,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
 
   public boolean isRadioOn() {
-/**/System.out.println("isRadioOn radio.Mode: " + radio.getMode());
+/**/System.out.println("802.15.14 mode: " + radio.getMode());
     if (radio.isReadyToReceive()) {
 /**/  System.out.println("Inside.1");
       return true;

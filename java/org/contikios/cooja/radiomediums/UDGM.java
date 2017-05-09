@@ -178,16 +178,19 @@ public class UDGM extends AbstractRadioMedium {
     }
 
     /* Calculate ranges: grows with radio output power */
-    double moteTransmissionRange = TRANSMITTING_RANGE
-    * ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
+    double moteTransmissionRange = TRANSMITTING_RANGE *
+    ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
     
 /**/System.out.println("moteTransmissionRange: " + moteTransmissionRange);
     
     
-    double moteInterferenceRange = INTERFERENCE_RANGE
-    * ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
+    double moteInterferenceRange = INTERFERENCE_RANGE *
+    ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
 
 /**/System.out.println("moteInterferenceRange: " + moteInterferenceRange);
+
+	double carrierInterferenceRange = INTERFERENCE_RANGE *
+	((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
     
     /* Get all potential destination radios */
     DestinationRadio[] potentialDestinations = dgrm.getPotentialDestinations(sender);
@@ -197,6 +200,7 @@ public class UDGM extends AbstractRadioMedium {
 
     /* Loop through all potential destinations */
     Position senderPos = sender.getPosition();
+/**/System.out.println("PotentialDestinations: " + potentialDestinations.length);
     for (DestinationRadio dest: potentialDestinations) {
 /**/  System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
       Radio recv = dest.radio;
@@ -231,43 +235,50 @@ public class UDGM extends AbstractRadioMedium {
 //      }
 
       double distance = senderPos.getDistanceTo(recvPos);
-      if (distance <= moteTransmissionRange) {
+      
+      if (sender.isGeneratingCarrier()) {
+    	  System.out.println("carrier: " + sender.getMote().getID() + " - isGeneratingCarrier");
+		  if (distance <= carrierInterferenceRange) {
+/**/		  System.out.println("Within carrierInterferenceRange");
+			  newConnection.addInterfered(recv);
+/**/  	      System.out.println("carrier - recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+			  recv.interfereAnyReception();
+		  }
+	  }  
+      else if (distance <= moteTransmissionRange) {
 /**/	 System.out.println("WithinTR");
         /* Within transmission range */
 
         if (!recv.isRadioOn()) {
-/**/      System.out.println("radio is off");
-/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("recv: " + recv.getMote().getID() + " - radio is off");
           newConnection.addInterfered(recv);
+/**/  	  System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
           recv.interfereAnyReception();
         } else if (recv.isInterfered()) {
-/**/      System.out.println("isInterfered");
-/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("recv: " + recv.getMote().getID() + " - isInterfered");
           /* Was interfered: keep interfering */
           newConnection.addInterfered(recv);
-        } 
-        /*
-        else if (recv.isGeneratingCarrier()) {
-        	System.out.println("isGeneratingCarrier");
-            System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/  	  System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+        } else if (recv.isListeningCarrier()) {
+/**/        System.out.println("recv: " + recv.getMote().getID() + " - isListeningCarrier");      
         	newConnection.addInterfered(recv);
-        } 
-        */
-        else if (recv.isTransmitting()) {
-/**/      System.out.println("isTransmitting");
-/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/  	    System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+        }else if (recv.isTransmitting()) {
+/**/      System.out.println("recv: " + recv.getMote().getID() + " - isTransmitting");
           newConnection.addInterfered(recv);
+/**/  	  System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
         } else if (recv.isReceiving() ||
             (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
-/**/      System.out.println("isReceiving");
-/**/      System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/      System.out.println("recv: " + recv.getMote().getID() + " - isReceiving");
           /* Was receiving, or reception failed: start interfering */
           newConnection.addInterfered(recv);
+/**/  	  System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
           recv.interfereAnyReception();
 
           /* Interfere receiver in all other active radio connections */
           for (RadioConnection conn : getActiveConnections()) {
             if (conn.isDestination(recv)) {
+/**/  	      System.out.println("recv: " + recv.getMote().getID() + " added as interfered to conn: " + conn.getID());
               conn.addInterfered(recv);
             }
           }
@@ -275,13 +286,13 @@ public class UDGM extends AbstractRadioMedium {
         } else {
           /* Success: radio starts receiving */
           newConnection.addDestination(recv);
-/**/      System.out.println("add new destination to newConnection");
+/**/      System.out.println("recv: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
         }
       } else if (distance <= moteInterferenceRange) {
-/**/  	  System.out.println("WithinIR");
-/**/  	  System.out.printf("recv id = %d\n", recv.getMote().getID());
+/**/  	System.out.println("WithinIR");
         /* Within interference range */
         newConnection.addInterfered(recv);
+/**/  	System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
         recv.interfereAnyReception();
       }
     }

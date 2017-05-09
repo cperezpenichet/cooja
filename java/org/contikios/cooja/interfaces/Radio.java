@@ -85,7 +85,7 @@ public abstract class Radio extends MoteInterface {
     RECEPTION_STARTED, RECEPTION_FINISHED, RECEPTION_INTERFERED,
     TRANSMISSION_STARTED, TRANSMISSION_FINISHED,
     PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED,
-    CARRIER_RECEPTION_STARTED, CARRIER_RECEPTION_STOPPED
+    CARRIER_LISTENING_STARTED, CARRIER_LISTENING_STOPPED
   }
 
   /**
@@ -121,44 +121,23 @@ public abstract class Radio extends MoteInterface {
    * @see #signalReceptionStart()
    */
   public abstract void signalReceptionEnd();
-  
-//  /* New Addition */
-//  public void carrrierGenerationStart() {
-//	  isGeneratingCarrier= true;
-//	  isTransmitting = false;
-//	  
-//	  lastEvent = RadioEvent.CARRIER_STARTED;
-//	  /* logger.debug("----- CARRIER STARTED -----"); */
-//	  setChanged();
-//	  notifyObservers();
-//  }
-//  
-//  public void carrierGenerationEnd() {
-//	  isGeneratingCarrier = false;
-//	  
-//	  lastEvent = RadioEvent.CARRIER_STOPPED;
-//	  /* logger.debug("----- CARRIER STOPPED -----"); */
-//	  setChanged();
-//	  notifyObservers();	  
-//  }
-//  
-//  public void carrierReceptionStart() {
-//	  isReceivingCarrier = true;
-//	  lastEvent = RadioEvent.CARRIER_RECEPTION_STARTED;
-//	  setChanged();
-//	  notifyObservers();
-//  }
-//  
-//  public void carrierReceptionEnd() {
-//	  isReceivingCarrier = false;
-//	  lastEvent = RadioEvent.CARRIER_RECEPTION_STOPPED;
-//	  setChanged();
-//	  notifyObservers();
-//  }
-//  
-//  /* New Addition */
-  
 
+  /**
+   * Signal that the carrier listening just begun. This method should normally be 
+   * called from the radio medium on interfered radios.
+   * 
+   * @see void carrierListeningEnd()
+   */
+  public void carrierListeningStart() {}
+  
+  /**
+   * Signal that the carrier listening was ended. This method should normally be 
+   * called from the radio medium on interfered radios.
+   * 
+   * @see void carrierListeningStart()
+   */
+  public void carrierListeningEnd() {}
+  
   /**
    * Returns last event at this radio. This method should be used to learn the
    * reason when a radio notifies a change to observers.
@@ -167,18 +146,26 @@ public abstract class Radio extends MoteInterface {
    */
   public abstract RadioEvent getLastEvent();
   
-
-  /* New Addition */
   /**
    * Returns true if this radio is generating a carrier, or just finished generating one.
    * 
+   * @see #isTransmitting()
    * @return True if radio is generating a carrier.
    */
   public boolean isGeneratingCarrier() {
 /**/  System.out.println("No this isGeneratingCarrier");
 	  return false;
   }
-  /* New Addition */  
+  
+  /**
+   * Returns true if this radio is listening a carrier, or just finished listening one.
+   * 
+   * @see #isTransmitting()
+   * @return True if radio is listening the carrier.
+   */
+  public boolean isListeningCarrier() {
+	  return false;
+  }
 
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,

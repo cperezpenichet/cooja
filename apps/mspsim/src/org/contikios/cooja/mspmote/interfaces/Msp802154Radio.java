@@ -78,6 +78,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   private boolean isReceiving = false;
   private boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
+  private boolean isListeningCarrier = false;
   
   protected byte lastOutgoingByte;
   protected byte lastIncomingByte;
@@ -100,9 +101,9 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
       final private byte[] syncSeq = {0,0,0,0,0x7A};
       
       public void receivedByte(byte data) {
-/**/    System.out.println("receivedByte");
+/**/    System.out.println("mote: " + mote.getID() + "- receivedByte");
         if (!isTransmitting()) {
-/**/    System.out.println("receivedByte, isTransmitting");        	
+/**/    System.out.println("mote: " + mote.getID() + "- receivedByte, isTransmitting");        	
           lastEvent = RadioEvent.TRANSMISSION_STARTED;
           lastOutgoingPacket = null;
           isTransmitting = true;
@@ -159,15 +160,15 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     
     radio.addOperatingModeListener(new OperatingModeListener() {
       public void modeChanged(Chip source, int mode) {
- /**/  	System.out.println("mode= "  + mode);
+/**/  	System.out.println("mote: " + mote.getID() + "- mode= "  + mode);
     	if (mode == CC2420.MODE_TEST_CARRIER_ON) {
-/**/   		System.out.println("MODE_TEST_CARRIER_ON");
+/**/   		System.out.println("mote: " + mote.getID() + "- MODE_TEST_CARRIER_ON");
 			lastEvent = RadioEvent.HW_ON;
 			setChanged();
 			notifyObservers();
     		lastEvent = RadioEvent.CARRIER_STARTED;
     		isGeneratingCarrier = true;
-/**/    	System.out.println("isGeneratingCarrier=" + isGeneratingCarrier);
+/**/    	System.out.println("mote: " + mote.getID() +  "- isGeneratingCarrier= " + isGeneratingCarrier);
     		setChanged();
     		notifyObservers();
     		return;
@@ -175,27 +176,28 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     	
     	if ((mode == CC2420.MODE_POWER_OFF) || (mode == CC2420.MODE_TXRX_OFF)) {
 			if (isGeneratingCarrier) {
+/**/    		System.out.println("mote: " + mote.getID() + " - MODE_TEST_CARRIER_OFF");
 				lastEvent = RadioEvent.CARRIER_STOPPED;
 				isGeneratingCarrier = false;
-/**/			System.out.println("isGeneratingCarrier=" + isGeneratingCarrier);
+/**/			System.out.println("mote: " + mote.getID() + " - isGeneratingCarrier=" + isGeneratingCarrier);
 				setChanged();
 				notifyObservers();
 				//return;
-/**/	        System.out.println("1.radioOff");
+/**/	        System.out.println("mote: " + mote.getID() + " - 1.radioOff");
 		        radioOff(); // actually it is a state change, not necessarily to OFF
 		        return;
 			}
 		
     	}
     	
-/**/   	System.out.println("addOperatingModeListener");
+/**/   	System.out.println("mote: " + mote.getID() + " - addOperatingModeListener");
         if (radio.isReadyToReceive()) {
-/**/      System.out.println("radio.isReadyToReceive");        	
+/**/      System.out.println("mote: " + mote.getID() + " - isReadyToReceive");        	
           lastEvent = RadioEvent.HW_ON;
           setChanged();
           notifyObservers();
         } else {
-/**/      System.out.println("2.radioOff");
+/**/      System.out.println("mote: " + mote.getID() + " - 2.radioOff");
           radioOff(); // actually it is a state change, not necessarily to OFF
         }
       }
@@ -205,7 +207,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
     radio.addChannelListener(new ChannelListener() {
       public void channelChanged(int channel) {
-/**/    System.out.println("addChannelListener");
+/**/    System.out.println("mote: " + mote.getID() + " - addChannelListener");
         /* XXX Currently assumes zero channel switch time */
         lastEvent = RadioEvent.UNKNOWN;
         setChanged();
@@ -218,11 +220,11 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   private void finishTransmission()
   {
     if (isTransmitting()) {
-/**/   System.out.println("isTransmitting");
+/**/   System.out.println("mote: " + mote.getID() + " - isTransmitting");
       //logger.debug("----- 802.15.4 TRANSMISSION FINISHED -----");
       isTransmitting = false;
       isSynchronized = false;
-/**/  System.out.println("Within finishedTransmission");
+/**/  System.out.println("mote: " + mote.getID() + " - Within finishedTransmission");
       lastEvent = RadioEvent.TRANSMISSION_FINISHED;
       setChanged();
       notifyObservers();
@@ -311,15 +313,13 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
   }
 
-  /* New Addition */
-  /**
-   * Returns true if this radio is generating a carrier, or just finished generating one.
-   * 
-   * @return True if radio is generating a carrier.
-   */
   public boolean isGeneratingCarrier() {
-/**/  System.out.println("THIS isGeneratingCarrier");
+/**/  System.out.println("mote: " + mote.getID() + " - THIS isGeneratingCarrier");
 	  return isGeneratingCarrier;
+  }
+  
+  public boolean isListeningCarrier() {
+	  return isListeningCarrier;
   }
   /* New Addition */ 
   
@@ -343,28 +343,27 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     return radio.getActiveFrequency();
   }
   
-//  /* New Addition */
-//  public void carrrierGenerationStart() {
-//	  isGeneratingCarrier= true;
-//	  isTransmitting = false;
-//	  
-//	  lastEvent = RadioEvent.CARRIER_STARTED;
-//	  /* logger.debug("----- CARRIER STARTED -----"); */
-//	  setChanged();
-//	  notifyObservers();
-//  }
-//  /* New Addition */
-//  
-//  /* New Addition */
-//  public void carrierGenerationStopped() {
-//	  isGeneratingCarrier = false;
-//	  
-//	  lastEvent = RadioEvent.CARRIER_STOPPED;
-//	  /* logger.debug("----- CARRIER STOPPED -----"); */
-//	  setChanged();
-//	  notifyObservers();	  
-//  }
-//  /* New Addition */
+  /* New Addition */  
+  
+  public void carrierListeningStart() {
+/**/  System.out.println("mote: " + mote.getID() + " - carrier_listening_started");
+	  isListeningCarrier = true;
+	  lastEvent = RadioEvent.CARRIER_LISTENING_STARTED;
+	  setChanged();
+	  notifyObservers();
+  }
+  
+  public void carrierListeningEnd() {
+/**/  System.out.println("mote: " + mote.getID() + " - carrier_listening_stopped");
+	  //isReceiving = false;
+	  isListeningCarrier = false;
+	  isInterfered = false;
+	  lastEvent = RadioEvent.CARRIER_LISTENING_STOPPED;
+	  setChanged();
+	  notifyObservers();
+  }
+  
+  /* New Addition */
   
   
   public void signalReceptionStart() {
@@ -491,9 +490,9 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
 
   public boolean isRadioOn() {
-/**/System.out.println("802.15.14 mode: " + radio.getMode());
+/**/System.out.println("802.15.14 radio: " + mote.getID() + " - mode: " + radio.getMode());
     if (radio.isReadyToReceive()) {
-/**/  System.out.println("Inside.1");
+/**/  System.out.println("mote: " +  mote.getID() + " - Inside.1");
       return true;
     }
     if (radio.getMode() == CC2420.MODE_POWER_OFF) {
@@ -502,7 +501,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     if (radio.getMode() == CC2420.MODE_TXRX_OFF) {
       return false;
     }
-/**/System.out.println("Inside.2");
+/**/System.out.println("mote: " +  mote.getID() + " - Inside.2");
     return true;
   }
   

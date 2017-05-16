@@ -356,9 +356,11 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					
 					/* Update signal strengths */
 					updateSignalStrengths();
+					System.out.println("connection: " + lastConnection.getID() + " is about to finish");
 					
 					/* Notify observers */
 					radioTransmissionObservable.setChangedAndNotify();
+/**/				System.out.println("connection: " + lastConnection.getID() + " finished");
 				}
 				break;
 				case CUSTOM_DATA_TRANSMITTED: {
@@ -540,10 +542,11 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					
 					/* Update signal strength */
 					updateSignalStrengths();
+/**/				System.out.println("connection: " + lastConnection.getID() + " is about to finish");
 					
 					/* Notify observers */
 					radioTransmissionObservable.setChangedAndNotify();
-					
+/**/				System.out.println("connection: " + lastConnection.getID() + " finished");
 				}
 				break;
 				default:

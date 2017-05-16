@@ -42,12 +42,12 @@ import se.sics.mspsim.platform.sky.SkyNode;
 /**
  * @author Fredrik Osterlind
  */
-public class TagMote extends MspMote {
-  private static Logger logger = Logger.getLogger(TagMote.class);
+public class PassiveTag extends MspMote {
+  private static Logger logger = Logger.getLogger(PassiveTag.class);
 
   public SkyNode skyNode = null;
 
-  public TagMote(MspMoteType moteType, Simulation sim) {
+  public PassiveTag(MspMoteType moteType, Simulation sim) {
     super(moteType, sim);
   }
 
@@ -59,7 +59,7 @@ public class TagMote extends MspMote {
 
       prepareMote(fileELF, skyNode);
     } catch (Exception e) {
-      logger.fatal("Error when creating Tag mote: ", e);
+      logger.fatal("Error when creating Passive Tag: ", e);
       return false;
     }
     return true;
@@ -106,7 +106,7 @@ public class TagMote extends MspMote {
   }
 
   public String toString() {
-    return "Tag " + getID();
+    return "sky" + getID();
   }
 
 }

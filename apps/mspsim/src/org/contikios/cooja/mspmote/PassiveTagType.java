@@ -70,13 +70,13 @@ import org.contikios.cooja.mspmote.interfaces.SkyFlash;
 import org.contikios.cooja.mspmote.interfaces.SkyLED;
 import org.contikios.cooja.mspmote.interfaces.SkyTemperature;
 
-@ClassDescription("Tag mote")
+@ClassDescription("Passive Tag")
 @AbstractionLevelDescription("Emulated level")
-public class TagMoteType extends MspMoteType {
-  private static Logger logger = Logger.getLogger(TagMoteType.class);
+public class PassiveTagType extends MspMoteType {
+  private static Logger logger = Logger.getLogger(PassiveTagType.class);
 
   protected MspMote createMote(Simulation simulation) {
-    return new TagMote(this, simulation);
+    return new PassiveTag(this, simulation);
   }
 
   public boolean configureAndInit(Container parentContainer, Simulation simulation, boolean visAvailable)
@@ -110,7 +110,7 @@ public class TagMoteType extends MspMoteType {
           identifierOK = true;
 
           counter++;
-          setIdentifier("tag" + counter);
+          setIdentifier("passive tag" + counter);
 
           for (MoteType existingMoteType : simulation.getMoteTypes()) {
             if (existingMoteType == this) {
@@ -126,7 +126,7 @@ public class TagMoteType extends MspMoteType {
 
       /* Create initial description */
       if (getDescription() == null) {
-        setDescription("Tag Mote Type #" + getIdentifier());
+        setDescription("Passive Tag Type #" + getIdentifier());
       }
 
       return MspCompileDialog.showDialog(parentContainer, simulation, this, "sky");
@@ -216,14 +216,14 @@ public class TagMoteType extends MspMoteType {
         MoteAttributes.class,
         MspClock.class,
         MspMoteID.class,
-        SkyButton.class,
-        SkyFlash.class,
+        //SkyButton.class,
+        //SkyFlash.class,
         SkyCoffeeFilesystem.class,
         MspBackRadio.class,
         MspSerial.class,
-        SkyLED.class,
+        //SkyLED.class,
         MspDebugOutput.class, /* EXPERIMENTAL: Enable me for COOJA_DEBUG(..) */
-        SkyTemperature.class
+        //SkyTemperature.class
     };
   }
 

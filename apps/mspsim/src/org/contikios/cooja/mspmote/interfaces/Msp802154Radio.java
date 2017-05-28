@@ -157,7 +157,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
       }
     }); /* addRFListener */
     
-    
     radio.addOperatingModeListener(new OperatingModeListener() {
       public void modeChanged(Chip source, int mode) {
 /**/  	System.out.println("mote: " + mote.getID() + "- mode= "  + mode);
@@ -187,7 +186,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 		        radioOff(); // actually it is a state change, not necessarily to OFF
 		        return;
 			}
-		
     	}
     	
 /**/   	System.out.println("mote: " + mote.getID() + " - addOperatingModeListener");
@@ -202,8 +200,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
         }
       }
     });
-    
-    
 
     radio.addChannelListener(new ChannelListener() {
       public void channelChanged(int channel) {
@@ -438,6 +434,8 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
       getMote().getSimulation().scheduleEvent(new MspMoteTimeEvent(mote, 0) {
         public void execute(long t) {
           super.execute(t);
+          /* it prints the title of the simulation: My simulation */
+/**/      //System.out.println("Simulation: " + getMote().getSimulation().getTitle());
 
           /* Update average */
           System.arraycopy(rssiLast, 1, rssiLast, 0, 7);

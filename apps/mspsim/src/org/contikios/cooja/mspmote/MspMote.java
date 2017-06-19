@@ -78,6 +78,8 @@ import se.sics.mspsim.util.MapEntry;
 import se.sics.mspsim.util.MapTable;
 import se.sics.mspsim.profiler.SimpleProfiler;
 
+/**/import se.sics.mspsim.chip.TagModule;
+
 import org.contikios.cooja.mspmote.interfaces.MspClock;
 
 /**
@@ -94,6 +96,7 @@ public abstract class MspMote extends AbstractEmulatedMote implements Mote, Watc
 
   private CommandHandler commandHandler;
   private MSP430 myCpu = null;
+/**/  private TagModule myTag = null;
   private MspMoteType myMoteType = null;
   private MspMoteMemory myMemory = null;
   private MoteInterfaceHandler myMoteInterfaceHandler = null;
@@ -186,7 +189,7 @@ public abstract class MspMote extends AbstractEmulatedMote implements Mote, Watc
   public void setCPU(MSP430 cpu) {
     myCpu = cpu;
   }
-
+  
   @Override
   public MemoryInterface getMemory() {
     return myMemory;

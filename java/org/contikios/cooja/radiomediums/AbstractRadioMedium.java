@@ -387,6 +387,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						}
 						
 						if (connection.getDestinationDelay(dstRadio) == 0) {
+/**/                        System.out.println("(CustomDataRadio)dstRadio: " + dstRadio.getMote().getID() + " receiveCustomData");
 							((CustomDataRadio) dstRadio).receiveCustomData(data);
 						} else {
 /**/						System.out.println("EXPERIMENTAL_CUSTOM_DATA_TRANSMITTED");							

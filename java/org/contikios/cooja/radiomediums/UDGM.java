@@ -157,7 +157,6 @@ public class UDGM extends AbstractRadioMedium {
   
   public void setTxRange(double r) {
     TRANSMITTING_RANGE = r;
-    //System.out.println("George");
     dgrm.requestEdgeAnalysis();
   }
 

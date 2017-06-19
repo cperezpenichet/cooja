@@ -357,6 +357,7 @@ public class Cooja extends Observable {
    * @param desktop Desktop pane
    */
   public Cooja(JDesktopPane desktop) {
+/**/System.out.println("Cooja");
     cooja = this;
     mySimulation = null;
     myDesktopPane = desktop;
@@ -2935,6 +2936,7 @@ public class Cooja extends Observable {
 
   private class GUIEventHandler implements ActionListener {
     public void actionPerformed(ActionEvent e) {
+/**/  System.out.println("GUIEventHandler");
       if (e.getActionCommand().equals("create mote type")) {
         cooja.doCreateMoteType((Class<? extends MoteType>) ((JMenuItem) e
             .getSource()).getClientProperty("class"));

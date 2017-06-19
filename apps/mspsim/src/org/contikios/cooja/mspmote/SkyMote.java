@@ -49,10 +49,12 @@ public class SkyMote extends MspMote {
 
   public SkyMote(MspMoteType moteType, Simulation sim) {
     super(moteType, sim);
+/**/System.out.println("SkyMote: " + moteType.getIdentifier());
   }
 
   protected boolean initEmulator(File fileELF) {
     try {
+/**/  System.out.println("SkyMote.initEmulator");
       skyNode = new SkyNode();
       registry = skyNode.getRegistry();
       skyNode.setFlash(new CoojaM25P80(skyNode.getCPU()));
@@ -64,7 +66,7 @@ public class SkyMote extends MspMote {
     }
     return true;
   }
-
+  
   /*private void configureWithMacAddressesTxt(int id) {
     String txt =
       "18 MAC 00:12:74:00:11:2b:0a:e9\n" +

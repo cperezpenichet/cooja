@@ -169,6 +169,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
    */
   public TimeLine(final Simulation simulation, final Cooja gui) {
     super("Timeline", gui);
+/**/System.out.println("Timeline");
     this.simulation = simulation;
 
     currentPixelDivisor = ZOOM_LEVELS[ZOOM_LEVELS.length/2];

@@ -45,6 +45,7 @@ import org.contikios.cooja.interfaces.Radio;
 import org.contikios.cooja.interfaces.Radio.RadioEvent;
 import org.contikios.cooja.mspmote.MspMote;
 import org.contikios.cooja.mspmote.MspMoteTimeEvent;
+
 import se.sics.mspsim.chip.CC2420;
 import se.sics.mspsim.chip.ChannelListener;
 import se.sics.mspsim.chip.RFListener;
@@ -87,13 +88,14 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   private RadioPacket lastIncomingPacket = null;
 
   public Msp802154Radio(Mote m) { 
-	System.out.println("Msp802154Radio");
+/**/System.out.println("Msp802154Radio");
     this.mote = (MspMote)m;
     this.radio = this.mote.getCPU().getChip(Radio802154.class);
+
     if (radio == null) {
       throw new IllegalStateException("Mote is not equipped with an IEEE 802.15.4 radio");
     }
-
+    
     radio.addRFListener(new RFListener() {
       int len = 0;
       int expMpduLen = 0;
@@ -287,6 +289,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
 
   public void receiveCustomData(Object data) {
+/**/System.out.println("Msp802154Radio.receiveCustomDataReiceived");
     if (!(data instanceof Byte)) {
       logger.fatal("Bad custom data: " + data);
       return;
@@ -302,6 +305,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     mote.getSimulation().scheduleEvent(new MspMoteTimeEvent(mote, 0) {
       public void execute(long t) {
         super.execute(t);
+/**/    System.out.println("Radio802154 radio receivedByte");
         radio.receivedByte(inputByte);
         mote.requestImmediateWakeup();
       }

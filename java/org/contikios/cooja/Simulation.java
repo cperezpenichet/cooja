@@ -149,6 +149,7 @@ public class Simulation extends Observable implements Runnable {
 
     invokeSimulationThread(new Runnable() {
       public void run() {
+/**/  System.out.println("Simulation");
         if (!millisecondEvent.isScheduled()) {
           scheduleEvent(
               millisecondEvent,

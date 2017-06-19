@@ -59,7 +59,10 @@ import org.contikios.cooja.interfaces.Mote2MoteRelations;
 import org.contikios.cooja.interfaces.MoteAttributes;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.RimeAddress;
-import org.contikios.cooja.mspmote.interfaces.MspBackRadio;
+import org.contikios.cooja.mspmote.interfaces.Msp802154Radio;
+
+//import org.contikios.cooja.mspmote.interfaces.Msp802154Tag;
+
 import org.contikios.cooja.mspmote.interfaces.MspClock;
 import org.contikios.cooja.mspmote.interfaces.MspDebugOutput;
 import org.contikios.cooja.mspmote.interfaces.MspMoteID;
@@ -68,15 +71,16 @@ import org.contikios.cooja.mspmote.interfaces.SkyButton;
 import org.contikios.cooja.mspmote.interfaces.SkyCoffeeFilesystem;
 import org.contikios.cooja.mspmote.interfaces.SkyFlash;
 import org.contikios.cooja.mspmote.interfaces.SkyLED;
+import org.contikios.cooja.mspmote.interfaces.TagLED;
 import org.contikios.cooja.mspmote.interfaces.SkyTemperature;
 
-@ClassDescription("Passive Tag")
+@ClassDescription("Backscatter Tag")
 @AbstractionLevelDescription("Emulated level")
-public class PassiveTagType extends MspMoteType {
-  private static Logger logger = Logger.getLogger(PassiveTagType.class);
+public class BackscatterTagType extends MspMoteType {
+  private static Logger logger = Logger.getLogger(BackscatterTagType.class);
 
   protected MspMote createMote(Simulation simulation) {
-    return new PassiveTag(this, simulation);
+    return new BackscatterTag(this, simulation);
   }
 
   public boolean configureAndInit(Container parentContainer, Simulation simulation, boolean visAvailable)
@@ -110,7 +114,7 @@ public class PassiveTagType extends MspMoteType {
           identifierOK = true;
 
           counter++;
-          setIdentifier("passive tag" + counter);
+          setIdentifier("tag" + counter);
 
           for (MoteType existingMoteType : simulation.getMoteTypes()) {
             if (existingMoteType == this) {
@@ -126,7 +130,7 @@ public class PassiveTagType extends MspMoteType {
 
       /* Create initial description */
       if (getDescription() == null) {
-        setDescription("Passive Tag Type #" + getIdentifier());
+        setDescription("Backscatter Tag Type #" + getIdentifier());
       }
 
       return MspCompileDialog.showDialog(parentContainer, simulation, this, "sky");
@@ -160,7 +164,7 @@ public class PassiveTagType extends MspMoteType {
           );
         } catch (Exception e) {
           MoteTypeCreationException newException =
-            new MoteTypeCreationException("TagMote type creation failed: " + e.getMessage());
+            new MoteTypeCreationException("BackascatterTag type creation failed: " + e.getMessage());
           newException = (MoteTypeCreationException) newException.initCause(e);
           newException.setCompilationOutput(compilationOutput);
 
@@ -188,7 +192,7 @@ public class PassiveTagType extends MspMoteType {
 
   public Icon getMoteTypeIcon() {
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    URL imageURL = this.getClass().getClassLoader().getResource("images/tag.jpg");
+    URL imageURL = this.getClass().getClassLoader().getResource("images/sky.jpg");
     Image image = toolkit.getImage(imageURL);
     MediaTracker tracker = new MediaTracker(Cooja.getTopParentContainer());
     tracker.addImage(image, 1);
@@ -217,11 +221,12 @@ public class PassiveTagType extends MspMoteType {
         MspClock.class,
         MspMoteID.class,
         //SkyButton.class,
-        //SkyFlash.class,
+        SkyFlash.class,
         SkyCoffeeFilesystem.class,
-        MspBackRadio.class,
+        Msp802154Radio.class,
+        //Msp802154Tag.class, /* Specified for the Backscatter transmission */
         MspSerial.class,
-        //SkyLED.class,
+        TagLED.class,
         MspDebugOutput.class, /* EXPERIMENTAL: Enable me for COOJA_DEBUG(..) */
         //SkyTemperature.class
     };
@@ -235,7 +240,7 @@ public class PassiveTagType extends MspMoteType {
   }
 
   protected String getTargetName() {
-  	return "sky";
+  	return "tag";
   }
 
 }

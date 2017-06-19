@@ -74,6 +74,7 @@ public class SkyMoteType extends MspMoteType {
   private static Logger logger = Logger.getLogger(SkyMoteType.class);
 
   protected MspMote createMote(Simulation simulation) {
+/**/System.out.println("SkyMoteType - createMote");
     return new SkyMote(this, simulation);
   }
 

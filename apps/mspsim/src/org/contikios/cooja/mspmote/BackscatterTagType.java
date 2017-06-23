@@ -61,7 +61,7 @@ import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.RimeAddress;
 import org.contikios.cooja.mspmote.interfaces.Msp802154Radio;
 
-//import org.contikios.cooja.mspmote.interfaces.Msp802154Tag;
+import org.contikios.cooja.mspmote.interfaces.Msp802154Tag;
 
 import org.contikios.cooja.mspmote.interfaces.MspClock;
 import org.contikios.cooja.mspmote.interfaces.MspDebugOutput;
@@ -72,11 +72,15 @@ import org.contikios.cooja.mspmote.interfaces.SkyCoffeeFilesystem;
 import org.contikios.cooja.mspmote.interfaces.SkyFlash;
 import org.contikios.cooja.mspmote.interfaces.SkyLED;
 import org.contikios.cooja.mspmote.interfaces.TagLED;
+
+import se.sics.mspsim.chip.TagModule;
+import se.sics.mspsim.chip.BackscatterTagRadio;
+
 import org.contikios.cooja.mspmote.interfaces.SkyTemperature;
 
 @ClassDescription("Backscatter Tag")
 @AbstractionLevelDescription("Emulated level")
-public class BackscatterTagType extends MspMoteType {
+public class BackscatterTagType extends SkyMoteType {
   private static Logger logger = Logger.getLogger(BackscatterTagType.class);
 
   protected MspMote createMote(Simulation simulation) {
@@ -190,27 +194,8 @@ public class BackscatterTagType extends MspMoteType {
     return true;
   }
 
-  public Icon getMoteTypeIcon() {
-    Toolkit toolkit = Toolkit.getDefaultToolkit();
-    URL imageURL = this.getClass().getClassLoader().getResource("images/sky.jpg");
-    Image image = toolkit.getImage(imageURL);
-    MediaTracker tracker = new MediaTracker(Cooja.getTopParentContainer());
-    tracker.addImage(image, 1);
-    try {
-      tracker.waitForAll();
-    } catch (InterruptedException ex) {
-    }
-    if (image.getHeight(Cooja.getTopParentContainer()) > 0 && image.getWidth(Cooja.getTopParentContainer()) > 0) {
-      image = image.getScaledInstance((200*image.getWidth(Cooja.getTopParentContainer())/image.getHeight(Cooja.getTopParentContainer())), 200, Image.SCALE_DEFAULT);
-      return new ImageIcon(image);
-    }
 
-    return null;
-  }
 
-  public Class<? extends MoteInterface>[] getDefaultMoteInterfaceClasses() {
-	  return getAllMoteInterfaceClasses();
-  }
   public Class<? extends MoteInterface>[] getAllMoteInterfaceClasses() {
     return new Class[] {
         Position.class,
@@ -223,20 +208,13 @@ public class BackscatterTagType extends MspMoteType {
         //SkyButton.class,
         SkyFlash.class,
         SkyCoffeeFilesystem.class,
-        Msp802154Radio.class,
-        //Msp802154Tag.class, /* Specified for the Backscatter transmission */
+        //Msp802154Radio.class,
+        Msp802154Tag.class, /* Specified for the Backscatter transmission */
         MspSerial.class,
         TagLED.class,
         MspDebugOutput.class, /* EXPERIMENTAL: Enable me for COOJA_DEBUG(..) */
         //SkyTemperature.class
     };
-  }
-
-  public File getExpectedFirmwareFile(File source) {
-    File parentDir = source.getParentFile();
-    String sourceNoExtension = source.getName().substring(0, source.getName().length()-2);
-
-    return new File(parentDir, sourceNoExtension + ".sky");
   }
 
   protected String getTargetName() {

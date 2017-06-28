@@ -69,23 +69,23 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public static final long DELAY_BETWEEN_BYTES =
     (long) (1000.0*Simulation.MILLISECOND/(250000.0/8.0)); /* us. Corresponds to 250kbit/s */
 
-  private RadioEvent lastEvent = RadioEvent.UNKNOWN;
+  protected RadioEvent lastEvent = RadioEvent.UNKNOWN;
 
   protected final MspMote mote;
   protected final Radio802154 radio;
   
   private boolean isInterfered = false;
-  private boolean isTransmitting = false;
+/**/  protected boolean isTransmitting = false;
   private boolean isReceiving = false;
-  private boolean isSynchronized = false;
+/**/  protected boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
   private boolean isListeningCarrier = false;
   
   protected byte lastOutgoingByte;
   protected byte lastIncomingByte;
 
-  private RadioPacket lastOutgoingPacket = null;
-  private RadioPacket lastIncomingPacket = null;
+/**/  protected RadioPacket lastOutgoingPacket = null;
+/**/  protected RadioPacket lastIncomingPacket = null;
 
   public Msp802154Radio(Mote m) { 
 /**/System.out.println("Msp802154Radio");
@@ -215,7 +215,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
 
 
-  private void finishTransmission()
+  protected void finishTransmission()
   {
     if (isTransmitting()) {
 /**/   System.out.println("mote: " + mote.getID() + " - isTransmitting");
@@ -508,9 +508,12 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
   
   public boolean canReceiveFrom(CustomDataRadio radio) {
-    if (radio.getClass().equals(this.getClass())) {
+/**///System.out.println("radio.getClass(): " + radio.getClass());
+/**///System.out.println("this.getClass(): " + this.getClass());
+    if ( this.getClass().isAssignableFrom(radio.getClass())) {
       return true;
     }
     return false;
   }
+  
 }

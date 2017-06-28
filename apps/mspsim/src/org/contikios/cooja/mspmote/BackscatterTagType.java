@@ -31,14 +31,8 @@
 package org.contikios.cooja.mspmote;
 
 import java.awt.Container;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Toolkit;
 import java.io.File;
-import java.net.URL;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
@@ -59,7 +53,6 @@ import org.contikios.cooja.interfaces.Mote2MoteRelations;
 import org.contikios.cooja.interfaces.MoteAttributes;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.RimeAddress;
-import org.contikios.cooja.mspmote.interfaces.Msp802154Radio;
 
 import org.contikios.cooja.mspmote.interfaces.Msp802154Tag;
 
@@ -72,10 +65,6 @@ import org.contikios.cooja.mspmote.interfaces.SkyCoffeeFilesystem;
 import org.contikios.cooja.mspmote.interfaces.SkyFlash;
 import org.contikios.cooja.mspmote.interfaces.SkyLED;
 import org.contikios.cooja.mspmote.interfaces.TagLED;
-
-import se.sics.mspsim.chip.TagModule;
-import se.sics.mspsim.chip.BackscatterTagRadio;
-
 import org.contikios.cooja.mspmote.interfaces.SkyTemperature;
 
 @ClassDescription("Backscatter Tag")
@@ -84,6 +73,7 @@ public class BackscatterTagType extends SkyMoteType {
   private static Logger logger = Logger.getLogger(BackscatterTagType.class);
 
   protected MspMote createMote(Simulation simulation) {
+/**/System.out.println("BackscatterTagType - createMote");      
     return new BackscatterTag(this, simulation);
   }
 

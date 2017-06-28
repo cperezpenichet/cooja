@@ -4,7 +4,7 @@
   <class id="1" language="java" name="org.contikios.cooja.mspmote.interfaces.Msp802154Tag" project="Cooja_test" 
     file="/Cooja_test/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/Msp802154Tag.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="783" width="264" x="24" y="-787"/>    
+    <position height="783" width="264" x="21" y="-770"/>    
     <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -61,25 +61,29 @@
     <end type="SOURCE" refId="1"/>    
     <end type="TARGET" refId="2"/>  
   </generalization>  
-  <generalization id="8">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <dependency id="9">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="5"/>  
-  </dependency>  
-  <realization id="10">    
+  <realization id="8">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="6"/>  
   </realization>  
-  <generalization id="11">    
+  <dependency id="9">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <generalization id="10">    
     <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="4"/>  
   </generalization>  
-  <generalization id="12">    
+  <generalization id="11">    
     <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="5"/>  
+  </generalization>  
+  <dependency id="12">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="5"/>  
+  </dependency>  
+  <generalization id="13">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
   </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    

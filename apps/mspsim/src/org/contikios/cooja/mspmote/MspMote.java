@@ -78,9 +78,6 @@ import se.sics.mspsim.util.MapEntry;
 import se.sics.mspsim.util.MapTable;
 import se.sics.mspsim.profiler.SimpleProfiler;
 
-/**/import se.sics.mspsim.chip.TagModule;
-/**/import se.sics.mspsim.chip.BackscatterTagRadio;
-
 import org.contikios.cooja.mspmote.interfaces.MspClock;
 
 /**

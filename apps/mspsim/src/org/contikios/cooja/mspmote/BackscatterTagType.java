@@ -64,7 +64,6 @@ import org.contikios.cooja.mspmote.interfaces.SkyButton;
 import org.contikios.cooja.mspmote.interfaces.SkyCoffeeFilesystem;
 import org.contikios.cooja.mspmote.interfaces.SkyFlash;
 import org.contikios.cooja.mspmote.interfaces.SkyLED;
-import org.contikios.cooja.mspmote.interfaces.TagLED;
 import org.contikios.cooja.mspmote.interfaces.SkyTemperature;
 
 @ClassDescription("Backscatter Tag")
@@ -184,9 +183,8 @@ public class BackscatterTagType extends SkyMoteType {
     return true;
   }
 
-
-
   public Class<? extends MoteInterface>[] getAllMoteInterfaceClasses() {
+/**/System.out.println("BackscatterTag.getMoteInterfaceClasses");      
     return new Class[] {
         Position.class,
         RimeAddress.class,
@@ -195,15 +193,14 @@ public class BackscatterTagType extends SkyMoteType {
         MoteAttributes.class,
         MspClock.class,
         MspMoteID.class,
-        //SkyButton.class,
+        SkyButton.class,
         SkyFlash.class,
         SkyCoffeeFilesystem.class,
-        //Msp802154Radio.class,
         Msp802154Tag.class, /* Specified for the Backscatter transmission */
         MspSerial.class,
-        TagLED.class,
+        SkyLED.class,
         MspDebugOutput.class, /* EXPERIMENTAL: Enable me for COOJA_DEBUG(..) */
-        //SkyTemperature.class
+        SkyTemperature.class
     };
   }
 

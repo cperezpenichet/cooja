@@ -47,6 +47,7 @@ public class SkyTemperature extends MoteInterface {
   private SkyMote skyMote;
 
   public SkyTemperature(Mote mote) {
+/**/System.out.println("SkyTemperature");      
     skyMote = (SkyMote) mote;
   }
 

@@ -44,7 +44,7 @@ public class SkyButton extends Button {
 
   public SkyButton(Mote mote) {
     super(mote);
-    System.out.println("SkyButton");
+/**/System.out.println("SkyButton");
     skyMote = (SkyMote) mote;
   }
 

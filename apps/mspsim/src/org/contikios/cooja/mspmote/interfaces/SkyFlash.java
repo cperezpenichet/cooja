@@ -52,6 +52,7 @@ public class SkyFlash extends MoteInterface {
   protected final CoojaM25P80 m24p80;
 
   public SkyFlash(Mote mote) {
+/**/System.out.println("SkyFlash");      
     MspMote mspMote = (MspMote) mote;
     m24p80 = (CoojaM25P80) mspMote.getCPU().getChip(CoojaM25P80.class);
     if (m24p80 == null) {

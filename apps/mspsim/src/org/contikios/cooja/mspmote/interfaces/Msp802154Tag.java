@@ -30,12 +30,11 @@
 
 package org.contikios.cooja.mspmote.interfaces;
 
-
 import org.apache.log4j.Logger;
 
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
-import se.sics.mspsim.chip.BackscatterTagRadio; 
+import se.sics.mspsim.chip.BackscatterTXRadio; 
 import se.sics.mspsim.chip.RFListener;
 
 /**
@@ -47,12 +46,12 @@ import se.sics.mspsim.chip.RFListener;
 public class Msp802154Tag extends Msp802154Radio {
   private static Logger logger = Logger.getLogger(Msp802154Tag.class);
 
-  protected final BackscatterTagRadio tag;
+  protected final BackscatterTXRadio tag;
 
   public Msp802154Tag(Mote m) {
     super(m);
 /**/System.out.println("Msp802154Tag");
-    this.tag = this.mote.getCPU().getChip(BackscatterTagRadio.class);
+    this.tag = this.mote.getCPU().getChip(BackscatterTXRadio.class);
             
     if (tag == null) {
         throw new IllegalStateException("Mote is not equipped with a tag");

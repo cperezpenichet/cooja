@@ -207,6 +207,7 @@ public class SkyMoteType extends MspMoteType {
 	  return getAllMoteInterfaceClasses();
   }
   public Class<? extends MoteInterface>[] getAllMoteInterfaceClasses() {
+/**/System.out.println("SkyMote.getMoteInterfaceClasses");       
     return new Class[] {
         Position.class,
         RimeAddress.class,

@@ -147,6 +147,15 @@ public abstract class Radio extends MoteInterface {
   public abstract RadioEvent getLastEvent();
   
   /**
+   * Checks if a radio refers to a backscatter tag or to a CC2420 radio.
+   * 
+   * @return True if radio refers to a backscatter tag
+   */
+  public boolean isBackscatterTag() {
+      return false;
+  }
+  
+  /**
    * Returns true if this radio is generating a carrier, or just finished generating one.
    * 
    * @see #isTransmitting()

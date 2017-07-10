@@ -92,6 +92,8 @@ public class UDGMBS extends UDGM {
 
   //private Random random = null;
   
+  private int tagTXChannel = 0;
+  
   public UDGMBS(Simulation simulation) {
       super(simulation);
   /**/System.out.println("UDGMBS");
@@ -172,9 +174,29 @@ public class UDGMBS extends UDGM {
 /**/    System.out.printf("UDGMBS.PotDest = %d\n", dest.radio.getMote().getID());
 
         Radio recv = dest.radio;
+
+        if(!sender.isListeningCarrier()) {
+            tagTXChannel = sender.getChannel();
+        }
         
-        /**/            System.out.println("sender: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
-        /**/            System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
+        if (!recv.isBackscatterTag()) {
+            /* Fail if radios are on different (but configured) channels */ 
+            if (sender.getChannel() >= 0 && recv.getChannel() >= 0 && sender.getChannel() != recv.getChannel()) {
+                
+/**/            System.out.println("carrier - recv: diff channels");
+/**/            System.out.println("carrier: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
+/**/            System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
+
+
+              /* Add the connection in a dormant state;
+                 it will be activated later when the radio will bes
+                 turned on and switched to the right channel. This behavior
+                 is consistent with the case when receiver is turned off. */
+              newConnection.addInterfered(recv);
+
+              continue;
+            }
+        }
         
         Position recvPos = recv.getPosition();
 
@@ -194,25 +216,9 @@ public class UDGMBS extends UDGM {
             }
         }
         else {
-            /* Fail if radios are on different (but configured) channels */ 
-            if (sender.getChannel() >= 0 && recv.getChannel() >= 0 &&
-                sender.getChannel() != recv.getChannel()) {
-                
-/**/            System.out.println("tag - recv: diff channels");
-/**/            System.out.println("tag: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
-/**/            System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
-
-
-              /* Add the connection in a dormant state;
-                 it will be activated later when the radio will bes
-                 turned on and switched to the right channel. This behavior
-                 is consistent with the case when receiver is turned off. */
-              newConnection.addInterfered(recv);
-
-              continue;
-            }
-            
             if (distance <= moteTransmissionRange) {
+/**/            System.out.println("tag: " +  sender.getMote().getID() + " - Ch= " + tagTXChannel);
+/**/            System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
 /**/            System.out.println("WithinTR");
 //                getRxSuccessProbability(sender, recv);
 /**///            System.out.println("random.nextDouble(): " + random.nextDouble());                
@@ -239,7 +245,7 @@ public class UDGMBS extends UDGM {
 /**/              System.out.println("recv: " + recv.getMote().getID() + " - isTransmitting");
                   newConnection.addInterfered(recv);
 /**/              System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-                } else if (recv.isReceiving() ||
+                } else if (recv.isReceiving() || 
                     (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
 /**///              System.out.println("recv: " + recv.getMote().getID() + " - isReceiving");
                   /* Was receiving, or reception failed: start interfering */

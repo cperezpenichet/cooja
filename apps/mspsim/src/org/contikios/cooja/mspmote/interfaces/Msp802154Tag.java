@@ -131,12 +131,11 @@ public class Msp802154Tag extends Msp802154Radio {
     }); /* addRFListener */
     
   }
+
   
-//  public boolean isTransmitting() {
-//      System.out.println("I am a tag");
-//      return isTransmitting;
-//  }
-  
+  public boolean isBackscatterTag() {
+      return true;
+  }
   
   public boolean isListeningCarrier() {
       return isListeningCarrier;
@@ -160,17 +159,17 @@ public class Msp802154Tag extends Msp802154Radio {
       notifyObservers();
   }
   
-    public int getCurrentOutputPowerIndicator() {
+  public int getCurrentOutputPowerIndicator() {
       return 31;
-    }
+  }
 
-    public int getOutputPowerIndicatorMax() {
+  public int getOutputPowerIndicatorMax() {
       return 31;
-    }
+  }
   
-  // HACK: tag doesn't have a radio but we need this method to be true whenever
-  // tag is listening to the carrier in order to draw the red line on the 
-  // timeline that dictates that tag is interfered
+  /* HACK: tag doesn't have a radio but we need this method to be true whenever
+     tag is listening to the carrier in order to draw the red line on the 
+     timeline that dictates that tag is interfered */
   public boolean isRadioOn() {
 /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
       if(isListeningCarrier()) {

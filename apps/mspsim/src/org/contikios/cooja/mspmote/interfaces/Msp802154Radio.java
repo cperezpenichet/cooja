@@ -74,12 +74,11 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   protected final MspMote mote;
   protected final Radio802154 radio;
   
-  private boolean isInterfered = false;
+  protected boolean isInterfered = false;
 /**/  protected boolean isTransmitting = false;
   private boolean isReceiving = false;
 /**/  protected boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
-  private boolean isListeningCarrier = false;
   
   protected byte lastOutgoingByte;
   protected byte lastIncomingByte;
@@ -314,20 +313,19 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
 
   public boolean isGeneratingCarrier() {
-/**/  System.out.println("mote: " + mote.getID() + " - THIS isGeneratingCarrier");
+/**///  System.out.println("mote: " + mote.getID() + " - THIS isGeneratingCarrier");
 	  return isGeneratingCarrier;
   }
-  
-  public boolean isListeningCarrier() {
-	  return isListeningCarrier;
-  }
-  /* New Addition */ 
-  
+ 
   public boolean isTransmitting() {
+/**///System.out.println("I am a radio");
+/**///System.out.println("isTransmitting: "  + isTransmitting); 
     return isTransmitting;
   }
   
   public boolean isReceiving() {
+/**/System.out.println("I am a radio");
+/**/System.out.println("isReceiving: "  + isReceiving);      
     return isReceiving;
   }
 
@@ -342,29 +340,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public int getFrequency() {
     return radio.getActiveFrequency();
   }
-  
-  /* New Addition */  
-  
-  public void carrierListeningStart() {
-/**/  System.out.println("mote: " + mote.getID() + " - carrier_listening_started");
-	  isListeningCarrier = true;
-	  lastEvent = RadioEvent.CARRIER_LISTENING_STARTED;
-	  setChanged();
-	  notifyObservers();
-  }
-  
-  public void carrierListeningEnd() {
-/**/  System.out.println("mote: " + mote.getID() + " - carrier_listening_stopped");
-	  //isReceiving = false;
-	  isListeningCarrier = false;
-	  isInterfered = false;
-	  lastEvent = RadioEvent.CARRIER_LISTENING_STOPPED;
-	  setChanged();
-	  notifyObservers();
-  }
-  
-  /* New Addition */
-  
   
   public void signalReceptionStart() {
     isReceiving = true;

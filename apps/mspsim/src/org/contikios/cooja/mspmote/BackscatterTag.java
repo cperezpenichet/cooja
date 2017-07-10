@@ -45,7 +45,7 @@ import se.sics.mspsim.platform.sky.BackscatterTagNode;
 public class BackscatterTag extends SkyMote {
   private static Logger logger = Logger.getLogger(BackscatterTag.class);
 
-  public BackscatterTagNode backscatterTagNode = null;
+  public BackscatterTagNode skyNode = null;
 
   public BackscatterTag(MspMoteType moteType, Simulation sim) {
     super(moteType, sim);
@@ -54,12 +54,14 @@ public class BackscatterTag extends SkyMote {
 
   protected boolean initEmulator(File fileELF) {
     try {
-/**/  System.out.println("BackscatterTag.initEmulator");
-      backscatterTagNode = new BackscatterTagNode();
-      registry = backscatterTagNode.getRegistry();
-      backscatterTagNode.setFlash(new CoojaM25P80(backscatterTagNode.getCPU()));
+/**/  System.out.println("1.BackscatterTag.initEmulatorskyNode");
+      skyNode = new BackscatterTagNode();
+      super.skyNode = skyNode;
+      registry = skyNode.getRegistry();
+      super.registry = registry;
+      skyNode.setFlash(new CoojaM25P80(skyNode.getCPU()));
       
-      prepareMote(fileELF, backscatterTagNode);
+      prepareMote(fileELF, skyNode);
     } catch (Exception e) {
       logger.fatal("Error when creating Backscatter Tag: ", e);
       return false;
@@ -69,7 +71,7 @@ public class BackscatterTag extends SkyMote {
 
   @Override
   public void idUpdated(int newID) {
-      backscatterTagNode.setNodeID(newID);
+      skyNode.setNodeID(newID);
 
     /* Statically configured MAC addresses */
     /*configureWithMacAddressesTxt(newID);*/

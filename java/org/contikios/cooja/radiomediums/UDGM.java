@@ -87,9 +87,9 @@ public class UDGM extends AbstractRadioMedium {
   public double TRANSMITTING_RANGE = 50; /* Transmission range. */
   public double INTERFERENCE_RANGE = 100; /* Interference range. Ignored if below transmission range. */
   
-  private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
+  protected DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
 
-  private Random random = null;
+  protected Random random = null;
   
   public UDGM(Simulation simulation) {
     super(simulation);
@@ -97,6 +97,7 @@ public class UDGM extends AbstractRadioMedium {
     random = simulation.getRandomGenerator();
     dgrm = new DirectedGraphMedium() {
       protected void analyzeEdges() {
+/**/    System.out.println("1.DirectedGraphMedium: " + dgrm);          
         /* Create edges according to distances.
          * XXX May be slow for mobile networks */
         clearEdges();
@@ -182,14 +183,10 @@ public class UDGM extends AbstractRadioMedium {
     
 /**/System.out.println("moteTransmissionRange: " + moteTransmissionRange);
     
-    
     double moteInterferenceRange = INTERFERENCE_RANGE *
     ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
 
 /**/System.out.println("moteInterferenceRange: " + moteInterferenceRange);
-
-	double carrierInterferenceRange = INTERFERENCE_RANGE *
-	((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
     
     /* Get all potential destination radios */
     DestinationRadio[] potentialDestinations = dgrm.getPotentialDestinations(sender);
@@ -218,7 +215,7 @@ public class UDGM extends AbstractRadioMedium {
 /**/ 	  System.out.println("Recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
 
         /* Add the connection in a dormant state;
-           it will be activated later when the radio will be
+           it will be activated later when the radio will bes
            turned on and switched to the right channel. This behavior
            is consistent with the case when receiver is turned off. */
         newConnection.addInterfered(recv);
@@ -244,19 +241,10 @@ public class UDGM extends AbstractRadioMedium {
       double distance = senderPos.getDistanceTo(recvPos);
 /**/  System.out.println("senderRecvDistance: " + distance);
       
-      if (sender.isGeneratingCarrier()) {
-/**/   	  System.out.println("carrier: " + sender.getMote().getID() + " - isGeneratingCarrier");
-		  if (distance <= carrierInterferenceRange) {
-/**/		  System.out.println("Within carrierInterferenceRange");
-			  newConnection.addInterfered(recv);
-/**/  	      System.out.println("carrier - recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-			  recv.interfereAnyReception();
-		  }
-	  }
-      else if (distance <= moteTransmissionRange) {
+      if (distance <= moteTransmissionRange) {
 /**/	 System.out.println("WithinTR");
         /* Within transmission range */
-		System.out.println("sender: " + sender.getMote().getID() + " isListeningCarrier= " + sender.isListeningCarrier());
+//		System.out.println("sender: " + sender.getMote().getID() + " isListeningCarrier= " + sender.isListeningCarrier());
 
         if (!recv.isRadioOn()) {
 /**/      System.out.println("recv: " + recv.getMote().getID() + " - radio is off");
@@ -318,6 +306,7 @@ public class UDGM extends AbstractRadioMedium {
   public double getRxSuccessProbability(Radio source, Radio dest) {
   	double distance = source.getPosition().getDistanceTo(dest.getPosition());
     double distanceSquared = Math.pow(distance,2.0);
+/**/// System.out.println("Power Indicator");
     double distanceMax = TRANSMITTING_RANGE * 
     ((double) source.getCurrentOutputPowerIndicator() / (double) source.getOutputPowerIndicatorMax());
     if (distanceMax == 0.0) {

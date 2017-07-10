@@ -34,7 +34,10 @@ import org.apache.log4j.Logger;
 
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
-import se.sics.mspsim.chip.BackscatterTXRadio; 
+import org.contikios.cooja.interfaces.Radio.RadioEvent;
+
+import se.sics.mspsim.chip.BackscatterTXRadio;
+import se.sics.mspsim.chip.CC2420;
 import se.sics.mspsim.chip.RFListener;
 
 /**
@@ -46,7 +49,10 @@ import se.sics.mspsim.chip.RFListener;
 public class Msp802154Tag extends Msp802154Radio {
   private static Logger logger = Logger.getLogger(Msp802154Tag.class);
 
-  protected final BackscatterTXRadio tag;
+  private final BackscatterTXRadio tag;
+  
+  //private boolean isTransmitting = false;
+  private boolean isListeningCarrier = false;
 
   public Msp802154Tag(Mote m) {
     super(m);
@@ -64,17 +70,21 @@ public class Msp802154Tag extends Msp802154Radio {
       final private byte[] syncSeq = {0,0,0,0,0x7A};
       
       public void receivedByte(byte data) {
-/**/    System.out.println("tag: " + mote.getID() + "- receivedByte");
+/**/    System.out.println("tag: " + mote.getID() + " - receivedByte");
+/**/    System.out.println("tag: " + mote.getID() + " - isTransmitting: " + isTransmitting());
         if (!isTransmitting()) {
-/**/    System.out.println("mote: " + mote.getID() + "- receivedByte, isTransmitting");         
-          lastEvent = RadioEvent.TRANSMISSION_STARTED;
-          lastOutgoingPacket = null;
-          isTransmitting = true;
-          len = 0;
-          expMpduLen = 0;
-          setChanged();
-          notifyObservers();
-          /*logger.debug("----- 802.15.4 TRANSMISSION STARTED -----");*/
+/**/    System.out.println("tag: " + mote.getID() + "- receivedByte, isTransmitting");
+/**/    System.out.println("tag: " + mote.getID() + " - isListeningCarrier: " + isListeningCarrier());
+            if(isListeningCarrier()) {
+              lastEvent = RadioEvent.TRANSMISSION_STARTED;
+              lastOutgoingPacket = null;
+              isTransmitting = true;
+              len = 0;
+              expMpduLen = 0;
+              setChanged();
+              notifyObservers();
+              /*logger.debug("----- 802.15.4 TRANSMISSION STARTED -----");*/
+            }
         }
 
         /* send this byte to all nodes */
@@ -120,5 +130,54 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     }); /* addRFListener */
     
+  }
+  
+//  public boolean isTransmitting() {
+//      System.out.println("I am a tag");
+//      return isTransmitting;
+//  }
+  
+  
+  public boolean isListeningCarrier() {
+      return isListeningCarrier;
+  }
+  
+  public void carrierListeningStart() {
+/**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_started");
+      isListeningCarrier = true;
+      lastEvent = RadioEvent.CARRIER_LISTENING_STARTED;
+      setChanged();
+      notifyObservers();
+  }
+  
+  public void carrierListeningEnd() {
+/**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_stopped");
+      //isReceiving = false;
+      isListeningCarrier = false;
+      isInterfered = false;
+      lastEvent = RadioEvent.CARRIER_LISTENING_STOPPED;
+      setChanged();
+      notifyObservers();
+  }
+  
+    public int getCurrentOutputPowerIndicator() {
+      return 31;
+    }
+
+    public int getOutputPowerIndicatorMax() {
+      return 31;
+    }
+  
+  // HACK: tag doesn't have a radio but we need this method to be true whenever
+  // tag is listening to the carrier in order to draw the red line on the 
+  // timeline that dictates that tag is interfered
+  public boolean isRadioOn() {
+/**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
+      if(isListeningCarrier()) {
+/**/  System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
+          return true;
+      }
+          
+      return false;
   }
 }

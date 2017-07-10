@@ -1151,7 +1151,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
           	  radioEv == RadioEvent.CARRIER_LISTENING_STOPPED) {
         	  
 /**/        System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - Radio RXTX events");
-/**/        System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - 2.isGeneratingCarrier = " + moteRadio.isGeneratingCarrier());
+/**///        System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - 2.isGeneratingCarrier = " + moteRadio.isGeneratingCarrier());
 
             RadioRXTXEvent ev;
             /* Override events, instead show state */
@@ -1164,7 +1164,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
             } else if (moteRadio.isInterfered()) {
-/**/          System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.INTERFERED");            	
+/**/          System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.INTERFERED");
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.INTERFERED);
             } else if (moteRadio.isReceiving()) {

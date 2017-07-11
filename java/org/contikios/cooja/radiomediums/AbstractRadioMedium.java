@@ -87,6 +87,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	
 	private Simulation simulation = null;
 	
+	//protected int txChannel;
+	
 	/* Book-keeping */
 	public int COUNTER_TX = 0;
 	public int COUNTER_RX = 0;
@@ -231,7 +233,9 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 			
 			final Radio.RadioEvent event = radio.getLastEvent();
 			
-/**/		System.out.println("radio= " + radio.getMote().getID() + " - event= " + event);
+      //      txChannel = radio.getChannel();
+            
+/**/        System.out.println("radio: " + radio.getMote().getID() + " - event= " + event);
 			
 			switch (event) {
 				case RECEPTION_STARTED:
@@ -269,6 +273,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							}
 						}
 					}
+					
 					
 					RadioConnection newConnection = createConnections(radio);
 					activeConnections.add(newConnection);
@@ -483,7 +488,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 //							}
 //						}
 //					}
-//					
+
 					RadioConnection newConnection = createConnections(radio);
 					activeConnections.add(newConnection);
 //					//radio.carrrierGenerationStart();

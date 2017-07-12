@@ -77,7 +77,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   protected boolean isInterfered = false;
 /**/  protected boolean isTransmitting = false;
   private boolean isReceiving = false;
-/**/  protected boolean isSynchronized = false;
+/**/  private boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
   
   protected byte lastOutgoingByte;

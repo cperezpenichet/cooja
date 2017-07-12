@@ -51,7 +51,9 @@ public class Msp802154Tag extends Msp802154Radio {
 
   private final BackscatterTXRadio tag;
   
+  //private boolean isInterfered = false;
   //private boolean isTransmitting = false;
+  private boolean isSynchronized = false;
   private boolean isListeningCarrier = false;
 
   public Msp802154Tag(Mote m) {

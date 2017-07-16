@@ -74,17 +74,17 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   protected final MspMote mote;
   protected final Radio802154 radio;
   
-  protected boolean isInterfered = false;
-/**/  protected boolean isTransmitting = false;
+  private boolean isInterfered = false;
+  private boolean isTransmitting = false;
   private boolean isReceiving = false;
-/**/  private boolean isSynchronized = false;
+  private boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
   
   protected byte lastOutgoingByte;
   protected byte lastIncomingByte;
 
-/**/  protected RadioPacket lastOutgoingPacket = null;
-/**/  protected RadioPacket lastIncomingPacket = null;
+  private RadioPacket lastOutgoingPacket = null;
+  private RadioPacket lastIncomingPacket = null;
 
   public Msp802154Radio(Mote m) { 
 /**/System.out.println("Msp802154Radio");
@@ -102,9 +102,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
       final private byte[] syncSeq = {0,0,0,0,0x7A};
       
       public void receivedByte(byte data) {
-/**/    System.out.println("mote: " + mote.getID() + "- receivedByte");
+/**/    System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + "- receivedByte");
+/**/    System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - isTransmitting: " + isTransmitting());
         if (!isTransmitting()) {
-/**/    System.out.println("mote: " + mote.getID() + "- receivedByte, isTransmitting");        	
+/**/      System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + "- receivedByte, isTransmitting");        	
           lastEvent = RadioEvent.TRANSMISSION_STARTED;
           lastOutgoingPacket = null;
           isTransmitting = true;
@@ -217,11 +218,12 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   protected void finishTransmission()
   {
     if (isTransmitting()) {
-/**/   System.out.println("mote: " + mote.getID() + " - isTransmitting");
+/**/  System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - Within finishedTransmission");        
+/**/  System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - 1.isTransmitting: " + isTransmitting());
       //logger.debug("----- 802.15.4 TRANSMISSION FINISHED -----");
       isTransmitting = false;
       isSynchronized = false;
-/**/  System.out.println("mote: " + mote.getID() + " - Within finishedTransmission");
+/**/  System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - 2.isTransmitting: " + isTransmitting());
       lastEvent = RadioEvent.TRANSMISSION_FINISHED;
       setChanged();
       notifyObservers();
@@ -244,6 +246,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
   public RadioPacket getLastPacketReceived() {
     return lastIncomingPacket;
+  }
+  
+  public void setLastOutgoingtPacket(RadioPacket lastOutgoingPacket) {
+      this.lastOutgoingPacket = lastOutgoingPacket;
   }
 
   public void setReceivedPacket(RadioPacket packet) {
@@ -336,6 +342,23 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public int getChannel() {
     return radio.getActiveChannel();
   }
+  
+  public void setInterfered(boolean isInterfered) {
+      this.isInterfered = isInterfered;
+  }
+  
+  public void setTransmitting(boolean isTransmitting) {
+      this.isTransmitting = isTransmitting;
+  }
+  
+  public void setSynchronized(boolean isSynchronized) {
+      this.isSynchronized = isSynchronized;
+  }
+  
+  public boolean getSynchronized() {
+      return isSynchronized;
+  }
+  
 
   public int getFrequency() {
     return radio.getActiveFrequency();
@@ -364,7 +387,11 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public RadioEvent getLastEvent() {
 	    return lastEvent;
   }
-
+  
+  public void setLastEvent(RadioEvent lastEvent) {
+      this.lastEvent = lastEvent;
+  }
+  
   public void interfereAnyReception() {
     isInterfered = true;
     isReceiving = false;

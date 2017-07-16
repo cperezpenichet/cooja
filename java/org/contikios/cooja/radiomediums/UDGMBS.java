@@ -298,7 +298,7 @@ public class UDGMBS extends UDGM {
             newConnection.addInterfered(recv);
 /**///        System.out.println("newConnection.getInterferedNonDestinations: " + newConnection.onlyInterfered.get(0).getMote().getID());           
 /**/        System.out.println("tag: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-            recv.interfereAnyReception();
+            recv.setInterfered(true);
           }
         } else {
             if (distance <= moteTransmissionRange) {
@@ -307,7 +307,7 @@ public class UDGMBS extends UDGM {
 /**/          System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + debugChannel);
 
               /* Within transmission range */
-/**/          System.out.println("sender: " + sender.getMote().getID() + " isListeningCarrier: " + sender.isListeningCarrier());
+/**/          System.out.println("tag: " + sender.getMote().getID() + " isListeningCarrier: " + sender.isListeningCarrier());
 
               if (!recv.isRadioOn()) {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " - radio is off");

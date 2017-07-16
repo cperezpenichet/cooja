@@ -85,7 +85,7 @@ public abstract class Radio extends MoteInterface {
     RECEPTION_STARTED, RECEPTION_FINISHED, RECEPTION_INTERFERED,
     TRANSMISSION_STARTED, TRANSMISSION_FINISHED,
     PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED,
-    CARRIER_LISTENING_STARTED, CARRIER_LISTENING_STOPPED
+    CARRIER_LISTENING_STARTED, CARRIER_LISTENING, CARRIER_LISTENING_STOPPED
   }
 
   /**
@@ -129,6 +129,8 @@ public abstract class Radio extends MoteInterface {
    * @see void carrierListeningEnd()
    */
   public void carrierListeningStart() {}
+  
+  public void carrierListening() {}
   
   /**
    * Signal that the carrier listening was ended. This method should normally be 
@@ -200,6 +202,9 @@ public abstract class Radio extends MoteInterface {
    * @return True if this radio is interfered
    */
   public abstract boolean isInterfered();
+  
+  
+  public void setInterfered(boolean isInterfered) {};
 
   /**
    * @return True if the simulated radio transceiver is on

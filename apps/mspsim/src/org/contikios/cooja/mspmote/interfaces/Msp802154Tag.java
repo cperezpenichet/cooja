@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
+import org.contikios.cooja.RadioPacket;
 import org.contikios.cooja.interfaces.Radio.RadioEvent;
 
 import se.sics.mspsim.chip.BackscatterTXRadio;
@@ -50,10 +51,7 @@ public class Msp802154Tag extends Msp802154Radio {
   private static Logger logger = Logger.getLogger(Msp802154Tag.class);
 
   private final BackscatterTXRadio tag;
-  
-  //private boolean isInterfered = false;
-  //private boolean isTransmitting = false;
-  private boolean isSynchronized = false;
+
   private boolean isListeningCarrier = false;
 
   public Msp802154Tag(Mote m) {
@@ -72,15 +70,15 @@ public class Msp802154Tag extends Msp802154Radio {
       final private byte[] syncSeq = {0,0,0,0,0x7A};
       
       public void receivedByte(byte data) {
-/**/    System.out.println("tag: " + mote.getID() + " - receivedByte");
-/**/    System.out.println("tag: " + mote.getID() + " - isTransmitting: " + isTransmitting());
+/**/    System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + " - receivedByte");
+/**/    System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + " - isTransmitting: " + isTransmitting());
         if (!isTransmitting()) {
-/**/    System.out.println("tag: " + mote.getID() + "- receivedByte, isTransmitting");
-/**/    System.out.println("tag: " + mote.getID() + " - isListeningCarrier: " + isListeningCarrier());
+/**/        System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + "- receivedByte, isTransmitting");
+/**/        System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + " - isListeningCarrier: " + isListeningCarrier());
             if(isListeningCarrier()) {
-              lastEvent = RadioEvent.TRANSMISSION_STARTED;
-              lastOutgoingPacket = null;
-              isTransmitting = true;
+              setLastEvent(RadioEvent.TRANSMISSION_STARTED);  
+              setLastOutgoingtPacket(null);
+              setTransmitting(true);
               len = 0;
               expMpduLen = 0;
               setChanged();
@@ -91,7 +89,7 @@ public class Msp802154Tag extends Msp802154Radio {
 
         /* send this byte to all nodes */
         lastOutgoingByte = data;
-        lastEvent = RadioEvent.CUSTOM_DATA_TRANSMITTED;
+        setLastEvent(RadioEvent.CUSTOM_DATA_TRANSMITTED); 
         setChanged();
         notifyObservers();
 
@@ -101,12 +99,12 @@ public class Msp802154Tag extends Msp802154Radio {
         len ++;
 
         if (len == 5) {
-          isSynchronized = true;
+          setSynchronized(true);
           for (int i=0; i<5; i++) {
             if (buffer[i] != syncSeq[i]) {
               // this should never happen, but it happens
               logger.error(String.format("Bad outgoing sync sequence %x %x %x %x %x", buffer[0], buffer[1], buffer[2], buffer[3], buffer[4]));
-              isSynchronized = false;
+              setSynchronized(false);
               break;
             }
           }
@@ -119,10 +117,10 @@ public class Msp802154Tag extends Msp802154Radio {
           }
         }
 
-        if (((expMpduLen & 0x80) == 0) && len == expMpduLen + 6 && isSynchronized) {
-          lastOutgoingPacket = CC2420RadioPacketConverter.fromCC2420ToCooja(buffer);
-          if (lastOutgoingPacket != null) {
-            lastEvent = RadioEvent.PACKET_TRANSMITTED;
+        if (((expMpduLen & 0x80) == 0) && len == expMpduLen + 6 && getSynchronized()) {
+          setLastOutgoingtPacket(CC2420RadioPacketConverter.fromCC2420ToCooja(buffer));
+          if (getLastPacketTransmitted() != null) {
+            setLastEvent(RadioEvent.PACKET_TRANSMITTED);  
             //logger.debug("----- 802.15.4 PACKET TRANSMITTED -----");
             setChanged();
             notifyObservers();
@@ -146,7 +144,18 @@ public class Msp802154Tag extends Msp802154Radio {
   public void carrierListeningStart() {
 /**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_started");
       isListeningCarrier = true;
-      lastEvent = RadioEvent.CARRIER_LISTENING_STARTED;
+      //setInterfered(true);
+      setLastEvent(RadioEvent.CARRIER_LISTENING_STARTED);
+      setChanged();
+      notifyObservers();
+  }
+  
+  public void carrierListening() {
+/**/  System.out.println("tag: " + mote.getID() + " - carrier_listening");
+      //isReceiving = false;
+      isListeningCarrier = true;
+      setInterfered(true);
+      setLastEvent(RadioEvent.CARRIER_LISTENING);
       setChanged();
       notifyObservers();
   }
@@ -155,8 +164,8 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_stopped");
       //isReceiving = false;
       isListeningCarrier = false;
-      isInterfered = false;
-      lastEvent = RadioEvent.CARRIER_LISTENING_STOPPED;
+      setInterfered(false);
+      setLastEvent(RadioEvent.CARRIER_LISTENING_STOPPED);
       setChanged();
       notifyObservers();
   }
@@ -175,7 +184,7 @@ public class Msp802154Tag extends Msp802154Radio {
   public boolean isRadioOn() {
 /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
       if(isListeningCarrier()) {
-/**/  System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
+/**/      System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
           return true;
       }
           

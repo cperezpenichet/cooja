@@ -1148,6 +1148,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
               radioEv == RadioEvent.RECEPTION_INTERFERED ||
               radioEv == RadioEvent.RECEPTION_FINISHED || 
           	  radioEv == RadioEvent.CARRIER_LISTENING_STARTED ||
+          	  radioEv == RadioEvent.CARRIER_LISTENING ||
           	  radioEv == RadioEvent.CARRIER_LISTENING_STOPPED) {
         	  
 /**/        System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - Radio RXTX events");

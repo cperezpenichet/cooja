@@ -65,7 +65,7 @@ public class RadioConnection {
   private ArrayList<Long> allDestinationDelays = new ArrayList<Long>();
 
   private ArrayList<Radio> allInterfered = new ArrayList<Radio>();
-  public ArrayList<Radio> onlyInterfered = new ArrayList<Radio>();
+  private ArrayList<Radio> onlyInterfered = new ArrayList<Radio>();
   private ArrayList<Radio> destinationsNonInterfered = new ArrayList<Radio>();
   
   private long startTime;

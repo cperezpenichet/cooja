@@ -171,9 +171,10 @@ public abstract class RadioMedium {
   public void removed() {
   }
 
-	/**
-	 * Notifies radio medium that the simulation finished loading.
-	 */
-	public void simulationFinishedLoading() {
-	}
+  /**
+   * Notifies radio medium that the simulation finished loading.
+   */
+  public void simulationFinishedLoading() {
+  }
+  
 }

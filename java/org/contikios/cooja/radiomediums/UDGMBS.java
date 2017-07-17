@@ -215,7 +215,7 @@ public class UDGMBS extends UDGM {
          */
          
         for (RadioConnection conn : getActiveConnections()) {
-/**/      System.out.println("A.conn: " + conn.getID());                              
+/**/      System.out.println("A.conn: " + conn.getID() + "with sender: " + conn.getSource().getMote().getID());                              
           
           /* ... and also check to which connection the tag belongs. Then take the  
              channel of the source (carrier generator) of that connection, move 

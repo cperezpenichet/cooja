@@ -122,6 +122,10 @@ public class UDGM extends AbstractRadioMedium {
         super.analyzeEdges();
       }
     };
+    
+    
+    
+    
 
     /* Register as position observer.
      * If any positions change, re-analyze potential receivers. */

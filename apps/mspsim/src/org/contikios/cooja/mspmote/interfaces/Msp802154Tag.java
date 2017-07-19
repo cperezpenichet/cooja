@@ -141,21 +141,24 @@ public class Msp802154Tag extends Msp802154Radio {
       return isListeningCarrier;
   }
   
+  public boolean isReceiving() {
+/**/System.out.println("I am a tag");
+/**/System.out.println("isReceiving: "  + false);      
+    return false;
+   }
+  
+  
+  public int getChannel() {
+/**/System.out.println("tag.getchannel");
+    return -1;
+   }
+
+  
   public void carrierListeningStart() {
 /**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_started");
       isListeningCarrier = true;
       //setInterfered(true);
       setLastEvent(RadioEvent.CARRIER_LISTENING_STARTED);
-      setChanged();
-      notifyObservers();
-  }
-  
-  public void carrierListening() {
-/**/  System.out.println("tag: " + mote.getID() + " - carrier_listening");
-      //isReceiving = false;
-      isListeningCarrier = true;
-      setInterfered(true);
-      setLastEvent(RadioEvent.CARRIER_LISTENING);
       setChanged();
       notifyObservers();
   }
@@ -169,6 +172,10 @@ public class Msp802154Tag extends Msp802154Radio {
       setChanged();
       notifyObservers();
   }
+  
+//  public void interfereAnyReception() {
+//      setInterfered(true);
+//  }
   
   public int getCurrentOutputPowerIndicator() {
       return 31;
@@ -184,10 +191,9 @@ public class Msp802154Tag extends Msp802154Radio {
   public boolean isRadioOn() {
 /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
       if(isListeningCarrier()) {
-/**/      System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
-          return true;
+/**/  System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
+        return true;
       }
-          
       return false;
   }
 }

@@ -167,9 +167,12 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 			lastEvent = RadioEvent.HW_ON;
 			setChanged();
 			notifyObservers();
+			isGeneratingCarrier = true;
+			isTransmitting = true;
+/**/        System.out.println("carrier.gen: " + mote.getID() +  " - isGeneratingCarrier: " + isGeneratingCarrier());  			
+/**/        System.out.println("carrier.gen: " + mote.getID() +  " - isTranmitting: " + isTransmitting());			
+/**/        System.out.println("carrier.gen: " + mote.getID() +  " - is about to start generating a carrier");			
     		lastEvent = RadioEvent.CARRIER_STARTED;
-    		isGeneratingCarrier = true;
-/**/    	System.out.println("mote: " + mote.getID() +  "- isGeneratingCarrier= " + isGeneratingCarrier);
     		setChanged();
     		notifyObservers();
     		return;
@@ -178,12 +181,14 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     	if ((mode == CC2420.MODE_POWER_OFF) || (mode == CC2420.MODE_TXRX_OFF)) {
 			if (isGeneratingCarrier) {
 /**/    		System.out.println("mote: " + mote.getID() + " - MODE_TEST_CARRIER_OFF");
-				lastEvent = RadioEvent.CARRIER_STOPPED;
 				isGeneratingCarrier = false;
-/**/			System.out.println("mote: " + mote.getID() + " - isGeneratingCarrier=" + isGeneratingCarrier);
-				setChanged();
+				isTransmitting = false;
+/**/            System.out.println("carrier.gen: " + mote.getID() +  " - isGeneratingCarrier: " + isGeneratingCarrier());           
+/**/            System.out.println("carrier.gen: " + mote.getID() +  " - isTranmitting: " + isTransmitting());      				
+/**/            System.out.println("carrier.gen: " + mote.getID() +  " - is about to stop generating a carrier");
+                lastEvent = RadioEvent.CARRIER_STOPPED;
+                setChanged();
 				notifyObservers();
-				//return;
 /**/	        System.out.println("mote: " + mote.getID() + " - 1.radioOff");
 		        radioOff(); // actually it is a state change, not necessarily to OFF
 		        return;

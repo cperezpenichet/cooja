@@ -230,21 +230,18 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				return;
 			}
 			
-			
+/**/		System.out.println("ARM.radioEventsObserver");
 			
 			Radio radio = (Radio) obs;
 			
 			final Radio.RadioEvent event = radio.getLastEvent();
 			
-/**/        System.out.println("radio: " + radio.getMote().getID() + " - event= " + event);
+/**/        System.out.println("ARM.radio: " + radio.getMote().getID() + " - event= " + event);
 			
 			switch (event) {
 				case RECEPTION_STARTED:
 				case RECEPTION_INTERFERED:
 				case RECEPTION_FINISHED:
-				case CARRIER_LISTENING_STARTED:
-				case CARRIER_LISTENING:
-				case CARRIER_LISTENING_STOPPED:
 					break;
 
 				case UNKNOWN:
@@ -261,7 +258,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_STARTED: {
-/**/				System.out.println("radio= " + radio.getMote().getID() + " - TRANSMISSION_STARTED");
+/**/				System.out.println("ARM.radio= " + radio.getMote().getID() + " - TRANSMISSION_STARTED");
 					/* Create new radio connection */
 					if (radio.isReceiving()) {
 						/*
@@ -276,27 +273,25 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						}
 					}
 					
-					
-					
 					RadioConnection newConnection = createConnections(radio);
 					activeConnections.add(newConnection);
 					
-/**/				System.out.println("ActiveConnections: " + activeConnections.size());
-/**/				System.out.println("newConnectionID: " + newConnection.getID());
-/**/				System.out.println("AllDestinations: " + newConnection.getAllDestinations().length);
+/**/				System.out.println("ARM.ActiveConnections: " + activeConnections.size());
+/**/				System.out.println("ARM.newConnectionID: " + newConnection.getID());
+/**/				System.out.println("ARM.AllDestinations: " + newConnection.getAllDestinations().length);
 
 					for (Radio r : newConnection.getAllDestinations()) {
 						if (newConnection.getDestinationDelay(r) == 0) {
-/**/					    System.out.println("r: " + r.getMote().getID() + " signalReceptionStart");
+/**/					    System.out.println("ARM.r: " + r.getMote().getID() + " signalReceptionStart");
                             r.signalReceptionStart();
 							 
 						} else {
-/**/						System.out.println("EXPERIMENTAL_TRANSMISSION_STARTED");
+/**/						System.out.println("ARM.EXPERIMENTAL_TRANSMISSION_STARTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = r;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-/**/								System.out.println("delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionStart");
+/**/								System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionStart");
                                     delayedRadio.signalReceptionStart();
 								}
 							};
@@ -312,7 +307,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_FINISHED: {
-/**/				System.out.println("radio= " + radio.getMote().getID() + " - TRANSMISSION_FINISHED");
+/**/				System.out.println("ARM.radio= " + radio.getMote().getID() + " - TRANSMISSION_FINISHED");
 					/* Remove radio connection */
 
 					/* Connection */
@@ -330,7 +325,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 /**/     				System.out.println("Radio dstRadio : transmission_finished.getAllDestinations");
 						
 						if (connection.getDestinationDelay(dstRadio) == 0) {
-/**/						System.out.println("dstRadio: " + dstRadio.getMote().getID() + " signalReceptionEnd");
+/**/						System.out.println("ARM.dstRadio: " + dstRadio.getMote().getID() + " signalReceptionEnd");
                             dstRadio.signalReceptionEnd();
 						} else {
 /**/						System.out.println("EXPERIMENTAL_TRANSMISSION_FINISHED");
@@ -338,7 +333,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							final Radio delayedRadio = dstRadio;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-/**/								System.out.println("delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionEnd");
+/**/								System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionEnd");
                                     delayedRadio.signalReceptionEnd();
 								}
 							};
@@ -351,22 +346,22 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					for (Radio intRadio : connection.getInterferedNonDestinations()) {
 
 					  if (intRadio.isInterfered()) {
-/**/				    System.out.println("intfRadio: " + intRadio.getMote().getID() + " signalReceptionEnd");
+/**/				    System.out.println("ARM.intfRadio: " + intRadio.getMote().getID() + " signalReceptionEnd");
                         intRadio.signalReceptionEnd();
 					  }
 					}
 					
 					/* Update signal strengths */
 					updateSignalStrengths();
-					System.out.println("connection: " + lastConnection.getID() + " is about to finish");
+					System.out.println("ARM.connection: " + lastConnection.getID() + " is about to finish");
 					
 					/* Notify observers */
 					radioTransmissionObservable.setChangedAndNotify();
-/**/				System.out.println("connection: " + lastConnection.getID() + " finished");
+/**/				System.out.println("ARM.connection: " + lastConnection.getID() + " finished");
 				}
 				break;
 				case CUSTOM_DATA_TRANSMITTED: {
-/**/                System.out.println("radio= " + radio.getMote().getID() + " - CUSTOM_DATA_TRANSMITTED");		
+/**/                System.out.println("ARM.radio= " + radio.getMote().getID() + " - CUSTOM_DATA_TRANSMITTED");		
 					/* Connection */
 					RadioConnection connection = getActiveConnectionFrom(radio);
 					if (connection == null) {
@@ -390,22 +385,22 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						if (!(dstRadio instanceof CustomDataRadio) || 
 						    !((CustomDataRadio) dstRadio).canReceiveFrom((CustomDataRadio)radio)) {
 							/* Radios communicate via radio packets */
-/**/     				    System.out.println("Radios communicate via radio packets");
+/**/     				    System.out.println("ARM.Radios communicate via radio packets");
 							continue;
 						}
 
 						 
 						if (connection.getDestinationDelay(dstRadio) == 0) {
-/**/                        System.out.println("(CustomDataRadio)dstRadio: " + dstRadio.getMote().getID() + " receiveCustomData");
+/**/                        System.out.println("ARM.(CustomDataRadio)dstRadio: " + dstRadio.getMote().getID() + " receiveCustomData");
 							((CustomDataRadio) dstRadio).receiveCustomData(data);
 						} else {
-/**/						System.out.println("EXPERIMENTAL_CUSTOM_DATA_TRANSMITTED");							
+/**/						System.out.println("ARM.EXPERIMENTAL_CUSTOM_DATA_TRANSMITTED");							
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final CustomDataRadio delayedRadio = (CustomDataRadio) dstRadio;
 							final Object delayedData = data;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-/**/                                System.out.println("(CustomDataRadio)delayedRadio: " + ((Radio)delayedRadio).getMote().getID() + " receiveCustomData");								    
+/**/                                System.out.println("ARM.(CustomDataRadio)delayedRadio: " + ((Radio)delayedRadio).getMote().getID() + " receiveCustomData");								    
 									delayedRadio.receiveCustomData(delayedData);
 								}
 							};
@@ -418,7 +413,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case PACKET_TRANSMITTED: {
-/**/                System.out.println("radio= " + radio.getMote().getID() + " - PACKET_TRANSMITTED");				    
+/**/                System.out.println("ARM.radio= " + radio.getMote().getID() + " - PACKET_TRANSMITTED");				    
 					/* Connection */
 					RadioConnection connection = getActiveConnectionFrom(radio);
 					if (connection == null) {
@@ -439,7 +434,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					      (dstRadio instanceof CustomDataRadio) && 
 					      ((CustomDataRadio) dstRadio).canReceiveFrom((CustomDataRadio)radio)) {
 					    /* Radios instead communicate via custom data objects */
-/**/                    System.out.println("Radios instead communicate via custom data objects");                  
+/**/                    System.out.println("ARM.Radios instead communicate via custom data objects");                  
 					    continue;
 					  }
 
@@ -447,7 +442,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						/* Forward radio packet */
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							dstRadio.setReceivedPacket(packet);
-/**/                        System.out.println("dstRadio: " + dstRadio.getMote().getID() + " setReceivedPacket");
+/**/                        System.out.println("ARM.dstRadio: " + dstRadio.getMote().getID() + " setReceivedPacket");
 						} else {
 /**/						System.out.println("EXPERIMENTAL_PACKET_TRANSMITTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
@@ -456,7 +451,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
 									delayedRadio.setReceivedPacket(delayedPacket);
-/**/                                System.out.println("delayedRadio: " + delayedRadio.getMote().getID() + " setReceivedPacket");
+/**/                                System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " setReceivedPacket");
 								}
 							};
 							simulation.scheduleEvent(delayedEvent,
@@ -466,106 +461,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					}
 				}
 				break;
-				case CARRIER_STARTED: {
-/**/				System.out.println("radio= " + radio.getMote().getID() + " - CARRIER_STARTED");
-					
-//					if(radio.isTransmitting()) { 						
-//						for(RadioConnection conn: activeConnections) {
-//							if(conn.getSource() == radio) { 
-//								conn.addInterfered(radio);
-//								//return;
-//							}
-//						}
-//					}
-//					else if(radio.isReceiving()) {
-//						radio.interfereAnyReception();
-//						for(RadioConnection conn: activeConnections) {
-//							if(conn.isDestination(radio)) {
-//								conn.addInterfered(radio);
-//							}
-//						}
-//					}
-
-					RadioConnection newConnection = createConnections(radio);
-					activeConnections.add(newConnection);
-					
-/**/                System.out.println("ActiveConnections: " + activeConnections.size());
-/**/                System.out.println("newConnectionID: " + newConnection.getID());
-/**/                System.out.println("AllDestinations: " + newConnection.getAllDestinations().length);
-/**/                System.out.println("InterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-					
-					for (Radio intfRadio: newConnection.getInterferedNonDestinations()) {
-						if (intfRadio.isInterfered()) {
-/**/						System.out.println("intfRadio: " + intfRadio.getMote().getID() + "  - carrierListeningStart");							
-							intfRadio.carrierListeningStart();
-						}
-					}
-					
 				
-					/* Update signal strength */
-					updateSignalStrengths();
-					
-					/* Notify observers */
-					lastConnection = null;
-					radioTransmissionObservable.setChangedAndNotify();
-				}
-				break;
-				case CARRIER_STOPPED: {	
-/**/				System.out.println("radio= " + radio.getMote().getID() + " - CARRIER_STOPPED");
-					RadioConnection connection = getActiveConnectionFrom(radio);
-					if(connection == null) {
-						logger.fatal("No radio connection found");
-						return;
-					}
-					
-					activeConnections.remove(connection);
-					lastConnection = connection;
-					
-/**/                System.out.println("carrier stops from conn: " + lastConnection.getID());					
-
-                    int nonTagConnections = 0;
-                    
-                    for (Radio intfRadio: connection.getInterferedNonDestinations()) {
-                      nonTagConnections = 0;
-/**/                  System.out.println("conn: " + connection.getID() + " - carier.gen: " + radio.getMote().getID() + " - intfRadio: " + intfRadio.getMote().getID());                        
-                      if (intfRadio.isInterfered()) {
-                        
-/**/                    System.out.println("intfRadio: " + intfRadio.getMote().getID() + " of last conn: " + connection.getID() + " isInterfered");
-/**/                    System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - carrierListeningEnd");
-                        //intfRadio.carrierListeningEnd();
-                        //radioTransmissionObservable.setChangedAndNotify();
-                        for(RadioConnection conn: getActiveConnections()) {
-                            
-                          if(conn.isInterfered(intfRadio)) {
-/**/                        System.out.println("intfRadio: " + intfRadio.getMote().getID() + " of active conn: " + conn.getID() + " isInterfered");
-/**/                        System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - carrierListening");
-                            //intfRadio.carrierListening();
-                            break;
-                          }
-                          nonTagConnections += 1;
-                        }
-                        
-                        if(nonTagConnections == getActiveConnections().length) {
-                            intfRadio.carrierListeningEnd();
-                        }
-                      } 
-                    }
-                      
-//						if (intfRadio.isInterfered()) {
-///**/						System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - carrierListeningEnd");
-//							intfRadio.carrierListeningEnd();
-//						}
-//					}
-//					
-					/* Update signal strength */
-					updateSignalStrengths();
-/**/				System.out.println("connection: " + lastConnection.getID() + " is about to finish");
-					
-					/* Notify observers */
-					radioTransmissionObservable.setChangedAndNotify();
-/**/				System.out.println("connection: " + lastConnection.getID() + " finished");
-				}
-				break;
 				default:
 					logger.fatal("Unsupported radio event: " + event);
 			}
@@ -586,6 +482,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 			return;
 		}
 		
+/**/    System.out.println("ARM.registerRadioInterface");		
 		registeredRadios.add(radio);
 		radio.addObserver(radioEventsObserver);
 		radioMediumObservable.setChangedAndNotify();
@@ -599,6 +496,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 			logger.warn("No radio to unregister: " + radio);
 			return;
 		}
+		
+/**/    System.out.println("ARM.unregisterRadioInterface");
 		
 		radio.deleteObserver(radioEventsObserver);
 		registeredRadios.remove(radio);

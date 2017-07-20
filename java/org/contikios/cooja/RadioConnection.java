@@ -124,6 +124,21 @@ public class RadioConnection {
     destinationsNonInterfered.remove(radio);
     onlyInterfered.remove(radio);
   }
+  
+  /**
+   * remove interfered radio
+   * 
+   * @param radio Radio
+   */
+  public void removeInterfered(Radio radio) {
+    int idx = allInterfered.indexOf(radio);
+    if (idx < 0) {
+      logger.fatal("Radio is not an interfered radio: " + radio);      
+    }
+     
+    allInterfered.remove(idx);
+    onlyInterfered.remove(idx);
+  }
 
   /**
    * Add (non-interfered) destination radio to connection.
@@ -171,7 +186,9 @@ public class RadioConnection {
     }
 
     allInterfered.add(radio);
+/**/System.out.println("1.destinationsNonInterfered: " +  destinationsNonInterfered.size());    
     destinationsNonInterfered.remove(radio);
+/**/System.out.println("2.destinationsNonInterfered: " +  destinationsNonInterfered.size());    
     if (!isDestination(radio)) {
       onlyInterfered.add(radio);
     }

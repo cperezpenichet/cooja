@@ -173,7 +173,8 @@ public class UDGM extends AbstractRadioMedium {
   public RadioConnection createConnections(Radio sender) {
     RadioConnection newConnection = new RadioConnection(sender);
 /**/System.out.println("\nNewConnID: " + newConnection.getID());
-/**/System.out.printf("sender id = %d\n", sender.getMote().getID());
+/**/System.out.println(sender.isGeneratingCarrier() ? "Sender=carrierGen: " + sender.getMote().getID() : 
+                       sender.isBackscatterTag() ? "Sender=tag: " + sender.getMote().getID() : "Sender=sender: " + sender.getMote().getID());
     
 
     /* Fail radio transmission randomly - no radios will hear this transmission */
@@ -203,7 +204,12 @@ public class UDGM extends AbstractRadioMedium {
 /**/System.out.println("PotentialDestinations: " + potentialDestinations.length);
     for (DestinationRadio dest: potentialDestinations) {
 /**/  System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
+
       Radio recv = dest.radio;
+
+/**/  System.out.println(recv.isGeneratingCarrier() ? "Recv=carrierGen: " + recv.getMote().getID() : 
+                         recv.isBackscatterTag() ? "Recv=tag: " + recv.getMote().getID() : "Recv=sender or carrierGen: " + recv.getMote().getID());      
+      
 
 /**/  System.out.println("Sender: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
 /**/  System.out.println("Recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());

@@ -69,7 +69,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public static final long DELAY_BETWEEN_BYTES =
     (long) (1000.0*Simulation.MILLISECOND/(250000.0/8.0)); /* us. Corresponds to 250kbit/s */
 
-  protected RadioEvent lastEvent = RadioEvent.UNKNOWN;
+  private RadioEvent lastEvent = RadioEvent.UNKNOWN;
 
   protected final MspMote mote;
   protected final Radio802154 radio;
@@ -168,6 +168,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 			setChanged();
 			notifyObservers();
 			isGeneratingCarrier = true;
+			isTransmitting = true;
 /**/        System.out.println("carrier.gen: " + mote.getID() +  " - isGeneratingCarrier: " + isGeneratingCarrier());  			
 /**/        System.out.println("carrier.gen: " + mote.getID() +  " - is about to start generating a carrier");			
     		lastEvent = RadioEvent.CARRIER_STARTED;
@@ -180,6 +181,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 			if (isGeneratingCarrier) {
 /**/    		System.out.println("mote: " + mote.getID() + " - MODE_TEST_CARRIER_OFF");
 				isGeneratingCarrier = false;
+				isTransmitting = false;
 /**/            System.out.println("carrier.gen: " + mote.getID() +  " - isGeneratingCarrier: " + isGeneratingCarrier());           
 /**/            System.out.println("carrier.gen: " + mote.getID() +  " - is about to stop generating a carrier");
                 lastEvent = RadioEvent.CARRIER_STOPPED;

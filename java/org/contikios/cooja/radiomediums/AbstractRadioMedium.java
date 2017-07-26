@@ -617,6 +617,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	public RadioConnection getLastConnection() {
 		return lastConnection;
 	}
+	
 	public Collection<Element> getConfigXML() {
 		Collection<Element> config = new ArrayList<Element>();
 		for(Entry<Radio, Double> ent: baseRssi.entrySet()){

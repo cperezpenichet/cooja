@@ -512,6 +512,8 @@ public class RadioLogger extends VisPlugin {
     radioMedium.addRadioTransmissionObserver(radioMediumObserver = new Observer() {
       @Override
       public void update(Observable obs, Object obj) {
+/**/    System.out.println("RadioLogger.RadioTransmissionObserver");
+          
         RadioConnection conn = radioMedium.getLastConnection();
         if (conn == null) {
           return;

@@ -67,6 +67,7 @@ import org.contikios.cooja.interfaces.Radio;
 import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.Visualizer.SimulationMenuAction;
 import org.contikios.cooja.plugins.VisualizerSkin;
+import org.contikios.cooja.radiomediums.AbstractRadioMedium;
 import org.contikios.cooja.radiomediums.UDGMBS;
 
 /**
@@ -91,7 +92,7 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
 
   private static final Color COLOR_TX = new Color(0, 255, 0, 100);
   private static final Color COLOR_INT = new Color(50, 50, 50, 100);
-
+  
   private Simulation simulation = null;
   private Visualizer visualizer = null;
   private UDGMBS radioMedium = null;

@@ -80,6 +80,7 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
     public void update(Observable obs, Object obj) {
       RadioConnection last = radioMedium.getLastConnection();
       if (last != null && historyList.size() < MAX_HISTORY_SIZE) {
+/**/    System.out.println("TrafficVisualizerSkin.RadioTransmissionObserver");
         synchronized(historyList) {
           historyList.add(new RadioConnectionArrow(last));
           visualizer.repaint(500);

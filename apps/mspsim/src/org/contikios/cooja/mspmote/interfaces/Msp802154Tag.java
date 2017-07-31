@@ -141,13 +141,20 @@ public class Msp802154Tag extends Msp802154Radio {
       return isListeningCarrier;
   }
   
+  /* 
+   * Currently there is no receiving 
+   * capability for the tag 
+   */
   public boolean isReceiving() {
 /**/System.out.println("I am a tag");
 /**/System.out.println("isReceiving: "  + false);      
     return false;
    }
   
-  
+  /* The channel of the tag returns 
+   * -1 skipping this way the usual
+   * channel check and using our own
+   */
   public int getChannel() {
 /**/System.out.println("tag.getchannel");
     return -1;
@@ -173,10 +180,7 @@ public class Msp802154Tag extends Msp802154Radio {
       notifyObservers();
   }
   
-//  public void interfereAnyReception() {
-//      setInterfered(true);
-//  }
-  
+ 
   public int getCurrentOutputPowerIndicator() {
       return 31;
   }
@@ -185,24 +189,24 @@ public class Msp802154Tag extends Msp802154Radio {
       return 31;
   }
   
-  /* HACK: tag doesn't have a radio but we need this method to be true whenever
-     tag is listening to the carrier in order to draw the red line on the 
-     timeline that dictates that tag is interfered */
-  public boolean isRadioOn() {
-/**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
-      if(isListeningCarrier()) {
-/**/  System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
-        return true;
-      }
-      return false;
-  }
-  
 //  /* HACK: tag doesn't have a radio but we need this method to be true whenever
-//  tag is listening to the carrier in order to draw the red line on the 
-//  timeline that dictates that tag is interfered */
+//     tag is listening to the carrier in order to draw the red line on the 
+//     timeline that dictates that tag is interfered */
 //  public boolean isRadioOn() {
-//      /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
-//     return true;
+///**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
+//      if(isListeningCarrier()) {
+///**/  System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
+//        return true;
+//      }
+//      return false;
 //  }
+  
+  /* HACK: tag doesn't have a radio but we need this method to be true whenever
+  tag is listening to the carrier in order to draw the red line on the 
+  timeline that dictates that tag is interfered */
+  public boolean isRadioOn() {
+      /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
+     return true;
+  }
   
 }

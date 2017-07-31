@@ -116,6 +116,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	 * @return All registered radios
 	 */
 	public Radio[] getRegisteredRadios() {
+	    System.out.println("getRegisteredRadios");
 		return registeredRadios.toArray(new Radio[0]);
 	}
 	
@@ -279,6 +280,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 /**/				System.out.println("ARM.ActiveConnections: " + activeConnections.size());
 /**/				System.out.println("ARM.newConnectionID: " + newConnection.getID());
 /**/				System.out.println("ARM.AllDestinations: " + newConnection.getAllDestinations().length);
+/**/                System.out.println("ARM.InterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
+
 
 					for (Radio r : newConnection.getAllDestinations()) {
 						if (newConnection.getDestinationDelay(r) == 0) {
@@ -461,6 +464,18 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					}
 				}
 				break;
+				
+				/* When a radio interface event is detected both radioEventsObserver observers in UDGMBS and 
+	             * AbstractRadioMedium classes are called.
+	             * 
+	             * These empty additions intend to make the default fatal message disappeared for cases the 
+	             * are not being updated by the observer in this class.
+	             */
+	            case CARRIER_STARTED:
+	            case CARRIER_STOPPED:
+	            case CARRIER_LISTENING_STARTED:
+	            case CARRIER_LISTENING_STOPPED:    
+	                break; 
 				
 				default:
 					logger.fatal("Unsupported radio event: " + event);

@@ -68,7 +68,7 @@ public class DGRMDestinationRadio extends DestinationRadio {
 	public Collection<Element> getConfigXML() {
 		Collection<Element> config = super.getConfigXML();
 		Element element;
-
+		
 		element = new Element("ratio");
 		element.setText("" + ratio);
 		config.add(element);

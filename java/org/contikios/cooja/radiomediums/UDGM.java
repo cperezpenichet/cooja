@@ -102,6 +102,7 @@ public class UDGM extends AbstractRadioMedium {
          * XXX May be slow for mobile networks */
         clearEdges();
         for (Radio source: UDGM.this.getRegisteredRadios()) {
+            System.out.println("UDGM.DirectedGraphMedium");  
           Position sourcePos = source.getPosition();
           for (Radio dest: UDGM.this.getRegisteredRadios()) {
             Position destPos = dest.getPosition();
@@ -115,16 +116,12 @@ public class UDGM extends AbstractRadioMedium {
               addEdge(
                   new DirectedGraphMedium.Edge(source, 
                       new DGRMDestinationRadio(dest)));
-             
             }
           }
         }
         super.analyzeEdges();
       }
     };
-    
-    
-    
     
 
     /* Register as position observer.
@@ -172,7 +169,7 @@ public class UDGM extends AbstractRadioMedium {
 
   public RadioConnection createConnections(Radio sender) {
     RadioConnection newConnection = new RadioConnection(sender);
-/**/System.out.println("\nNewConnID: " + newConnection.getID());
+/**/System.out.println("\nNewActiveConnID: " + newConnection.getID());
 /**/System.out.println(sender.isGeneratingCarrier() ? "Sender=carrierGen: " + sender.getMote().getID() : 
                        sender.isBackscatterTag() ? "Sender=tag: " + sender.getMote().getID() : "Sender=sender: " + sender.getMote().getID());
     
@@ -382,7 +379,7 @@ public class UDGM extends AbstractRadioMedium {
           continue;
         }
 
-/**/      System.out.printf("intfRadio = %d\n", intfRadio.getMote().getID()) ;        
+/**/    System.out.printf("intfRadio = %d\n", intfRadio.getMote().getID()) ;        
         
         double dist = conn.getSource().getPosition().getDistanceTo(intfRadio.getPosition());
 /**///    System.out.printf("dist = %.2f\n", dist);

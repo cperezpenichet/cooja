@@ -332,6 +332,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     return isTransmitting;
   }
   
+  public void setTransmitting(boolean isTransmitting) {
+      this.isTransmitting = isTransmitting;
+  }
+  
   public boolean isReceiving() {
 /**/System.out.println("I am a radio");
 /**/System.out.println("isReceiving: "  + isReceiving);      
@@ -341,32 +345,35 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public boolean isInterfered() {
     return isInterfered;
   }
-
-  public int getChannel() {
-    return radio.getActiveChannel();
-  }
   
   public void setInterfered(boolean isInterfered) {
       this.isInterfered = isInterfered;
   }
-  
-  public void setTransmitting(boolean isTransmitting) {
-      this.isTransmitting = isTransmitting;
+
+  public boolean getSynchronized() {
+      return isSynchronized;
   }
   
   public void setSynchronized(boolean isSynchronized) {
       this.isSynchronized = isSynchronized;
   }
   
-  public boolean getSynchronized() {
-      return isSynchronized;
+  public int getChannel() {
+      return radio.getActiveChannel();
   }
-  
 
   public int getFrequency() {
     return radio.getActiveFrequency();
   }
   
+  public RadioEvent getLastEvent() {
+      return lastEvent;
+  }
+
+  public void setLastEvent(RadioEvent lastEvent) {
+    this.lastEvent = lastEvent;
+  }
+
   public void signalReceptionStart() {
     isReceiving = true;
 
@@ -385,14 +392,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     /*logger.debug("----- 802.15.4 RECEPTION FINISHED -----");*/
     setChanged();
     notifyObservers();
-  }
-  
-  public RadioEvent getLastEvent() {
-	    return lastEvent;
-  }
-  
-  public void setLastEvent(RadioEvent lastEvent) {
-      this.lastEvent = lastEvent;
   }
   
   public void interfereAnyReception() {

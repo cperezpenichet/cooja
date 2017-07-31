@@ -130,8 +130,6 @@ public abstract class Radio extends MoteInterface {
    */
   public void carrierListeningStart() {}
   
-  public void carrierListening() {}
-  
   /**
    * Signal that the carrier listening was ended. This method should normally be 
    * called from the radio medium on interfered radios.

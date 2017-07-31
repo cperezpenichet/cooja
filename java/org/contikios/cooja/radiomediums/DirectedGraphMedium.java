@@ -104,7 +104,6 @@ public class DirectedGraphMedium extends AbstractRadioMedium {
     edges.remove(edge);
     requestEdgeAnalysis();
 
-
     radioTransmissionObservable.setChangedAndNotify();
   }
 

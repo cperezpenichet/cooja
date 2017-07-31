@@ -881,6 +881,10 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
             stats.onTimeRX += diff;
             continue;
           }
+          if (rxtxEvent.state == RXTXRadioEvent.CARRIER_GENERATED) {
+            stats.onTimeRX += diff;
+            continue;
+          }
         }
       }
 
@@ -1146,7 +1150,9 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
               radioEv == RadioEvent.TRANSMISSION_FINISHED ||
               radioEv == RadioEvent.RECEPTION_STARTED ||
               radioEv == RadioEvent.RECEPTION_INTERFERED ||
-              radioEv == RadioEvent.RECEPTION_FINISHED || 
+              radioEv == RadioEvent.RECEPTION_FINISHED ||
+              radioEv == RadioEvent.CARRIER_STARTED ||
+              radioEv == RadioEvent.CARRIER_STOPPED ||
           	  radioEv == RadioEvent.CARRIER_LISTENING_STARTED ||
           	  radioEv == RadioEvent.CARRIER_LISTENING_STOPPED) {
         	  
@@ -1156,11 +1162,16 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
             RadioRXTXEvent ev;
             /* Override events, instead show state */
             if (moteRadio.isTransmitting()) {
-/**/          System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.TRANSMITTING");
+///**/          System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.TRANSMITTING");
+//              ev = new RadioRXTXEvent(
+//                      simulation.getSimulationTime(), RXTXRadioEvent.TRANSMITTING);
+
               if (moteRadio.isGeneratingCarrier()) {
+/**/              System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.CARRIER_GENERATED");
                   ev = new RadioRXTXEvent(
-                      simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
+                      simulation.getSimulationTime(), RXTXRadioEvent.CARRIER_GENERATED);
               } else {
+/**/              System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.TRANSMITTING");
                   ev = new RadioRXTXEvent(
                       simulation.getSimulationTime(), RXTXRadioEvent.TRANSMITTING);
               }
@@ -2029,7 +2040,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
     }
   }
   public enum RXTXRadioEvent {
-    IDLE, RECEIVING, TRANSMITTING, INTERFERED
+    IDLE, RECEIVING, TRANSMITTING, INTERFERED, CARRIER_GENERATED
   }
   class RadioRXTXEvent extends MoteEvent {
     RXTXRadioEvent state = null;
@@ -2050,6 +2061,8 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
         return Color.GREEN;
       } else if (state == RXTXRadioEvent.INTERFERED) {
         return Color.RED;
+      } else if (state == RXTXRadioEvent.CARRIER_GENERATED) {
+          return Color.YELLOW;
       } else {
         logger.fatal("Unknown RXTX event");
         return null;
@@ -2063,6 +2076,8 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
       } else if (state == RXTXRadioEvent.RECEIVING) {
         return "Radio receiving from " + time + "<br>";
       } else if (state == RXTXRadioEvent.INTERFERED) {
+        return "Radio interfered from " + time + "<br>";
+      } else if (state == RXTXRadioEvent.CARRIER_GENERATED) {
         return "Radio interfered from " + time + "<br>";
       } else {
         return "Unknown event<br>";

@@ -46,7 +46,6 @@ import org.contikios.cooja.Mote;
 import org.contikios.cooja.MoteInterface;
 import org.contikios.cooja.RadioPacket;
 import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
-//import org.contikios.cooja.interfaces.Radio.RadioEvent;
 
 /**
  * A mote radio transceiver.
@@ -60,23 +59,8 @@ import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
 @ClassDescription("Radio")
 public abstract class Radio extends MoteInterface {
   private static Logger logger = Logger.getLogger(Radio.class);
-  
-  
-  
-  //private RadioEvent lastEvent = RadioEvent.UNKNOWN;
-  
-//  /* New addition */
-//  public boolean isGeneratingCarrier = false;
-//  public boolean isReceivingCarrier = false;
-//  /* New addition */
-//  
-//  
-//  
-//  private boolean isInterfered = false;
-//  private boolean isTransmitting = false;
-//  private boolean isReceiving = false;
-//  private boolean isSynchronized = false;
 
+  
   /**
    * Events that radios should notify observers about.
    */
@@ -201,9 +185,6 @@ public abstract class Radio extends MoteInterface {
    */
   public abstract boolean isInterfered();
   
-  
-  public void setInterfered(boolean isInterfered) {};
-
   /**
    * @return True if the simulated radio transceiver is on
    */

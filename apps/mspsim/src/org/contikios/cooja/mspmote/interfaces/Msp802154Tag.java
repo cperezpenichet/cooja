@@ -153,7 +153,7 @@ public class Msp802154Tag extends Msp802154Radio {
   
   /* The channel of the tag returns 
    * -1 skipping this way the usual
-   * channel check and using our own
+   * channel check and using our own.
    */
   public int getChannel() {
 /**/System.out.println("tag.getchannel");

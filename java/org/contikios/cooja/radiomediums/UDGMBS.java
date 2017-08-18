@@ -47,6 +47,7 @@ import org.contikios.cooja.Mote;
 import org.contikios.cooja.RadioConnection;
 import org.contikios.cooja.SimEventCentral.MoteCountListener;
 import org.contikios.cooja.Simulation;
+import org.contikios.cooja.TimeEvent;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.Radio;
 import org.contikios.cooja.plugins.Visualizer;
@@ -173,174 +174,13 @@ public class UDGMBS extends UDGM {
     }
   
   
-  //It might be deleted because in a connection created by a carrier generator radio will never be a destination
-  private void removeFromActiveConnections(Radio radio) {
-/**/  System.out.println("UDGMBS.removeFromActiveConnections");      
-      /* This radio must not be a connection source */
-      RadioConnection connection = getActiveConnectionFromCarrier(radio);
-      if (connection != null) {
-          logger.fatal("Connection source turned off radio: " + radio);
-      }
-      
-      /* Set interfered if currently a connection destination */
-      for (RadioConnection conn : activeConnectionsFromCarrier) {
-          if (conn.isDestination(radio)) {
-              conn.addInterfered(radio);
-              if (!radio.isInterfered()) {
-                  radio.interfereAnyReception();
-              }
-          }
-      }
-  }
-  
-  
-  /**
-   * @return All active connections created by a radio which acts as
-   *         a carrier generator.
-   */
-  public RadioConnection[] getActiveConnectionsFromCarrier() {
-      /* NOTE: toArray([0]) creates array and handles synchronization */
-      return activeConnectionsFromCarrier.toArray(new RadioConnection[0]);
-  }
-
-  private RadioConnection getActiveConnectionFromCarrier(Radio source) {
-      for (RadioConnection conn : activeConnectionsFromCarrier) {
-          if (conn.getSource() == source) {
-              return conn;
-          }
-      }
-      return null;
-  }
-  
-  private Observer radioEventsObserver = new Observer() {
-      public void update(Observable obs, Object obj) {
-          if (!(obs instanceof Radio)) {
-              logger.fatal("Radio event dispatched by non-radio object");
-              return;
-          }
-          
-/**/      System.out.println("UDGMBS.radioEventsObserver");
-          
-          Radio radio = (Radio) obs;
-          
-          final Radio.RadioEvent event = radio.getLastEvent();
-          
-/**/      System.out.println("UDGMBS.radio: " + radio.getMote().getID() + " - event= " + event);
-
-          switch (event) {
-            case CARRIER_LISTENING_STARTED:
-            case CARRIER_LISTENING_STOPPED:
-              break;
-            
-            case UNKNOWN:  
-            case HW_ON: {
-/**/          System.out.println("\nradio= " + radio.getMote().getID() + " - HW_ON");
-            
-              /* Update signal strength */
-              updateSignalStrengths();
-            }
-            break;
-            case HW_OFF: {
-/**/          System.out.println("\nradio= " + radio.getMote().getID() + " - HW_OFF");                
-            
-              /* Remove any radio connections from this radio */
-              removeFromActiveConnections(radio);
-              /* Update signal strength */
-              updateSignalStrengths();
-            }
-            break;
-            
-            case CARRIER_STARTED: {
-/**/          System.out.println("\nradio= " + radio.getMote().getID() + " - CARRIER_STARTED");
-                      
-              RadioConnection newConnection = createConnections(radio);
-              activeConnectionsFromCarrier.add(newConnection);
-                      
-                      
-/**/          System.out.println("\nActiveConnectionsFromCarrier: " + activeConnectionsFromCarrier.size());
-/**/          System.out.println("carrierConnID: " + newConnection.getID());
-/**/          System.out.println("carrierConn: " + newConnection.getID() + " - AllDestinations: " + newConnection.getAllDestinations().length);
-/**/          System.out.println("carrierConn: " + newConnection.getID() + " - InterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-                  
-              for (Radio intfRadio: newConnection.getInterferedNonDestinations()) {
-                if (intfRadio.isInterfered() && intfRadio.isBackscatterTag()) {
-/**/              System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - isListeningCarrier(): " + intfRadio.isListeningCarrier());                    
-                  if (!intfRadio.isListeningCarrier()) { //this is true for active recvs as well but the carrier   
-/**/                System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - carrierListeningStart");                          
-                    intfRadio.carrierListeningStart();
-                  }
-                }  
-              }
-                  
-              /* Update signal strength */
-              updateSignalStrengths();
-                  
-              /* Notify observers */
-//              lastConnection = null;
-              radioTransmissionObservable.setChangedAndNotify(); //Maybe it is not needed here as long arrows are not drawn for carrer start
-            }
-            break;
-            case CARRIER_STOPPED: { 
-/**/          System.out.println("\nradio= " + radio.getMote().getID() + " - CARRIER_STOPPED");
-                  
-              RadioConnection connection = getActiveConnectionFromCarrier(radio);
-                  
-              if(connection == null) {
-                logger.fatal("No radio connection found");
-                return;
-              }
-                  
-/**/          System.out.println("\nActiveConnectionsFromCarrier: " + getActiveConnectionsFromCarrier().length);
-/**/          System.out.println("carrier stops from conn: " + connection.getID()); 
-              activeConnectionsFromCarrier.remove(connection);
-//              lastConnection = connection;
-/**/          System.out.println("ActiveConnectionsFromCarrier left: " + getActiveConnectionsFromCarrier().length);                  
-                      
-              boolean isStillInterfered = false;
-                  
-                  
-              for (Radio intfRadio: connection.getInterferedNonDestinations()) {
-                if (intfRadio.isInterfered()) {
-                  if(!intfRadio.isBackscatterTag()) {
-/**/                System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - signalReceptionEnd");                         
-                    intfRadio.signalReceptionEnd(); 
-                  } else {
-/**/                  System.out.println("intfRadio: " + intfRadio.getMote().getID() + " - carrierListeningEnd");                         
-                      intfRadio.carrierListeningEnd();
-                  }
-                }
-              }
-                    
-              /* Update signal strength */
-              updateSignalStrengths();
-/**/          System.out.println("connection: " + connection.getID() + " is about to finish");
-                  
-              /* Notify observers */
-              radioTransmissionObservable.setChangedAndNotify(); //Maybe it is not needed here as long arrows are not drawn for carrier stop
-  /**/        System.out.println("connection: " + connection.getID() + " finished");
-            }
-            break;
-            
-            /* When a radio interface event is detected both radioEventsObserver observers in UDGMBS and 
-             * AbstractRadioMedium classes are called.
-             * 
-             * These empty additions intend to make the default fatal message disappeared for cases the 
-             * are not being updated by the observer in this class.
-             */
-            case RECEPTION_STARTED:
-            case RECEPTION_INTERFERED:
-            case RECEPTION_FINISHED:
-            case TRANSMISSION_STARTED: 
-            case TRANSMISSION_FINISHED: 
-            case CUSTOM_DATA_TRANSMITTED:
-            case PACKET_TRANSMITTED:
-                break;            
-            
-            default:
-              logger.fatal("Unsupported radio event: " + event);
-        }            
-    }
-  };
+//  private Observer radioEventsObserver = new Observer() {
+//      public void update(Observable obs, Object obj) {
+//          if (!(obs instanceof Radio)) {
+//              logger.fatal("Radio event dispatched by non-radio object");
+//              return;
+//          }
+//  };
   
   public HashSet<Integer> getTXChannels(Radio sender) {
     /* Store the channels for an active or backscatter transmission */
@@ -353,13 +193,13 @@ public class UDGMBS extends UDGM {
      * Hence, check every active connection generated by a carrier generator
      */
     if(sender.isBackscatterTag()) {         
-      for (RadioConnection conn : getActiveConnectionsFromCarrier()) {
+      for (RadioConnection conn : getActiveConnections()) {
 /**/    System.out.println("A.conn: " + conn.getID() + " with sender: " + conn.getSource().getMote().getID());                              
               
         /* ... and also check to which connection the tag belongs. Then take the  
            channel of the source (carrier generator) of that connection, move 
            it two channels apart (+2) and store that channel to a set. */  
-        if (conn.isInterfered(sender)) {
+        if (conn.isDestination(sender)) {
 /**/      System.out.println("tag: " + sender.getMote().getID() + " belongs to conn: " + conn.getID());                
           if (conn.getSource().isGeneratingCarrier()) { // TODO It might be interesting to reflect active transmissions as interference too
             if (conn.getSource().getChannel() >=0) {
@@ -392,43 +232,46 @@ public class UDGMBS extends UDGM {
     
     if (!sender.isBackscatterTag()) {
       /* 
-       * For an active transmission with a sender which may generate
-       * a carrier or not use the already implemented super() method 
+       * For an active transmission started by an active sender which may 
+       * generate a carrier or not use the already implemented super() method  
        * for creating the new connection.
        */  
       newConnection = super.createConnections(sender);
-/**/  System.out.println("sender:" + sender.getMote().getID() + " is a carrier generator");      
 
       /* 
-       * If the receiver is a tag, within the transmission range of the sender, which  is either 
-       * transmitting a package or generating a carrier, it is initially added as a destination 
-       * concerning the newConnection. This is happening because in backscattering communication 
-       * the channel of the tag is not being concerned. Hence, the getChannel() method of the tag
-       * always returns -1 avoiding this way the usual channel check.
-       *  
-       * Hence, if they are added as destinations we are removing them from destinations and adding
-       * them in the interfered radios following the procedure below.
+       * In case the sender is a carrier generator, every radio that was added
+       * as destination, except for a tag, is removed from destinations and is 
+       * added to interfered. Whereas, in case the sender is transmitting a packet
+       * only a tag is moved from destinations to the interfered radios.
        */  
 /**/  System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length);
 /**/  System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
       if(sender.isGeneratingCarrier()) {
+/**/    System.out.println("sender:" + sender.getMote().getID() + " is a carrier generator");      
+        
         for (Radio r: newConnection.getAllDestinations()) {
-          newConnection.removeDestination(r);
-/**/      System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
-          newConnection.addInterfered(r);
-/**/      System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-/**/      System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
-          r.interfereAnyReception();
+          if (!r.isBackscatterTag()) {
+            newConnection.removeDestination(r);
+/**/        System.out.println("r:" + r.getMote().getID() + " is removed from destinations");      
+/**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
+            newConnection.addInterfered(r);
+/**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
+/**/        //System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
+            //r.interfereAnyReception();
+          }
         } 
       } else {
+/**/    System.out.println("sender:" + sender.getMote().getID() + " is an active sender");      
+
         for (Radio r: newConnection.getAllDestinations()) {
           if (r.isBackscatterTag()) {
             newConnection.removeDestination(r);
 /**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
             newConnection.addInterfered(r);
+/**/        System.out.println("r:" + r.getMote().getID() + " is removed from destinations");      
 /**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
 /**/        System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
-           // r.interfereAnyReception();
+            r.interfereAnyReception();
           }    
         }
       }
@@ -570,7 +413,7 @@ public class UDGMBS extends UDGM {
   public void updateSignalStrengths() {
     /* Override: uses distance as signal strength factor */
 /**/System.out.println("\nUpdate signal strengths");
-    
+
     /* Reset signal strengths */
 /**/System.out.printf("Reset signal strength \n");
     for (Radio radio : getRegisteredRadios()) {
@@ -580,7 +423,7 @@ public class UDGMBS extends UDGM {
     
     HashSet<Integer> txChannels = new HashSet<Integer>();
     
-    /* Concerning connections created either by an active transmitter on a tag */
+    /* Concerning connections created either by an active transmitter or a tag */
 
     /* Set signal strength to below strong on destinations */
     RadioConnection[] conns = getActiveConnections();
@@ -615,9 +458,24 @@ public class UDGMBS extends UDGM {
           dstRadio.setCurrentSignalStrength(signalStrength);
 /**/      System.out.printf("dstRadio = %d , signal = %.2f\n", dstRadio.getMote().getID(), dstRadio.getCurrentSignalStrength());
         }
+        
+        /* 
+         * In case the tag stopped listening the carrier from one connection but
+         * it is still listening the carrier from another connection keep it signaled.
+         */
+        if(!dstRadio.isListeningCarrier()) {
+/**/      System.out.printf("dstRadio %d was not listening the carrier\n" , dstRadio.getMote().getID());
+          if (conn.getSource().isGeneratingCarrier()) {
+/**/        System.out.println("conn: " + conn.getID() + " is still active");
+/**/        System.out.println("and its source: " + conn.getSource().getMote().getID() + " isGeneratingCarrier(): " 
+                               + conn.getSource().isGeneratingCarrier());
+            dstRadio.signalReceptionStart();
+          }
+        }
       }
       /* Clear txChannels HashSet for the next connection */
       txChannels.clear();
+      
     }
 
     /* Set signal strength to below weak on interfered */
@@ -668,103 +526,9 @@ public class UDGMBS extends UDGM {
       }
       /* Clear txChannels HashSet for the next connection */
       txChannels.clear();
-      
-    } /* Concerning connections created either by an active transmitter on a tag */
-    
-    /* Concerning connections created by a carrier generator */
-/**/System.out.println("\nUpdate signal strengths for radios belonging to connections generated by a carrier");    
-    RadioConnection[] connFromCarrier = getActiveConnectionsFromCarrier();
-    
-      /* Set signal strength to below weak on interfered */
-    for (RadioConnection conn : connFromCarrier) {
-/**/  System.out.println("\nUDGMBS.Set signal strength to below weak on interfered");
-/**/  System.out.println("\nconnFromCarrier: " + conn.getID() + " - source: " + conn.getSource().getMote().getID());  
-      for (Radio intfRadio : conn.getInterfered()) {
-/**/    System.out.println("UDGMBS.ActiveConnID: " + conn.getID());
-
-        if (conn.getSource().getChannel() >= 0 && intfRadio.getChannel() >= 0 &&
-            conn.getSource().getChannel() != intfRadio.getChannel()) {
-              continue;
-        }
-/**/    System.out.printf("UDGMBS.intfRadio = %d\n", intfRadio.getMote().getID()) ;        
-
-        double dist = conn.getSource().getPosition().getDistanceTo(intfRadio.getPosition());
-/**///    System.out.printf("dist = %.2f\n", dist);
-
-        double maxTxDist = TRANSMITTING_RANGE *
-          ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-/**///    System.out.printf("maxTxDist = %.2f\n", maxTxDist);
-          
-        double distFactor = dist/maxTxDist;
-/**///    System.out.printf("distFactor = %.2f\n", distFactor);
-
-        if (distFactor < 1) {
-          double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
-          if (intfRadio.getCurrentSignalStrength() < signalStrength) {
-            intfRadio.setCurrentSignalStrength(signalStrength);
-/**/       System.out.printf("1.UDGMBS.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
-          }
-        } else {
-            intfRadio.setCurrentSignalStrength(SS_WEAK);
-            if (intfRadio.getCurrentSignalStrength() < SS_WEAK) {
-              intfRadio.setCurrentSignalStrength(SS_WEAK);
-/**/          System.out.printf("2.UDGMBS.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
-            }
-        }
-        
-        if(!intfRadio.isInterfered()) {
-/**/      System.out.printf("UDGMBS.intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
-          if(!intfRadio.isBackscatterTag()) {
-/**/        System.out.println("radio: " + intfRadio.getMote().getID() + " - interfereAnyReception");
-            intfRadio.interfereAnyReception();
-          } else {
-/**/          System.out.println("radio: " + intfRadio.getMote().getID() + " - interfereAnyReception");
-              intfRadio.interfereAnyReception();
-/**/          System.out.println("radio: " + intfRadio.getMote().getID() + " - carrierListeningStart");              
-              intfRadio.carrierListeningStart();
-          }
-        }
-        
-      }
-    } /* Concerning connections created by a carrier generator */
-
- /**/System.out.println();
+    }
 
   } /* uptadeSignalStrengths */
-  
-  
-//  public RadioConnection getLastConnection() {
-//      return lastConnection;
-//  }
-  
-  public void registerRadioInterface(Radio radio, Simulation sim) {
-      super.registerRadioInterface(radio, sim);
-      
-/**/  System.out.println("UDGMBS.registerRadioInterface");      
-      
-      radio.addObserver(radioEventsObserver);
-      
-      radioMediumObservable.setChangedAndNotify();
-      
-      /* Update signal strengths */
-      updateSignalStrengths();
-  }
-  
-  public void unregisterRadioInterface(Radio radio, Simulation sim) {
-      super.unregisterRadioInterface(radio, sim);
-
-/**/  System.out.println("UDGMBS.unregisterRadioInterface");
-      
-      radio.deleteObserver(radioEventsObserver);
-      
-      removeFromActiveConnections(radio);
-      
-      radioMediumObservable.setChangedAndNotify();
-      
-      /* Update signal strengths */
-      updateSignalStrengths();
-  }
-  
   
   
 } /* createConnections */

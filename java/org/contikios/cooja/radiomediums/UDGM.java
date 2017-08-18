@@ -325,7 +325,7 @@ public class UDGM extends AbstractRadioMedium {
 
   public void updateSignalStrengths() {
     /* Override: uses distance as signal strength factor */
-/**/System.out.println("\nUpdate signal strengths");
+/**/System.out.println("\nUDGM.Update signal strengths");
     
     /* Reset signal strengths */
 /**/System.out.printf("Reset signal strength \n");

@@ -160,27 +160,26 @@ public class Msp802154Tag extends Msp802154Radio {
     return -1;
    }
 
-  
-  public void carrierListeningStart() {
-/**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_started");
-      isListeningCarrier = true;
-      //setInterfered(true);
-      setLastEvent(RadioEvent.CARRIER_LISTENING_STARTED);
-      setChanged();
-      notifyObservers();
+  /* Concerns the start of the carrier listening */
+  public void signalReceptionStart() {
+/**/System.out.println("tag: " + mote.getID() + " - carrier_listening_started");
+    isListeningCarrier = true;
+    setLastEvent(RadioEvent.CARRIER_LISTENING_STARTED);
+    setChanged();
+    notifyObservers();
   }
   
-  public void carrierListeningEnd() {
-/**/  System.out.println("tag: " + mote.getID() + " - carrier_listening_stopped");
-      //isReceiving = false;
-      isListeningCarrier = false;
-      setInterfered(false);
-      setLastEvent(RadioEvent.CARRIER_LISTENING_STOPPED);
-      setChanged();
-      notifyObservers();
+  /* Concerns the end of the carrier listening */
+  public void signalReceptionEnd() {
+/**/System.out.println("tag: " + mote.getID() + " - carrier_listening_stopped");
+    //isReceiving = false;
+    isListeningCarrier = false;
+    setInterfered(false);
+    setLastEvent(RadioEvent.CARRIER_LISTENING_STOPPED);
+    setChanged();
+    notifyObservers();
   }
-  
- 
+
   public int getCurrentOutputPowerIndicator() {
       return 31;
   }
@@ -189,21 +188,6 @@ public class Msp802154Tag extends Msp802154Radio {
       return 31;
   }
   
-//  /* HACK: tag doesn't have a radio but we need this method to be true whenever
-//     tag is listening to the carrier in order to draw the red line on the 
-//     timeline that dictates that tag is interfered */
-//  public boolean isRadioOn() {
-///**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
-//      if(isListeningCarrier()) {
-///**/  System.out.println("2.Msp802154Tag.isRadioOn(): " + mote.getID());          
-//        return true;
-//      }
-//      return false;
-//  }
-  
-  /* HACK: tag doesn't have a radio but we need this method to be true whenever
-  tag is listening to the carrier in order to draw the red line on the 
-  timeline that dictates that tag is interfered */
   public boolean isRadioOn() {
       /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
      return true;

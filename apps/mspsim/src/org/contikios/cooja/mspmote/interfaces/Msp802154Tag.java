@@ -145,13 +145,15 @@ public class Msp802154Tag extends Msp802154Radio {
    * Currently there is no receiving 
    * capability for the tag 
    */
+  @Override
   public boolean isReceiving() {
 /**/System.out.println("I am a tag");
 /**/System.out.println("isReceiving: "  + false);      
     return false;
    }
   
-  /* The channel of the tag returns 
+  /*
+   * The channel of the tag returns 
    * -1 skipping this way the usual
    * channel check and using our own.
    */
@@ -161,6 +163,7 @@ public class Msp802154Tag extends Msp802154Radio {
    }
 
   /* Concerns the start of the carrier listening */
+  @Override
   public void signalReceptionStart() {
 /**/System.out.println("tag: " + mote.getID() + " - carrier_listening_started");
     isListeningCarrier = true;
@@ -170,6 +173,7 @@ public class Msp802154Tag extends Msp802154Radio {
   }
   
   /* Concerns the end of the carrier listening */
+  @Override
   public void signalReceptionEnd() {
 /**/System.out.println("tag: " + mote.getID() + " - carrier_listening_stopped");
     //isReceiving = false;
@@ -179,15 +183,18 @@ public class Msp802154Tag extends Msp802154Radio {
     setChanged();
     notifyObservers();
   }
-
+  
+  @Override
   public int getCurrentOutputPowerIndicator() {
       return 31;
   }
 
+  @Override
   public int getOutputPowerIndicatorMax() {
       return 31;
   }
   
+  @Override
   public boolean isRadioOn() {
       /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
      return true;

@@ -207,10 +207,8 @@ public class UDGM extends AbstractRadioMedium {
 /**/  System.out.println(recv.isGeneratingCarrier() ? "Recv=carrierGen: " + recv.getMote().getID() : 
                          recv.isBackscatterTag() ? "Recv=tag: " + recv.getMote().getID() : "Recv=sender or carrierGen: " + recv.getMote().getID());      
       
-
 /**/  System.out.println("Sender: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
 /**/  System.out.println("Recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
-            
 
       /* Fail if radios are on different (but configured) channels */ 
       if (sender.getChannel() >= 0 &&

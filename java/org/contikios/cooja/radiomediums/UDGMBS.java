@@ -223,191 +223,155 @@ public class UDGMBS extends UDGM {
   
       
   public RadioConnection createConnections(Radio sender) {
-    RadioConnection newConnection;
+    RadioConnection newConnection = new RadioConnection(sender);
+    /**/System.out.println("\nNewActiveConnID: " + newConnection.getID());
+    /**/System.out.println(sender.isGeneratingCarrier() ? "Sender=carrierGen: " + sender.getMote().getID() : 
+                           sender.isBackscatterTag() ? "Sender=tag: " + sender.getMote().getID() : "Sender=sender: " + sender.getMote().getID());
+
 
     /* Store the channels to which the tag can transmit */
     HashSet<Integer> tagTXChannels = new HashSet<Integer>();
-    
-   int debugChannel = 0;
-    
-    if (!sender.isBackscatterTag()) {
-      /* 
-       * For an active transmission started by an active sender which may 
-       * generate a carrier or not use the already implemented super() method  
-       * for creating the new connection.
-       */  
-      newConnection = super.createConnections(sender);
-
-      /* 
-       * In case the sender is a carrier generator, every radio that was added
-       * as destination, except for a tag, is removed from destinations and is 
-       * added to interfered. Whereas, in case the sender is transmitting a packet
-       * only a tag is moved from destinations to the interfered radios.
-       */  
-/**/  System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length);
-/**/  System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-      if(sender.isGeneratingCarrier()) {
-/**/    System.out.println("sender:" + sender.getMote().getID() + " is a carrier generator");      
-        
-        for (Radio r: newConnection.getAllDestinations()) {
-          if (!r.isBackscatterTag()) {
-            newConnection.removeDestination(r);
-/**/        System.out.println("r:" + r.getMote().getID() + " is removed from destinations");      
-/**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
-            newConnection.addInterfered(r);
-/**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-/**/        //System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
-            //r.interfereAnyReception();
-          }
-        } 
-      } else {
-/**/    System.out.println("sender:" + sender.getMote().getID() + " is an active sender");      
-
-        for (Radio r: newConnection.getAllDestinations()) {
-          if (r.isBackscatterTag()) {
-            newConnection.removeDestination(r);
-/**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
-            newConnection.addInterfered(r);
-/**/        System.out.println("r:" + r.getMote().getID() + " is removed from destinations");      
-/**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-/**/        System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
-            r.interfereAnyReception();
-          }    
-        }
-      }
-/**/  System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
-    } else {
-      /* 
-       * For an active connection created by a tag which is listening
-       * the carrier create a new connection using the following procedure.
-       */   
-      newConnection = new RadioConnection(sender);
       
-      /* Fail radio transmission randomly - no radios will hear this transmission */
-      if (getTxSuccessProbability(sender) < 1.0 && random.nextDouble() > getTxSuccessProbability(sender)) {
-        return newConnection;
-      }
+    /* Fail radio transmission randomly - no radios will hear this transmission */
+    if (getTxSuccessProbability(sender) < 1.0 && random.nextDouble() > getTxSuccessProbability(sender)) {
+      return newConnection;
+    }
       
-      if (sender.isListeningCarrier()) {
-/**/    System.out.println("\nNewBackscatteringConnID: " + newConnection.getID());
+    /* Collect the channels for backscattering communication */
+    tagTXChannels = getTXChannels(sender);
 
-        /* Collect the channels for backscattering communication */
-        tagTXChannels = getTXChannels(sender);
+    /* Calculate ranges: grows with radio output power */
+    double moteTransmissionRange = TRANSMITTING_RANGE *
+        ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
 
-        /* Calculate ranges: grows with radio output power */
-        double moteTransmissionRange = TRANSMITTING_RANGE *
-                ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
+/**///System.out.println("moteTransmissionRange: " + moteTransmissionRange);
 
-/**///    System.out.println("moteTransmissionRange: " + moteTransmissionRange);
+    double moteInterferenceRange = INTERFERENCE_RANGE *
+        ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
 
-        double moteInterferenceRange = INTERFERENCE_RANGE *
-                ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
-
-/**///    System.out.println("moteInterferenceRange: " + moteInterferenceRange);
+/**///System.out.println("moteInterferenceRange: " + moteInterferenceRange);
             
           
-/**/    System.out.println("tagConn: " + newConnection.getID() + " contains: " + tagTXChannels.size() + " channels which are");          
+/**/  System.out.println("tagConn: " + newConnection.getID() + " contains: " + tagTXChannels.size() + " channels which are");          
 
-        Iterator<Integer> itr = tagTXChannels.iterator();
-        while(itr.hasNext()) {
-/**/      System.out.println("channel: " + itr.next());
-        }
+    Iterator<Integer> itr = tagTXChannels.iterator();
+    while(itr.hasNext()) {
+/**/  System.out.println("channel: " + itr.next());
+    }
           
-        /* Get all potential destination radios */
-        DestinationRadio[] potentialDestinations = dgrm.getPotentialDestinations(sender);
-        if (potentialDestinations == null) {
-          return newConnection;
-        }
+    /* Get all potential destination radios */
+    DestinationRadio[] potentialDestinations = dgrm.getPotentialDestinations(sender);
+    if (potentialDestinations == null) {
+      return newConnection;
+    }
           
-        /* Loop through all potential destinations */
-        Position senderPos = sender.getPosition();
-/**/    System.out.println("PotentialDestinations: " + potentialDestinations.length);
+    /* Loop through all potential destinations */
+    Position senderPos = sender.getPosition();
+/**/System.out.println("PotentialDestinations: " + potentialDestinations.length);
       
-        for (DestinationRadio dest: potentialDestinations) {
-/**/      System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
+    for (DestinationRadio dest: potentialDestinations) {
+/**/  System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
 
-          Radio recv = dest.radio;
+      Radio recv = dest.radio;
+      
+/**/  System.out.println(recv.isGeneratingCarrier() ? "Recv=carrierGen: " + recv.getMote().getID() : 
+          recv.isBackscatterTag() ? "Recv=tag: " + recv.getMote().getID() : "Recv=active: " + recv.getMote().getID());      
 
-//            if (!recv.isBackscatterTag()) {
-            
-          debugChannel = recv.getChannel();
-          if(recv.getChannel() >= 0 && !tagTXChannels.contains(recv.getChannel())) {
+/**/  System.out.println("Sender: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
+/**/  System.out.println("Recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
+
+      if(recv.getChannel() >= 0 && !tagTXChannels.contains(recv.getChannel())) {
                       
-/**/        System.out.println("sender - recv: diff channels");
-/**/        System.out.println(sender.isListeningCarrier() ? "sender(tag): " + sender.getMote().getID() : "sender: " + sender.getMote().getID() + " - Ch= " + sender.getChannel());
-/**/        System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
+/**/  System.out.println("sender - recv: diff channels");
+/**/  System.out.println(sender.isListeningCarrier() ? "sender(tag): " + sender.getMote().getID() : "sender: " + sender.getMote().getID() + " - Ch= " + sender.getChannel());
+/**/  System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
 
 
-            /* Add the connection in a dormant state;
-               it will be activated later when the radio will bes
-               turned on and switched to the right channel. This behavior
-               is consistent with the case when receiver is turned off. */
+      /* Add the connection in a dormant state;
+         it will be activated later when the radio will bes
+         turned on and switched to the right channel. This behavior
+         is consistent with the case when receiver is turned off. */
+         newConnection.addInterfered(recv);
+      } else {
+        Position recvPos = recv.getPosition();
+        double distance = senderPos.getDistanceTo(recvPos);
+/**/    System.out.println("senderRecvDistance: " + distance);
+
+        if (distance <= moteTransmissionRange) {
+          /* Within transmission range */
+/**/      System.out.println("WithinTR");
+//        System.out.println("sender: " + sender.getMote().getID() + " isListeningCarrier= " + sender.isListeningCarrier());
+
+          if (!recv.isRadioOn()) {
+/**/        System.out.println("recv: " + recv.getMote().getID() + " - radio is off");
             newConnection.addInterfered(recv);
-          } else {
-            Position recvPos = recv.getPosition();
-            double distance = senderPos.getDistanceTo(recvPos);
-/**/        System.out.println("senderRecvDistance: " + distance);
-
-            if (distance <= moteTransmissionRange) {
-              /* Within transmission range */
-/**/          System.out.println("WithinTR");
-//              System.out.println("sender: " + sender.getMote().getID() + " isListeningCarrier= " + sender.isListeningCarrier());
-
-              if (!recv.isRadioOn()) {
-/**/            System.out.println("recv: " + recv.getMote().getID() + " - radio is off");
-                newConnection.addInterfered(recv);
-/**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-                recv.interfereAnyReception();
-              } else if (recv.isInterfered()) {
-/**/            System.out.println("recv: " + recv.getMote().getID() + " - isInterfered");
-                /* Was interfered: keep interfering */
-                newConnection.addInterfered(recv);
-/**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-              } else if (recv.isTransmitting()) {
-/**/            System.out.println("recv: " + recv.getMote().getID() + " - isTransmitting");
-                newConnection.addInterfered(recv);
-/**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-              } else if (recv.isReceiving() || (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
-/**/            System.out.println("recv: " + recv.getMote().getID() + " - isReceiving");
-                /* Was receiving, or reception failed: start interfering */
-                newConnection.addInterfered(recv);
-/**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-                recv.interfereAnyReception();
-
-                /* Interfere receiver in all other active radio connections */
-                for (RadioConnection conn : getActiveConnections()) {
-                  if (conn.isDestination(recv)) {
-/**/                System.out.println("recv: " + recv.getMote().getID() + " added as interfered to conn: " + conn.getID());
-                    conn.addInterfered(recv);
-                  }
-                }
-              } else {
-                if(!recv.isBackscatterTag()) {
-                  /* Success: radio starts receiving */
-                  newConnection.addDestination(recv);
-/**/              System.out.println("recv: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
-                } else {
-                  /* In case the receiver is a tag */  
-                  newConnection.addInterfered(recv);
-/**/              System.out.println("recv: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
-                }
+/**/        System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+            recv.interfereAnyReception();
+          } else if (recv.isInterfered()) {
+/**/        System.out.println("recv: " + recv.getMote().getID() + " - isInterfered");
+            /* Was interfered: keep interfering */
+            newConnection.addInterfered(recv);
+/**/        System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+          } else if (recv.isTransmitting()) {
+/**/        System.out.println("recv: " + recv.getMote().getID() + " - isTransmitting");
+            newConnection.addInterfered(recv);
+/**/        System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+          } else if (recv.isReceiving() || (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
+/**/        System.out.println("recv: " + recv.getMote().getID() + " - isReceiving");
+            /* Was receiving, or reception failed: start interfering */
+            newConnection.addInterfered(recv);
+/**/        System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+            recv.interfereAnyReception();
+            
+            /* Interfere receiver in all other active radio connections */
+            for (RadioConnection conn : getActiveConnections()) {
+              if (conn.isDestination(recv)) {
+/**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to conn: " + conn.getID());
+                conn.addInterfered(recv);
               }
-            } else if (distance <= moteInterferenceRange) {
-/**/          System.out.println("WithinIR");
-              /* Within interference range */
-              newConnection.addInterfered(recv);
-/**/          System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-              recv.interfereAnyReception();
+            }
+          } else {
+            if (!sender.isGeneratingCarrier()) {
+/**/          System.out.println(sender.isListeningCarrier() ? "sender=tag: " + recv.getMote().getID() : "sender=active: " + recv.getMote().getID());
+              if (recv.isBackscatterTag()) {
+                newConnection.addInterfered(recv);
+/**/            System.out.println("tag: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+              } else {
+                // Success: radio starts receiving either from 
+                // an active transmitter or a tag 
+                newConnection.addDestination(recv);
+/**/            System.out.println("recv: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
+              }
+            } else {
+/**/          System.out.println("sender=carriert gen: " + recv.getMote().getID());
+              if (recv.isBackscatterTag()) {
+                /* Success: tag starts listening the carrier */
+                newConnection.addDestination(recv);
+/**/            System.out.println("tag: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
+              } else {
+                newConnection.addInterfered(recv);
+/**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+              }
             }
           }  
-        } 
-      } else {
-        return newConnection;
-      }
-    }
-/**/System.out.println("return newConnection");        
+        } else if (distance <= moteInterferenceRange) {
+/**/      System.out.println("WithinIR");
+          /* Within interference range */
+          if (!recv.isBackscatterTag()) {
+            newConnection.addInterfered(recv);
+/**/        System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
+            recv.interfereAnyReception();
+          } else {
+            /* in case the recv is a tag */
+            newConnection.addDestination(recv);
+/**/        System.out.println("tag: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
+          }
+        }
+      }  
+    } 
+    /**/System.out.println("return newConnection");        
     return newConnection;    
-  }
+  } 
   
 
   public void updateSignalStrengths() {
@@ -519,9 +483,11 @@ public class UDGMBS extends UDGM {
         }
 
         if (!intfRadio.isInterfered()) {
-          /*logger.warn("Radio was not interfered: " + intfRadio);*/
-/**/      System.out.printf("intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
-          intfRadio.interfereAnyReception();
+          if (!intfRadio.isBackscatterTag()) {
+            /*logger.warn("Radio was not interfered: " + intfRadio);*/
+/**/        System.out.printf("intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
+            intfRadio.interfereAnyReception();
+          }
         }
       }
       /* Clear txChannels HashSet for the next connection */

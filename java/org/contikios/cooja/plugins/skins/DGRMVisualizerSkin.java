@@ -60,6 +60,8 @@ public class DGRMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
+/**/System.out.println("DGRMVisualizerSkin.setActive");
+    
     if (!(simulation.getRadioMedium() instanceof DirectedGraphMedium)) {
       logger.fatal("Cannot activate DGRM skin for unknown radio medium: " + simulation.getRadioMedium());
       return;
@@ -70,6 +72,8 @@ public class DGRMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setInactive() {
+/**/System.out.println("DGRMVisualizerSkin.setInactive");
+    
     if (simulation == null) {
       /* Skin was never activated */
       return;
@@ -78,6 +82,7 @@ public class DGRMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public Color[] getColorOf(Mote mote) {
+/**/System.out.println("DGRMVisualizerSkin.getColorOf");
     if (visualizer.getSelectedMotes().contains(mote)) {
       return new Color[]{Color.CYAN};
     }
@@ -86,6 +91,8 @@ public class DGRMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void paintBeforeMotes(Graphics g) {
+/**/System.out.println("DGRMVisualizerSkin.paintBeforeMotes");
+    
     Set<Mote> selectedMotes = visualizer.getSelectedMotes();
     if (simulation == null || selectedMotes == null) {
       return;
@@ -164,6 +171,8 @@ public class DGRMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void paintAfterMotes(Graphics g) {
+/**/System.out.println("DGRMVisualizerSkin.paintAfterMotes");
+    
   }
 
   @Override

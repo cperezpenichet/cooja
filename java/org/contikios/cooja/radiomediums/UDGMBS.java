@@ -86,10 +86,13 @@ import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 @ClassDescription("Unit Disk Graph Medium for Backscaterring Communications (UDGMBS): Distance Loss")
 public class UDGMBS extends UDGM {
   private static Logger logger = Logger.getLogger(UDGMBS.class);
-
-  private ArrayList<RadioConnection> activeConnectionsFromCarrier = new ArrayList<RadioConnection>();
   
-//  private RadioConnection lastConnection = null;
+  /* 
+   * Backscatter tag has a smaller tx range because of the reflection 
+   * it causes to the incident wave transmitted by the carrier generator.
+   */
+  public double TRANSMITTING_RANGE = 40; /* Transmission range for tag */ 
+  public double INTERFERENCE_RANGE = 100; /* Interference range for tag. Ignored if below transmission range. */
   
   private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
   
@@ -120,7 +123,6 @@ public class UDGMBS extends UDGM {
                 addEdge(
                     new DirectedGraphMedium.Edge(source, 
                         new DGRMDestinationRadio(dest)));
-               
               }
             }
           }
@@ -150,6 +152,8 @@ public class UDGMBS extends UDGM {
         mote.getInterfaces().getPosition().addObserver(positionObserver);
       }
       dgrm.requestEdgeAnalysis();
+      
+      super.removed();
 
       /* Register visualizer skin */
       Visualizer.registerVisualizerSkin(UDGMBSVisualizerSkin.class);
@@ -158,17 +162,17 @@ public class UDGMBS extends UDGM {
   
   
   public void removed() {
-      super.removed();
+      //super.removed();
 
       Visualizer.unregisterVisualizerSkin(UDGMBSVisualizerSkin.class);
   }
   
-  public void setTxRange(double r) {
+  public void setTagTxRange(double r) {
       TRANSMITTING_RANGE = r;
       dgrm.requestEdgeAnalysis();
     }
 
-    public void setInterferenceRange(double r) {
+    public void setTagInterferenceRange(double r) {
       INTERFERENCE_RANGE = r;
       dgrm.requestEdgeAnalysis();
     }

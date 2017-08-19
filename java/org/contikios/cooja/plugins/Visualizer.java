@@ -121,6 +121,8 @@ import org.contikios.cooja.plugins.skins.MoteTypeVisualizerSkin;
 import org.contikios.cooja.plugins.skins.PositionVisualizerSkin;
 import org.contikios.cooja.plugins.skins.TrafficVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
+import org.contikios.cooja.radiomediums.UDGM;
+import org.contikios.cooja.radiomediums.UDGMBS;
 
 /**
  * Simulation visualizer supporting different visualizers
@@ -251,6 +253,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     String[] skins = gui.getProjectConfig().getStringArrayValue(Visualizer.class, "SKINS");
 
     for (String skinClass : skins) {
+/**/ System.out.println("skinClass: " + skinClass);      
       Class<? extends VisualizerSkin> skin = gui.tryLoadClass(this, VisualizerSkin.class, skinClass);
       if (registerVisualizerSkin(skin)) {
         logger.info("Registered external visualizer: " + skinClass);
@@ -340,10 +343,12 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
 
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (VisualizerSkin skin : currentSkins) {
+/**/      System.out.println("1.VisualizerSkin: " + skin.getClass().getName());          
           skin.paintBeforeMotes(g);
         }
         paintMotes(g);
         for (VisualizerSkin skin : currentSkins) {
+/**/      System.out.println("2.VisualizerSkin: " + skin.getClass().getName());          
           skin.paintAfterMotes(g);
         }
         selection.drawSelection(g);
@@ -687,6 +692,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void generateAndActivateSkin(Class<? extends VisualizerSkin> skinClass) {
+/**/System.out.println("currentSkins.size: " + currentSkins.size());
     for (VisualizerSkin skin : currentSkins) {
       if (skinClass == skin.getClass()) {
         logger.warn("Selected visualizer already active: " + skinClass);
@@ -695,6 +701,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     }
 
     if (!isSkinCompatible(skinClass)) {
+/**/   System.out.println("isSkinCompatible: ");
       /*logger.warn("Skin is not compatible with current simulation: " + skinClass);*/
       return;
     }
@@ -702,6 +709,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     /* Create and activate new skin */
     try {
       VisualizerSkin newSkin = skinClass.newInstance();
+
       newSkin.setActive(Visualizer.this.simulation, Visualizer.this);
       currentSkins.add(0, newSkin);
     }
@@ -713,6 +721,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
 
   @Override
   public void startPlugin() {
+/**/System.out.println("startPlugin");    
     super.startPlugin();
     if (loadedConfig) {
       return;
@@ -724,6 +733,9 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       if (skin.isEmpty()) {
         continue;
       }
+      
+/**/  System.out.println("Visualizer.skin: " + skin);
+
       Class<? extends VisualizerSkin> skinClass
               = simulation.getCooja().tryLoadClass(this, VisualizerSkin.class, skin);
       generateAndActivateSkin(skinClass);
@@ -776,11 +788,15 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       return false;
     }
     visualizerSkins.add(skin);
+/**/System.out.println("skin: " + skin);    
+/**/System.out.println("1.visualizerSkins.SIZE(): " + visualizerSkins.size());    
     return true;
   }
 
   public static void unregisterVisualizerSkin(Class<? extends VisualizerSkin> skin) {
     visualizerSkins.remove(skin);
+/**/System.out.println("2.visualizerSkins.SIZE(): " + visualizerSkins.size());    
+    
   }
 
   private void handlePopupRequest(Point point) {
@@ -946,19 +962,27 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     if (skinClass == null) {
       return false;
     }
-
+    
+/**/System.out.println("simulation.getRadioMedium().getClass(): " + simulation.getRadioMedium().getClass());
+    
     /* Check if skin depends on any particular radio medium */
     boolean showMenuItem = true;
     if (skinClass.getAnnotation(SupportedArguments.class) != null) {
       showMenuItem = false;
       Class<? extends RadioMedium>[] radioMediums = skinClass.getAnnotation(SupportedArguments.class).radioMediums();
       for (Class<? extends Object> o : radioMediums) {
+/**/    System.out.println("o.getClass(): " + o);        
         if (o.isAssignableFrom(simulation.getRadioMedium().getClass())) {
+//          if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMBS.class) {
+//            break;
+//          }
           showMenuItem = true;
+/**/      System.out.println("1.showMenuItem: " + showMenuItem);          
           break;
         }
       }
     }
+/**/System.out.println("2.showMenuItem: " + showMenuItem);    
     return showMenuItem;
   }
 

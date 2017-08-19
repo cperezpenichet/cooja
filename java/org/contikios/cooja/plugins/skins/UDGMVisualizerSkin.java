@@ -98,9 +98,12 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
   private JInternalFrame rrFrame;
   private Box ratioRX, ratioTX, rangeTX, rangeINT;
-
+  
+  
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
+/**/System.out.println("UDGM.setActive");
+
     if (!(simulation.getRadioMedium() instanceof UDGM)) {
       logger.fatal("Cannot activate UDGM skin for unknown radio medium: " + simulation.getRadioMedium());
       return;
@@ -248,6 +251,7 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setInactive() {
+/**/System.out.println("UDGM.setInactive");      
     if (simulation == null) {
       /* Skin was never activated */
       return;
@@ -263,11 +267,14 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public Color[] getColorOf(Mote mote) {
+/**/System.out.println("UDGM.getColorOf");         
     return null;
   }
 
   @Override
   public void paintBeforeMotes(Graphics g) {
+/**/System.out.println("UDGM.paintBeforeMotes");         
+      
     Set<Mote> selectedMotes = visualizer.getSelectedMotes();
     if (simulation == null || selectedMotes == null) {
       return;
@@ -277,6 +284,8 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
     Area intRangeMaxArea = new Area();
     Area trxRangeArea = new Area();
     Area trxRangeMaxArea = new Area();
+    
+/**/System.out.println("UDGM.paintBeforeMotesSTART");
 
     for (Mote selectedMote : selectedMotes) {
       if (selectedMote.getInterfaces().getRadio() == null) {
@@ -347,10 +356,9 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
               2 * translatedTransmissionMax.x,
               2 * translatedTransmissionMax.y)));
 
-    }
-
+    }   
     Graphics2D g2d = (Graphics2D) g;
-
+/**/System.out.println("UDGM.Graphics2D");
     g2d.setColor(COLOR_INT);
     g2d.fill(intRangeArea);
     g.setColor(Color.GRAY);
@@ -384,11 +392,13 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
         g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
       }
     }
+/**/System.out.println("UDGM.paintBeforeMotesSTOP");
 
   }
 
   @Override
   public void paintAfterMotes(Graphics g) {
+/**/System.out.println("UDGM.paintAfterMotes");         
   }
 
   public static class RangeMenuAction implements SimulationMenuAction {
@@ -444,6 +454,8 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
   };
 
   private void updateRatioRangeFrame() {
+/**/System.out.println("UDGM.updateRatioRangeFrame");         
+      
     if (rrFrame.getDesktopPane() == null) {
       visualizer.getDesktopPane().add(rrFrame);
     }
@@ -472,4 +484,10 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
   public Visualizer getVisualizer() {
     return visualizer;
   }
+  
+  /* New addition */
+  public JInternalFrame getRRFrame() {
+    return rrFrame;
+  }
+  
 }

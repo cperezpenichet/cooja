@@ -39,7 +39,7 @@ import org.contikios.cooja.plugins.skins.DGRMVisualizerSkin;
  * With this annotation, Cooja components (e.g. mote plugins) can be activated
  * or deactivated depending on the given argument (e.g. mote). This may for
  * example be used by a mote plugin that only accepts emulated motes, and that
- * consequently should be hidden in other non-emulated motes' plugin menues.
+ * consequently should be hidden in other non-emulated motes' plugin menus.
  *
  * See below code usage examples.
  *

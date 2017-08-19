@@ -54,17 +54,23 @@ public class GridVisualizerSkin implements VisualizerSkin {
   private Visualizer visualizer = null;
 
   public void setActive(Simulation simulation, Visualizer vis) {
+/**/System.out.println("GridVisualizerSkin.setActive");
+
     this.visualizer = vis;
   }
 
   public void setInactive() {
+/**/System.out.println("GridVisualizerSkin.setInactive");
+
   }
 
   public Color[] getColorOf(Mote mote) {
+/**/System.out.println("GridVisualizerSkin.getColorOf");
     return null;
   }
 
   public void paintBeforeMotes(Graphics g) {
+/**/System.out.println("GridVisualizerSkin.paintBeforeMotes");
 
     /* Background grid every 10 meters */
     Position upperLeft = 
@@ -116,6 +122,7 @@ public class GridVisualizerSkin implements VisualizerSkin {
   }
 
   public void paintAfterMotes(Graphics g) {
+/**/System.out.println("GridVisualizerSkin.paintAfterMotes");
   }
 
   public Visualizer getVisualizer() {

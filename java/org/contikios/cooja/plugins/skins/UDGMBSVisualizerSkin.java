@@ -68,6 +68,7 @@ import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.Visualizer.SimulationMenuAction;
 import org.contikios.cooja.plugins.VisualizerSkin;
 import org.contikios.cooja.radiomediums.AbstractRadioMedium;
+import org.contikios.cooja.radiomediums.UDGM;
 import org.contikios.cooja.radiomediums.UDGMBS;
 
 /**
@@ -86,7 +87,7 @@ import org.contikios.cooja.radiomediums.UDGMBS;
  */
 @ClassDescription("Radio environment (UDGMBS)")
 @SupportedArguments(radioMediums = {UDGMBS.class})
-public class UDGMBSVisualizerSkin implements VisualizerSkin {
+public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
   private static final Logger logger = Logger.getLogger(UDGMBSVisualizerSkin.class);
 
@@ -102,6 +103,8 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
+    super.setActive(simulation, vis);
+/**/System.out.println("UDGMBS.setActive");
     if (!(simulation.getRadioMedium() instanceof UDGMBS)) {
       logger.fatal("Cannot activate UDGMBS skin for unknown radio medium: " + simulation.getRadioMedium());
       return;
@@ -120,7 +123,7 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
     interferenceModel.setValue(new Double(radioMedium.INTERFERENCE_RANGE));
     interferenceModel.setStepSize(new Double(1.0)); // 1m
     interferenceModel.setMinimum(new Double(0.0));
-
+    /*
     SpinnerNumberModel successRatioTxModel = new SpinnerNumberModel();
     successRatioTxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_TX));
     successRatioTxModel.setStepSize(new Double(0.001)); // 0.1%
@@ -132,7 +135,7 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
     successRatioRxModel.setStepSize(new Double(0.001)); // 0.1%
     successRatioRxModel.setMinimum(new Double(0.0));
     successRatioRxModel.setMaximum(new Double(1.0));
-
+    */
     JSpinner.NumberEditor editor;
     final JSpinner txRangeSpinner = new JSpinner(transmissionModel);
     editor = new JSpinner.NumberEditor(txRangeSpinner, "0m");
@@ -140,26 +143,28 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
     final JSpinner interferenceRangeSpinner = new JSpinner(interferenceModel);
     editor = new JSpinner.NumberEditor(interferenceRangeSpinner, "0m");
     interferenceRangeSpinner.setEditor(editor);
+    /*
     final JSpinner successRatioTxSpinner = new JSpinner(successRatioTxModel);
     editor = new JSpinner.NumberEditor(successRatioTxSpinner, "0.0%");
     successRatioTxSpinner.setEditor(editor);
     final JSpinner successRatioRxSpinner = new JSpinner(successRatioRxModel);
     editor = new JSpinner.NumberEditor(successRatioRxSpinner, "0.0%");
     successRatioRxSpinner.setEditor(editor);
+    */
 
     ((JSpinner.DefaultEditor) txRangeSpinner.getEditor()).getTextField().setColumns(5);
     ((JSpinner.DefaultEditor) interferenceRangeSpinner.getEditor()).getTextField().setColumns(5);
-    ((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
-    ((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
+    //((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
+    //((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
     txRangeSpinner.setToolTipText("Transmitting range (m)");
     interferenceRangeSpinner.setToolTipText("Interference range (m)");
-    successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
-    successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
+    //successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
+    //successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
 
     txRangeSpinner.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
-        radioMedium.setTxRange(((SpinnerNumberModel) txRangeSpinner.getModel())
+        radioMedium.setTagTxRange(((SpinnerNumberModel) txRangeSpinner.getModel())
                 .getNumber().doubleValue());
         visualizer.repaint();
       }
@@ -168,12 +173,13 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
     interferenceRangeSpinner.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
-        radioMedium.setInterferenceRange(((SpinnerNumberModel) interferenceRangeSpinner.getModel())
+        radioMedium.setTagInterferenceRange(((SpinnerNumberModel) interferenceRangeSpinner.getModel())
                 .getNumber().doubleValue());
         visualizer.repaint();
       }
     });
-
+    
+    /*
     successRatioTxSpinner.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
@@ -191,10 +197,11 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
         visualizer.repaint();
       }
     });
+    */
 
     /* Register menu actions */
     visualizer.registerSimulationMenuAction(RangeMenuAction.class);
-    visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
+    //visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
 
     /* UI components */
     JPanel main = new JPanel();
@@ -209,6 +216,8 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
     rangeINT.add(new JLabel("INT range:"));
     rangeINT.add(Box.createHorizontalStrut(5));
     rangeINT.add(interferenceRangeSpinner);
+    
+    /*
     ratioTX = Box.createHorizontalBox();
     ratioTX.add(new JLabel("TX ratio:"));
     ratioTX.add(Box.createHorizontalStrut(5));
@@ -217,18 +226,32 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
     ratioRX.add(new JLabel("RX ratio:"));
     ratioRX.add(Box.createHorizontalStrut(5));
     ratioRX.add(successRatioRxSpinner);
+    */
 
     rangeTX.setVisible(false);
     rangeINT.setVisible(false);
+    /*
     ratioTX.setVisible(false);
     ratioRX.setVisible(false);
-
+    */
+    
     main.add(rangeTX);
     main.add(rangeINT);
+    /*
     main.add(ratioTX);
     main.add(ratioRX);
+    */
+    
+    /*
+     * Now we have a rrFrame for each one of the motes
+     * either it is a cc2420 radio or tag.
+     */
 
-    rrFrame = new JInternalFrame("UDGMBS", false, true);
+    /* Change the title of the rrFrame of the parent */
+    getRRFrame().setTitle("CC2420 Radio");
+    
+    /* Set the rrFrame for the radio */
+    rrFrame = new JInternalFrame("Backscatter Tag", false, true);
     rrFrame.setVisible(false);
     rrFrame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     rrFrame.addInternalFrameListener(new InternalFrameAdapter() {
@@ -237,8 +260,10 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
         super.internalFrameClosed(ife);
         rangeTX.setVisible(false);
         rangeINT.setVisible(false);
+        /*
         ratioTX.setVisible(false);
         ratioRX.setVisible(false);
+        */
         rrFrame.setVisible(false);
       }
     });
@@ -249,6 +274,9 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setInactive() {
+    super.setInactive();
+/**/System.out.println("UDGMBS.setInactive");
+      
     if (simulation == null) {
       /* Skin was never activated */
       return;
@@ -259,109 +287,124 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
 
     /* Unregister menu actions */
     visualizer.unregisterSimulationMenuAction(RangeMenuAction.class);
-    visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
+    //visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
   }
 
-  @Override
-  public Color[] getColorOf(Mote mote) {
-    return null;
-  }
+//  @Override
+//  public Color[] getColorOf(Mote mote) {
+///**/System.out.println("UDGMBS.getColorOf");      
+//    return null;
+//  }
 
   @Override
   public void paintBeforeMotes(Graphics g) {
+/**/System.out.println("UDGMBS.paintBeforeMotes");         
+      
     Set<Mote> selectedMotes = visualizer.getSelectedMotes();
     if (simulation == null || selectedMotes == null) {
       return;
     }
-
+    
     Area intRangeArea = new Area();
     Area intRangeMaxArea = new Area();
     Area trxRangeArea = new Area();
     Area trxRangeMaxArea = new Area();
+    
+/**/System.out.println("UDGMBS.paintBeforeMotesSTART");
+    
 
     for (Mote selectedMote : selectedMotes) {
       if (selectedMote.getInterfaces().getRadio() == null) {
         continue;
       }
+      
+/**/  System.out.println("UDGMBS.selectedMoteID: " + selectedMote.getID());
+      
+      if (selectedMote.getInterfaces().getRadio().isBackscatterTag()) {
+/**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());        
 
-      /* Paint transmission and interference range for selected mote */
-      Position motePos = selectedMote.getInterfaces().getPosition();
+        /* Paint transmission and interference range for selected mote */
+        Position motePos = selectedMote.getInterfaces().getPosition();
 
-      Point pixelCoord = visualizer.transformPositionToPixel(motePos);
-      int x = pixelCoord.x;
-      int y = pixelCoord.y;
+        Point pixelCoord = visualizer.transformPositionToPixel(motePos);
+        int x = pixelCoord.x;
+        int y = pixelCoord.y;
 
-      // Fetch current output power indicator (scale with as percent)
-      Radio selectedRadio = selectedMote.getInterfaces().getRadio();
-      double moteInterferenceRange
-              = radioMedium.INTERFERENCE_RANGE
-              * ((double) selectedRadio.getCurrentOutputPowerIndicator()
-              / (double) selectedRadio.getOutputPowerIndicatorMax());
-      double moteTransmissionRange
-              = radioMedium.TRANSMITTING_RANGE
-              * ((double) selectedRadio.getCurrentOutputPowerIndicator()
-              / (double) selectedRadio.getOutputPowerIndicatorMax());
+        // Fetch current output power indicator (scale with as percent)
+        Radio selectedRadio = selectedMote.getInterfaces().getRadio();
+        double moteInterferenceRange
+                = radioMedium.INTERFERENCE_RANGE
+                * ((double) selectedRadio.getCurrentOutputPowerIndicator()
+                / (double) selectedRadio.getOutputPowerIndicatorMax());
+        double moteTransmissionRange
+                = radioMedium.TRANSMITTING_RANGE
+                * ((double) selectedRadio.getCurrentOutputPowerIndicator()
+                / (double) selectedRadio.getOutputPowerIndicatorMax());
 
-      Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
-      Point translatedInterference
-              = visualizer.transformPositionToPixel(moteInterferenceRange, moteInterferenceRange, 0.0);
-      Point translatedTransmission
-              = visualizer.transformPositionToPixel(moteTransmissionRange, moteTransmissionRange, 0.0);
-      Point translatedInterferenceMax
-              = visualizer.transformPositionToPixel(radioMedium.INTERFERENCE_RANGE, radioMedium.INTERFERENCE_RANGE, 0.0);
-      Point translatedTransmissionMax
-              = visualizer.transformPositionToPixel(radioMedium.TRANSMITTING_RANGE, radioMedium.TRANSMITTING_RANGE, 0.0);
+        Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
+        Point translatedInterference
+                = visualizer.transformPositionToPixel(moteInterferenceRange, moteInterferenceRange, 0.0);
+        Point translatedTransmission
+                = visualizer.transformPositionToPixel(moteTransmissionRange, moteTransmissionRange, 0.0);
+        Point translatedInterferenceMax
+                = visualizer.transformPositionToPixel(radioMedium.INTERFERENCE_RANGE, radioMedium.INTERFERENCE_RANGE, 0.0);
+        Point translatedTransmissionMax
+                = visualizer.transformPositionToPixel(radioMedium.TRANSMITTING_RANGE, radioMedium.TRANSMITTING_RANGE, 0.0);
 
-      translatedInterference.x = Math.abs(translatedInterference.x - translatedZero.x);
-      translatedInterference.y = Math.abs(translatedInterference.y - translatedZero.y);
-      translatedTransmission.x = Math.abs(translatedTransmission.x - translatedZero.x);
-      translatedTransmission.y = Math.abs(translatedTransmission.y - translatedZero.y);
-      translatedInterferenceMax.x = Math.abs(translatedInterferenceMax.x - translatedZero.x);
-      translatedInterferenceMax.y = Math.abs(translatedInterferenceMax.y - translatedZero.y);
-      translatedTransmissionMax.x = Math.abs(translatedTransmissionMax.x - translatedZero.x);
-      translatedTransmissionMax.y = Math.abs(translatedTransmissionMax.y - translatedZero.y);
+        translatedInterference.x = Math.abs(translatedInterference.x - translatedZero.x);
+        translatedInterference.y = Math.abs(translatedInterference.y - translatedZero.y);
+        translatedTransmission.x = Math.abs(translatedTransmission.x - translatedZero.x);
+        translatedTransmission.y = Math.abs(translatedTransmission.y - translatedZero.y);
+        translatedInterferenceMax.x = Math.abs(translatedInterferenceMax.x - translatedZero.x);
+        translatedInterferenceMax.y = Math.abs(translatedInterferenceMax.y - translatedZero.y);
+        translatedTransmissionMax.x = Math.abs(translatedTransmissionMax.x - translatedZero.x);
+        translatedTransmissionMax.y = Math.abs(translatedTransmissionMax.y - translatedZero.y);
 
-      /* Interference range */
-      intRangeArea.add(new Area(new Ellipse2D.Double(
-              x - translatedInterference.x,
-              y - translatedInterference.y,
-              2 * translatedInterference.x,
-              2 * translatedInterference.y)));
+        /* Interference range */
+        intRangeArea.add(new Area(new Ellipse2D.Double(
+                x - translatedInterference.x,
+                y - translatedInterference.y,
+                2 * translatedInterference.x,
+                2 * translatedInterference.y)));
+  
+        /* Interference range (MAX) */
+        trxRangeArea.add(new Area(new Ellipse2D.Double(
+                x - translatedTransmission.x,
+                y - translatedTransmission.y,
+                2 * translatedTransmission.x,
+                2 * translatedTransmission.y)));
+  
+        intRangeMaxArea.add(new Area(new Ellipse2D.Double(
+                x - translatedInterferenceMax.x,
+                y - translatedInterferenceMax.y,
+                2 * translatedInterferenceMax.x,
+                2 * translatedInterferenceMax.y)));
+  
+        /* Transmission range (MAX) */
+        trxRangeMaxArea.add(new Area(new Ellipse2D.Double(
+                x - translatedTransmissionMax.x,
+                y - translatedTransmissionMax.y,
+                2 * translatedTransmissionMax.x,
+                2 * translatedTransmissionMax.y)));
+      
 
-      /* Interference range (MAX) */
-      trxRangeArea.add(new Area(new Ellipse2D.Double(
-              x - translatedTransmission.x,
-              y - translatedTransmission.y,
-              2 * translatedTransmission.x,
-              2 * translatedTransmission.y)));
-
-      intRangeMaxArea.add(new Area(new Ellipse2D.Double(
-              x - translatedInterferenceMax.x,
-              y - translatedInterferenceMax.y,
-              2 * translatedInterferenceMax.x,
-              2 * translatedInterferenceMax.y)));
-
-      /* Transmission range (MAX) */
-      trxRangeMaxArea.add(new Area(new Ellipse2D.Double(
-              x - translatedTransmissionMax.x,
-              y - translatedTransmissionMax.y,
-              2 * translatedTransmissionMax.x,
-              2 * translatedTransmissionMax.y)));
-
-    }
-
-    Graphics2D g2d = (Graphics2D) g;
-
-    g2d.setColor(COLOR_INT);
-    g2d.fill(intRangeArea);
-    g.setColor(Color.GRAY);
-    g2d.draw(intRangeMaxArea);
-
-    g.setColor(COLOR_TX);
-    g2d.fill(trxRangeArea);
-    g.setColor(Color.GRAY);
-    g2d.draw(trxRangeMaxArea);
-
+        Graphics2D g2d = (Graphics2D) g;
+/**/    System.out.println("UDGMBS.Graphics2D");
+    
+        g2d.setColor(COLOR_INT);
+        g2d.fill(intRangeArea);
+        g.setColor(Color.GRAY);
+        g2d.draw(intRangeMaxArea);
+    
+        g.setColor(COLOR_TX);
+        g2d.fill(trxRangeArea);
+        g.setColor(Color.GRAY);
+        g2d.draw(trxRangeMaxArea);
+        
+      } else {
+        super.paintBeforeMotes(g);
+      }
+    }   
     FontMetrics fm = g.getFontMetrics();
     g.setColor(Color.BLACK);
 
@@ -385,12 +428,15 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
         g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
       }
     }
+/**/System.out.println("UDGMBS.paintBeforeMotesSTOP");
 
   }
-
-  @Override
-  public void paintAfterMotes(Graphics g) {
-  }
+  
+//  @Override
+//  public void paintAfterMotes(Graphics g) {
+///**/System.out.println("UDGMBS.paintAfterMotes");         
+//      
+//  }
 
   public static class RangeMenuAction implements SimulationMenuAction {
 
@@ -401,7 +447,7 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
 
     @Override
     public String getDescription(Visualizer visualizer, Simulation simulation) {
-      return "Change transmission ranges";
+      return "Change transmission ranges for tag";
     }
 
     @Override
@@ -427,7 +473,7 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
 
     @Override
     public String getDescription(Visualizer visualizer, Simulation simulation) {
-      return "Change TX/RX success ratio";
+      return "Change TX/RX success ratio for tag";
     }
 
     @Override
@@ -445,6 +491,8 @@ public class UDGMBSVisualizerSkin implements VisualizerSkin {
   };
 
   private void updateRatioRangeFrame() {
+/**/System.out.println("UDGMBS.updateRatioRangeFrame");         
+      
     if (rrFrame.getDesktopPane() == null) {
       visualizer.getDesktopPane().add(rrFrame);
     }

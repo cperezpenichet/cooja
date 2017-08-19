@@ -2993,21 +2993,25 @@ public class Cooja extends Observable {
 
     if (callingObject != null) {
       try {
+/**/    //System.out.println("callingObject: " + callingObject.getClass().getClassLoader().getClass());        
         return callingObject.getClass().getClassLoader().loadClass(className).asSubclass(classType);
       } catch (ClassNotFoundException e) {
       } catch (UnsupportedClassVersionError e) {
       }
     }
-
+/**///System.out.println("2.callingObject");
     try {
+/**///System.out.println("3.callingObject");      
       return Class.forName(className).asSubclass(classType);
     } catch (ClassNotFoundException e) {
     } catch (UnsupportedClassVersionError e) {
     }
-
+/**/  //  System.out.println("4.callingObject");
     if (!isVisualizedInApplet()) {
-      try {
+      try {      
+/**/    //System.out.println("5.callingObject");
         if (projectDirClassLoader != null) {
+/**/      //System.out.println("6.callingObject");          
           return projectDirClassLoader.loadClass(className).asSubclass(
               classType);
         }

@@ -973,9 +973,10 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       for (Class<? extends Object> o : radioMediums) {
 /**/    System.out.println("o.getClass(): " + o);        
         if (o.isAssignableFrom(simulation.getRadioMedium().getClass())) {
-//          if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMBS.class) {
-//            break;
-//          }
+          /* Custom solution */
+          if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMBS.class) {
+            break;
+          }
           showMenuItem = true;
 /**/      System.out.println("1.showMenuItem: " + showMenuItem);          
           break;

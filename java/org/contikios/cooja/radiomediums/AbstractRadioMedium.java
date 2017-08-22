@@ -337,7 +337,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					}
 					
 /**/      System.out.println("\nActiveConnections: " + getActiveConnections().length);
-/**/      System.out.println("conn: " + connection.getID() + "stopps"); 
+/**/      System.out.println("conn: " + connection.getID() + " stops"); 
 
 					activeConnections.remove(connection);
 					lastConnection = connection;
@@ -486,8 +486,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	             * These empty additions intend to make the default fatal message disappeared for cases the 
 	             * are not being updated by the observer in this class.
 	             */
-	            case CARRIER_STARTED:
-	            case CARRIER_STOPPED:
 	            case CARRIER_LISTENING_STARTED:
 	            case CARRIER_LISTENING_STOPPED:    
 	                break; 

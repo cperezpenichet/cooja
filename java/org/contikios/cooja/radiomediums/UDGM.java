@@ -306,18 +306,40 @@ public class UDGM extends AbstractRadioMedium {
   }
   public double getRxSuccessProbability(Radio source, Radio dest) {
   	double distance = source.getPosition().getDistanceTo(dest.getPosition());
+/**/System.out.println("UDGM.distance: " + distance);
     double distanceSquared = Math.pow(distance,2.0);
-/**/// System.out.println("Power Indicator");
+/**/System.out.println("UDGM.distanceSquared: " + distanceSquared);
+
+/**/System.out.println();
+/**/System.out.println("UDGM.Power Indicator");
+/**/System.out.println("UDGM.source.getCurrentOutputPowerIndicator(): " + (double)source.getCurrentOutputPowerIndicator());
+/**/System.out.println("UDGM.source.getCurrentOutputPowerIndicatorMax(): " + (double) source.getOutputPowerIndicatorMax());
+
+/**/System.out.println("UDGM.TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
+
     double distanceMax = TRANSMITTING_RANGE * 
     ((double) source.getCurrentOutputPowerIndicator() / (double) source.getOutputPowerIndicatorMax());
     if (distanceMax == 0.0) {
       return 0.0;
     }
+
+/**/System.out.println("UDGM.distanceMax: " + distanceMax);
+
     double distanceMaxSquared = Math.pow(distanceMax,2.0);
+
+/**/System.out.println("UDGM.distanceMaxSquared: " + distanceMaxSquared);
+
     double ratio = distanceSquared / distanceMaxSquared;
+    /**/System.out.println("UDGM.ratio: " + ratio);
+
+    
     if (ratio > 1.0) {
     	return 0.0;
     }
+    
+/**/System.out.println("UDGM.SUCCESS_RATIO_RX: " + SUCCESS_RATIO_RX);
+
+    
     return 1.0 - ratio*(1.0-SUCCESS_RATIO_RX);
   }
 

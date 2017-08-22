@@ -279,7 +279,7 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
     if (simulation == null || selectedMotes == null) {
       return;
     }
-
+    
     Area intRangeArea = new Area();
     Area intRangeMaxArea = new Area();
     Area trxRangeArea = new Area();
@@ -291,6 +291,9 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
       if (selectedMote.getInterfaces().getRadio() == null) {
         continue;
       }
+      
+/**/  System.out.println("selectedRadioMoteID: " + selectedMote.getID());        
+
 
       /* Paint transmission and interference range for selected mote */
       Position motePos = selectedMote.getInterfaces().getPosition();
@@ -305,6 +308,9 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
               = radioMedium.INTERFERENCE_RANGE
               * ((double) selectedRadio.getCurrentOutputPowerIndicator()
               / (double) selectedRadio.getOutputPowerIndicatorMax());
+      
+      /**/System.out.println("radioMedium.TRANSMITTING_RANGE: " + radioMedium.TRANSMITTING_RANGE);
+      
       double moteTransmissionRange
               = radioMedium.TRANSMITTING_RANGE
               * ((double) selectedRadio.getCurrentOutputPowerIndicator()
@@ -374,14 +380,23 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
     /* Print transmission success probabilities only if single mote is selected */
     if (selectedMotes.size() == 1) {
+/**/    System.out.println("UDGM.selectedMotes.size(): " + selectedMotes.size());      
+      
       Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
       for (Mote m : simulation.getMotes()) {
         if (m == selectedMote) {
           continue;
         }
+        
+/**/    System.out.println("UDGM.m: " + m.getID());      
+     
         double prob
                 = ((UDGM) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, m.getInterfaces().getRadio());
+       
+/**/    System.out.println("UDGM.PROB: " + prob);
+
+        
         if (prob == 0.0d) {
           continue;
         }

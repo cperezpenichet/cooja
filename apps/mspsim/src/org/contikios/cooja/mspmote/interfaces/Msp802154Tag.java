@@ -184,6 +184,16 @@ public class Msp802154Tag extends Msp802154Radio {
     notifyObservers();
   }
   
+  /* 
+   * Based on the absence of the receiving capabilities
+   * the tag does not get interfered 
+   */
+  public void interfereAnyReception() {
+/**/System.out.println("tag: " + mote.getID() + " does not get interfered");
+    setInterfered(false);
+  }
+  
+  
   @Override
   public int getCurrentOutputPowerIndicator() {
       return 31;

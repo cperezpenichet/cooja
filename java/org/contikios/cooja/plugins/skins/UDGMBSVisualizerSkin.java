@@ -112,18 +112,20 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     this.simulation = simulation;
     this.visualizer = vis;
     this.radioMedium = (UDGMBS) simulation.getRadioMedium();
+    
+    /* Change the title of the visualizer */
+    getVisualizer().setTitle("Network - UDGMBS");
 
     /* Spinner GUI components */
     SpinnerNumberModel transmissionModel = new SpinnerNumberModel();
-    transmissionModel.setValue(new Double(radioMedium.TRANSMITTING_RANGE));
+    transmissionModel.setValue(new Double(radioMedium.TAG_TRANSMITTING_RANGE));
     transmissionModel.setStepSize(new Double(1.0)); // 1m
     transmissionModel.setMinimum(new Double(0.0));
 
     SpinnerNumberModel interferenceModel = new SpinnerNumberModel();
-    interferenceModel.setValue(new Double(radioMedium.INTERFERENCE_RANGE));
+    interferenceModel.setValue(new Double(radioMedium.TAG_INTERFERENCE_RANGE));
     interferenceModel.setStepSize(new Double(1.0)); // 1m
     interferenceModel.setMinimum(new Double(0.0));
-    /*
     SpinnerNumberModel successRatioTxModel = new SpinnerNumberModel();
     successRatioTxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_TX));
     successRatioTxModel.setStepSize(new Double(0.001)); // 0.1%
@@ -135,7 +137,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     successRatioRxModel.setStepSize(new Double(0.001)); // 0.1%
     successRatioRxModel.setMinimum(new Double(0.0));
     successRatioRxModel.setMaximum(new Double(1.0));
-    */
     JSpinner.NumberEditor editor;
     final JSpinner txRangeSpinner = new JSpinner(transmissionModel);
     editor = new JSpinner.NumberEditor(txRangeSpinner, "0m");
@@ -143,23 +144,21 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     final JSpinner interferenceRangeSpinner = new JSpinner(interferenceModel);
     editor = new JSpinner.NumberEditor(interferenceRangeSpinner, "0m");
     interferenceRangeSpinner.setEditor(editor);
-    /*
     final JSpinner successRatioTxSpinner = new JSpinner(successRatioTxModel);
     editor = new JSpinner.NumberEditor(successRatioTxSpinner, "0.0%");
     successRatioTxSpinner.setEditor(editor);
     final JSpinner successRatioRxSpinner = new JSpinner(successRatioRxModel);
     editor = new JSpinner.NumberEditor(successRatioRxSpinner, "0.0%");
     successRatioRxSpinner.setEditor(editor);
-    */
 
     ((JSpinner.DefaultEditor) txRangeSpinner.getEditor()).getTextField().setColumns(5);
     ((JSpinner.DefaultEditor) interferenceRangeSpinner.getEditor()).getTextField().setColumns(5);
-    //((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
-    //((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
+    ((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
+    ((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
     txRangeSpinner.setToolTipText("Transmitting range (m)");
     interferenceRangeSpinner.setToolTipText("Interference range (m)");
-    //successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
-    //successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
+    successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
+    successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
 
     txRangeSpinner.addChangeListener(new ChangeListener() {
       @Override
@@ -179,7 +178,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       }
     });
     
-    /*
     successRatioTxSpinner.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
@@ -197,16 +195,15 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         visualizer.repaint();
       }
     });
-    */
 
     /* Register menu actions */
     visualizer.registerSimulationMenuAction(RangeMenuAction.class);
-    //visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
+    visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
 
     /* UI components */
     JPanel main = new JPanel();
     main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
-    main.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    main.setBorder(BorderFactory.createEmptyBorder(9, 9, 9, 9));
 
     rangeTX = Box.createHorizontalBox();
     rangeTX.add(new JLabel("TX range:"));
@@ -217,7 +214,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     rangeINT.add(Box.createHorizontalStrut(5));
     rangeINT.add(interferenceRangeSpinner);
     
-    /*
     ratioTX = Box.createHorizontalBox();
     ratioTX.add(new JLabel("TX ratio:"));
     ratioTX.add(Box.createHorizontalStrut(5));
@@ -226,25 +222,20 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     ratioRX.add(new JLabel("RX ratio:"));
     ratioRX.add(Box.createHorizontalStrut(5));
     ratioRX.add(successRatioRxSpinner);
-    */
 
     rangeTX.setVisible(false);
     rangeINT.setVisible(false);
-    /*
     ratioTX.setVisible(false);
     ratioRX.setVisible(false);
-    */
     
     main.add(rangeTX);
     main.add(rangeINT);
-    /*
     main.add(ratioTX);
     main.add(ratioRX);
-    */
     
     /*
      * Now we have a rrFrame for each one of the motes
-     * either it is a cc2420 radio or tag.
+     * either it is a cc2420 radio or a tag.
      */
 
     /* Change the title of the rrFrame of the parent */
@@ -260,10 +251,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         super.internalFrameClosed(ife);
         rangeTX.setVisible(false);
         rangeINT.setVisible(false);
-        /*
         ratioTX.setVisible(false);
         ratioRX.setVisible(false);
-        */
         rrFrame.setVisible(false);
       }
     });
@@ -287,24 +276,33 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
     /* Unregister menu actions */
     visualizer.unregisterSimulationMenuAction(RangeMenuAction.class);
-    //visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
+    visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
   }
 
-//  @Override
-//  public Color[] getColorOf(Mote mote) {
-///**/System.out.println("UDGMBS.getColorOf");      
-//    return null;
-//  }
+  @Override
+  public Color[] getColorOf(Mote mote) {
+/**/System.out.println("UDGMBS.getColorOf");      
+    return null;
+  }
 
   @Override
   public void paintBeforeMotes(Graphics g) {
-/**/System.out.println("UDGMBS.paintBeforeMotes");         
+/**/System.out.println("UDGMBS.paintBeforeMotes");
+
       
     Set<Mote> selectedMotes = visualizer.getSelectedMotes();
     if (simulation == null || selectedMotes == null) {
+/**/System.out.println("simulation || selectedMotes = null");      
       return;
     }
     
+    boolean tagSelected = false;
+
+    for (Mote mote: selectedMotes) {
+/**/  System.out.println("selectedMote: " + mote.getID());
+    
+    }
+
     Area intRangeArea = new Area();
     Area intRangeMaxArea = new Area();
     Area trxRangeArea = new Area();
@@ -332,24 +330,24 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
         // Fetch current output power indicator (scale with as percent)
         Radio selectedRadio = selectedMote.getInterfaces().getRadio();
-        double moteInterferenceRange
-                = radioMedium.INTERFERENCE_RANGE
+        double tagInterferenceRange
+                = radioMedium.TAG_INTERFERENCE_RANGE
                 * ((double) selectedRadio.getCurrentOutputPowerIndicator()
                 / (double) selectedRadio.getOutputPowerIndicatorMax());
-        double moteTransmissionRange
-                = radioMedium.TRANSMITTING_RANGE
+        double tagTransmissionRange
+                = radioMedium.TAG_TRANSMITTING_RANGE
                 * ((double) selectedRadio.getCurrentOutputPowerIndicator()
                 / (double) selectedRadio.getOutputPowerIndicatorMax());
 
         Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
         Point translatedInterference
-                = visualizer.transformPositionToPixel(moteInterferenceRange, moteInterferenceRange, 0.0);
+                = visualizer.transformPositionToPixel(tagInterferenceRange, tagInterferenceRange, 0.0);
         Point translatedTransmission
-                = visualizer.transformPositionToPixel(moteTransmissionRange, moteTransmissionRange, 0.0);
+                = visualizer.transformPositionToPixel(tagTransmissionRange, tagTransmissionRange, 0.0);
         Point translatedInterferenceMax
-                = visualizer.transformPositionToPixel(radioMedium.INTERFERENCE_RANGE, radioMedium.INTERFERENCE_RANGE, 0.0);
+                = visualizer.transformPositionToPixel(radioMedium.TAG_INTERFERENCE_RANGE, radioMedium.TAG_INTERFERENCE_RANGE, 0.0);
         Point translatedTransmissionMax
-                = visualizer.transformPositionToPixel(radioMedium.TRANSMITTING_RANGE, radioMedium.TRANSMITTING_RANGE, 0.0);
+                = visualizer.transformPositionToPixel(radioMedium.TAG_TRANSMITTING_RANGE, radioMedium.TAG_TRANSMITTING_RANGE, 0.0);
 
         translatedInterference.x = Math.abs(translatedInterference.x - translatedZero.x);
         translatedInterference.y = Math.abs(translatedInterference.y - translatedZero.y);
@@ -386,57 +384,72 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
                 y - translatedTransmissionMax.y,
                 2 * translatedTransmissionMax.x,
                 2 * translatedTransmissionMax.y)));
-      
-
-        Graphics2D g2d = (Graphics2D) g;
-/**/    System.out.println("UDGMBS.Graphics2D");
-    
-        g2d.setColor(COLOR_INT);
-        g2d.fill(intRangeArea);
-        g.setColor(Color.GRAY);
-        g2d.draw(intRangeMaxArea);
-    
-        g.setColor(COLOR_TX);
-        g2d.fill(trxRangeArea);
-        g.setColor(Color.GRAY);
-        g2d.draw(trxRangeMaxArea);
         
+      
+        tagSelected = true;  
+      
       } else {
         super.paintBeforeMotes(g);
       }
-    }   
-    FontMetrics fm = g.getFontMetrics();
-    g.setColor(Color.BLACK);
-
-    /* Print transmission success probabilities only if single mote is selected */
-    if (selectedMotes.size() == 1) {
-      Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
-      Radio selectedRadio = selectedMote.getInterfaces().getRadio();
-      for (Mote m : simulation.getMotes()) {
-        if (m == selectedMote) {
-          continue;
-        }
-        double prob
-                = ((UDGMBS) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, m.getInterfaces().getRadio());
-        if (prob == 0.0d) {
-          continue;
-        }
-        String msg = (((int) (1000 * prob)) / 10.0) + "%";
-        Position pos = m.getInterfaces().getPosition();
-        Point pixel = visualizer.transformPositionToPixel(pos);
-        int msgWidth = fm.stringWidth(msg);
-        g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
-      }
     }
+    
+    if (tagSelected) {
+      Graphics2D g2d = (Graphics2D) g;
+/**/  System.out.println("UDGMBS.Graphics2D");
+    
+      g2d.setColor(COLOR_INT);
+      g2d.fill(intRangeArea);
+      g.setColor(Color.GRAY);
+      g2d.draw(intRangeMaxArea);
+  
+      g.setColor(COLOR_TX);
+      g2d.fill(trxRangeArea);
+      g.setColor(Color.GRAY);
+      g2d.draw(trxRangeMaxArea);
+       
+      FontMetrics fm = g.getFontMetrics();
+      g.setColor(Color.BLACK);
+
+      /* Print transmission success probabilities only if single mote is selected */
+      if (selectedMotes.size() == 1) {
+/**/    System.out.println("UDGMBS.selectedMotes.size(): " + selectedMotes.size());      
+        Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
+        Radio selectedRadio = selectedMote.getInterfaces().getRadio();
+        for (Mote m : simulation.getMotes()) {
+          if (m == selectedMote) {
+            continue;
+          }
+          
+/**/    System.out.println("UDGMBS.m: " + m.getID());      
+
+          
+          double prob
+                  = ((UDGMBS) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, m.getInterfaces().getRadio());
+          
+/**/      System.out.println("UDGMBS.PROB: " + prob);
+          
+          if (prob == 0.0d) {
+            continue;
+          }
+          String msg = (((int) (1000 * prob)) / 10.0) + "%";
+          Position pos = m.getInterfaces().getPosition();
+          Point pixel = visualizer.transformPositionToPixel(pos);
+          int msgWidth = fm.stringWidth(msg);
+          g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
+        }
+      }
+    }  
+    tagSelected = false;
+
 /**/System.out.println("UDGMBS.paintBeforeMotesSTOP");
 
   }
   
-//  @Override
-//  public void paintAfterMotes(Graphics g) {
-///**/System.out.println("UDGMBS.paintAfterMotes");         
-//      
-//  }
+  @Override
+  public void paintAfterMotes(Graphics g) {
+/**/System.out.println("UDGMBS.paintAfterMotes");         
+      
+  }
 
   public static class RangeMenuAction implements SimulationMenuAction {
 

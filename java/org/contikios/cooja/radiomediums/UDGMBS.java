@@ -153,6 +153,8 @@ public class UDGMBS extends UDGM {
         mote.getInterfaces().getPosition().addObserver(positionObserver);
       }
       dgrm.requestEdgeAnalysis();
+      
+      super.removed();
 
       /* Register visualizer skin */
       Visualizer.registerVisualizerSkin(UDGMBSVisualizerSkin.class);
@@ -161,7 +163,7 @@ public class UDGMBS extends UDGM {
   
   
   public void removed() {
-      super.removed();
+     // super.removed();
 
       Visualizer.unregisterVisualizerSkin(UDGMBSVisualizerSkin.class);
   }

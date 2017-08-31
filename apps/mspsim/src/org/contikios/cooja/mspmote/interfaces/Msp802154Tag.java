@@ -88,7 +88,7 @@ public class Msp802154Tag extends Msp802154Radio {
         }
 
         /* send this byte to all nodes */
-        lastOutgoingByte = data;
+        setLastOutgoingByte(data);
         setLastEvent(RadioEvent.CUSTOM_DATA_TRANSMITTED); 
         setChanged();
         notifyObservers();

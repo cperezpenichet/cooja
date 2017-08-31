@@ -80,8 +80,8 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   private boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
   
-  protected byte lastOutgoingByte;
-  protected byte lastIncomingByte;
+  private byte lastOutgoingByte;
+  private byte lastIncomingByte;
 
   private RadioPacket lastOutgoingPacket = null;
   private RadioPacket lastIncomingPacket = null;
@@ -318,6 +318,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
       }
     }, mote.getSimulation().getSimulationTime());
 
+  }
+  
+  public void setLastOutgoingByte(byte lastOutgoingByte) {
+    this.lastOutgoingByte = lastOutgoingByte;
   }
 
   public boolean isGeneratingCarrier() {

@@ -331,7 +331,6 @@ public class UDGM extends AbstractRadioMedium {
 
     double ratio = distanceSquared / distanceMaxSquared;
     /**/System.out.println("UDGM.ratio: " + ratio);
-
     
     if (ratio > 1.0) {
     	return 0.0;

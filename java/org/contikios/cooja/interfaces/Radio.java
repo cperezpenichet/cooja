@@ -31,6 +31,7 @@ package org.contikios.cooja.interfaces;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Hashtable;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -44,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
 import org.contikios.cooja.MoteInterface;
+import org.contikios.cooja.RadioConnection;
 import org.contikios.cooja.RadioPacket;
 import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
 
@@ -272,6 +274,31 @@ public abstract class Radio extends MoteInterface {
    * @return Mote
    */
   public abstract Mote getMote();
+  
+  public void updateTagTXPowers(RadioConnection conn) {};
+  public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower){};
+  public double getTagCurrentOutputPowerMax(int channel) {
+    return 0.0;
+  }
+
+  public double getTagTXPower(int channel){
+    return 0.0;
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
 
   public JPanel getInterfaceVisualizer() {

@@ -31,6 +31,7 @@
 package org.contikios.cooja.mspmote.interfaces;
 
 import java.util.Collection;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -85,6 +86,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
   private RadioPacket lastOutgoingPacket = null;
   private RadioPacket lastIncomingPacket = null;
+  
 
   public Msp802154Radio(Mote m) { 
 /**/System.out.println("Msp802154Radio");

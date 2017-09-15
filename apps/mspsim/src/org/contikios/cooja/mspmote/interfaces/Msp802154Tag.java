@@ -30,16 +30,31 @@
 
 package org.contikios.cooja.mspmote.interfaces;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
 
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
 import org.contikios.cooja.RadioPacket;
+import org.contikios.cooja.interfaces.Radio;
+import org.contikios.cooja.RadioConnection;
+
 import org.contikios.cooja.interfaces.Radio.RadioEvent;
+import org.contikios.cooja.radiomediums.AbstractRadioMedium;
+import org.contikios.cooja.radiomediums.UDGMBS;
 
 import se.sics.mspsim.chip.BackscatterTXRadio;
 import se.sics.mspsim.chip.CC2420;
 import se.sics.mspsim.chip.RFListener;
+
+
+import org.contikios.cooja.RadioConnection;
+
 
 /**
  * MSPSim 802.15.4 radio to COOJA wrapper.
@@ -53,7 +68,19 @@ public class Msp802154Tag extends Msp802154Radio {
   private final BackscatterTXRadio tag;
 
   private boolean isListeningCarrier = false;
+  
+  /* Keeps a record of the transmitted power from the tag */
+  private Hashtable<Integer, Hashtable<RadioConnection, Double>> tagTXPower = 
+                                                new Hashtable<Integer, Hashtable<RadioConnection, Double>>(); 
+  
+  /* Keeps a record of the maximum transmitted power from the tag */
+  private Hashtable<Integer, Hashtable<RadioConnection, Double>> tagTXPowerMax = 
+                                                new Hashtable<Integer, Hashtable<RadioConnection, Double>>(); 
 
+  
+  
+  
+  
   public Msp802154Tag(Mote m) {
     super(m);
 /**/System.out.println("Msp802154Tag");
@@ -132,7 +159,6 @@ public class Msp802154Tag extends Msp802154Radio {
     
   }
 
-  
   public boolean isBackscatterTag() {
       return true;
   }
@@ -160,7 +186,7 @@ public class Msp802154Tag extends Msp802154Radio {
   public int getChannel() {
 /**/System.out.println("tag.getchannel");
     return -1;
-   }
+  }
 
   /* Concerns the start of the carrier listening */
   @Override
@@ -185,8 +211,8 @@ public class Msp802154Tag extends Msp802154Radio {
   }
   
   /* 
-   * Based on the absence of the receiving capabilities
-   * the tag does not get interfered 
+   * Based on the absence of the receiving capabilities of
+   * the tag, it does not get interfered. 
    */
   public void interfereAnyReception() {
 /**/System.out.println("tag: " + mote.getID() + " does not get interfered");
@@ -194,20 +220,66 @@ public class Msp802154Tag extends Msp802154Radio {
   }
   
   
-  @Override
-  public int getCurrentOutputPowerIndicator() {
-      return 31;
+  public void updateTagTXPowers(RadioConnection conn) {
+/**/System.out.println("updateTagTXPowers");
+/**/System.out.println("2.lastConnID: " + conn.getID());
+/**/System.out.println("3.tagTXPower: " + tagTXPower); 
+    //if(tagTXPower.get(conn.getSource().getChannel()+2).containsKey(conn)) {
+      tagTXPower.get(conn.getSource().getChannel()+2).remove(conn);
+    //}
+    
+/**/System.out.println("4.tagTXPower: " + tagTXPower);
   }
+  
+  public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower) {
+/**/System.out.println("putTagTXPower");
 
-  @Override
-  public int getOutputPowerIndicatorMax() {
-      return 31;
+    if (tagTXPower.containsKey(channel)) {
+      tagTXPower.get(channel).put(conn, tagCurrentTXPower);
+    } else {
+      Hashtable<RadioConnection, Double> txPower = new Hashtable<RadioConnection, Double>();
+      txPower.put(conn, tagCurrentTXPower);
+      tagTXPower.put(channel, txPower);
+    }
+
+/**/System.out.println("1.tagTXPower: " + tagTXPower);
   }
+  
+  public double getTagTXPower(int channel) {
+/**/System.out.println("getTagTXPower");
+/**/System.out.println("2.tagTXPower: " + tagTXPower);
+/**/System.out.println(tagTXPower.get(channel).values());
+/**/System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
+    
+    return Collections.max(tagTXPower.get(channel).values(), null);
+  }
+  
+  public double getTagCurrentOutputPowerMax(int channel) {
+    
+    RadioConnection conn = null;
+    
+    double tagPower = Collections.max(tagTXPower.get(channel).values(), null);
+    Enumeration<RadioConnection > conns = tagTXPower.get(channel).keys();
+    while (conns.hasMoreElements()) {
+      conn = conns.nextElement();
+      if(tagTXPower.get(channel).get(conn) == tagPower) {
+        return (double) conn.getSource().getCurrentOutputPowerIndicator();
+      }
+    }
+    return 0.0;
+  }
+  
+  
+     
+//  @Override
+//  public int getOutputPowerIndicatorMax() {
+//    return 31;
+//  }
   
   @Override
   public boolean isRadioOn() {
-      /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
-     return true;
+    /**/  System.out.println("1.Msp802154Tag.isRadioOn(): " + mote.getID());
+    return true;
   }
   
 }

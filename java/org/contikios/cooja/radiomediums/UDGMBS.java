@@ -31,12 +31,15 @@
 package org.contikios.cooja.radiomediums;
 
 import java.lang.Integer;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -86,14 +89,36 @@ import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 @ClassDescription("Unit Disk Graph Medium for Backscaterring Communications (UDGMBS): Distance Loss")
 public class UDGMBS extends UDGM {
   private static Logger logger = Logger.getLogger(UDGMBS.class);
+ 
+  /* Gain of the transmitting antenna */
+  public final double GT = 0;
+  /* Gain of the transmitting antenna */
+  public final double GR = 0;
+  ///* Gain of the antenna of the backscatter tag */
+  //public static final double GTAG = 3;
+  /* Wavelenght */
+  public final double WAVELENGTH = 0.122;
+  /* Energy loss */
+  public final double ENERGYLOSS = -4.4;
+  /* Reflection loss */
+  public final double REFLECTIONLOSS = -15 - ENERGYLOSS;
+  
+  /* Output power of CC240 radio tranceiver in dBm,(p.51 - datasheet) */
+  private final double[] CC2420OutputPower = {
+      -37.92, -32.98, -28.7, -25.0, -21.84, -19.15, 
+      -16.89, -15.0, -13.42, -12.1, -10.98, -10.0, 
+      -9.12, -8.33, -7.63, -7.0, -6.44, -5.94, -5.47, 
+      -5.0, -4.52, -4.03, -3.52, -3.0, -2.47, -1.95, 
+      -1.45, -1.0, -0.61, -0.3, -0.09, 0.0
+  };
   
   /* 
    * Backscatter tag has smaller TX and INTF ranges because of the reflection 
    * it causes to the incident wave transmitted by the carrier generator.
    */
   public double TAG_TRANSMITTING_RANGE = 25; /* Transmission range for tag */ 
-  public double TAG_INTERFERENCE_RANGE = 50; /* Interference range for tag. Ignored if below transmission range. */    
-      
+  public double TAG_INTERFERENCE_RANGE = 50; /* Interference range for tag. Ignored if below transmission range. */ 
+  
   private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
   
   private Random random = null;
@@ -123,7 +148,6 @@ public class UDGMBS extends UDGM {
                 addEdge(
                     new DirectedGraphMedium.Edge(source, 
                         new DGRMDestinationRadio(dest)));
-               
               }
             }
           }
@@ -154,6 +178,8 @@ public class UDGMBS extends UDGM {
       }
       dgrm.requestEdgeAnalysis();
       
+      //this.addRadioTransmissionObserver(radioMediumConnectionActivityObserver);
+      
       super.removed();
 
       /* Register visualizer skin */
@@ -177,6 +203,45 @@ public class UDGMBS extends UDGM {
     TAG_INTERFERENCE_RANGE = r;
     dgrm.requestEdgeAnalysis();
   }
+  
+  
+  /**
+   * Returns the loss in signal strength of the propagation wave
+   * 
+   * @param distance
+   */
+  public double pathLoss(double distance) {
+    return 20*Math.log10(WAVELENGTH / (4*Math.PI*distance));
+  }
+  
+  public double friisEquation(Radio source, double distance) {
+    double transmitttedPower = 0.0;
+    
+    /* Transform power level into output power in dBm */
+    for (int i =0; i < CC2420OutputPower.length; i++) {
+      if((double) source.getCurrentOutputPowerIndicator() == i) {
+        transmitttedPower = CC2420OutputPower[i];
+/**/    System.out.println("transmitttedPower: " + transmitttedPower);
+      }
+    }
+    double receivedPower = transmitttedPower + GT + GR + pathLoss(distance);
+    return receivedPower;
+  }
+  
+  
+  
+
+//  private Observer radioMediumConnectionActivityObserver = new Observer() {
+//    public void update(Observable obs, Object obj) {
+//      for (Radio r: getRegisteredRadios()) {
+//        if(r.isBackscatterTag()) {
+//          Enumeration<Integer> channels = r.
+//        }
+//      }
+//      
+//      
+//    }
+//  };
   
   
 //  private Observer radioEventsObserver = new Observer() {
@@ -219,7 +284,7 @@ public class UDGMBS extends UDGM {
       /* Store the channel of the sender which is responsible for an active transmission */
 /**/  System.out.println(sender.isGeneratingCarrier() ? "sender: " + sender.getMote().getID() + " is a carrier gen" 
                          : "sender: " + sender.getMote().getID() + " is a cc2420 radio");
-      if (sender.getChannel() >=0) {
+      if (sender.getChannel() >= 0) {
         txChannels.add(sender.getChannel());
 /**/    System.out.println("Ch= " +  sender.getChannel() + " is stored in txChannels");               
       }
@@ -268,11 +333,29 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
 /**/        //System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
             //r.interfereAnyReception();
-          }
+          } else {
+            // Calculate the incident power that each tag receives from the carrier gen.
+            // and keep a record of that power indexing it by the appropriate backscatter
+            // channel derived by the carrier generator that created that incident power.
+/**/        System.out.println();
+/**/        System.out.println("Start keeping a record of the tagTXPower");
+/**/        System.out.println("backTag: " + r.getMote().getID());
+            double dist = sender.getPosition().getDistanceTo(r.getPosition());
+/**/        System.out.println("dist: " + dist);
+            /* Incident power in dBm */
+            double incidentPower = friisEquation(sender, dist);
+/**/        System.out.println("incidentPower: " + incidentPower);
+            /* Current power of the tag in dBm */
+            double tagCurrentTXPower = incidentPower - REFLECTIONLOSS;
+/**/        System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
+/**/        System.out.println(newConnection);
+            r.putTagTXPower(sender.getChannel() + 2, newConnection, tagCurrentTXPower);
+/**/        System.out.println("Stop keeping a record of the tagTXPower");
+/**/        System.out.println();
+          } 
         } 
       } else {
 /**/    System.out.println("sender:" + sender.getMote().getID() + " is an active sender");      
-
         for (Radio r: newConnection.getAllDestinations()) {
           if (r.isBackscatterTag()) {
             newConnection.removeDestination(r);
@@ -303,18 +386,6 @@ public class UDGMBS extends UDGM {
 
         /* Collect the channels for backscattering communication */
         tagTXChannels = getTXChannels(sender);
-
-        /* Calculate ranges: grows with radio output power */
-        double tagTransmissionRange = TAG_TRANSMITTING_RANGE
-        * ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
-
-/**///    System.out.println("moteTransmissionRange: " + moteTransmissionRange);
-
-        double tagInterferenceRange = TAG_INTERFERENCE_RANGE
-        * ((double) sender.getCurrentOutputPowerIndicator() / (double) sender.getOutputPowerIndicatorMax());
-
-/**///    System.out.println("moteInterferenceRange: " + moteInterferenceRange);
-            
           
 /**/    System.out.println("tagConn: " + newConnection.getID() + " contains: " + tagTXChannels.size() + " channels which are");          
 
@@ -344,13 +415,29 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println(sender.isListeningCarrier() ? "sender(tag): " + sender.getMote().getID() : "sender: " + sender.getMote().getID() + " - Ch= " + sender.getChannel());
 /**/        System.out.println("recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
 
-
             /* Add the connection in a dormant state;
                it will be activated later when the radio will bes
                turned on and switched to the right channel. This behavior
                is consistent with the case when receiver is turned off. */
             newConnection.addInterfered(recv);
           } else {
+/**/      System.out.println("recvID: " + recv.getMote().getID());
+/**/      System.out.println("recvChannel: " + recv.getChannel());
+          double tagCurrentOutputPowerIndicator = sender.getTagTXPower(recv.getChannel());
+          double tagCurrentOutputPowerIndicatorMax = sender.getTagCurrentOutputPowerMax(recv.getChannel()) 
+                                                      - GT - GR - REFLECTIONLOSS; 
+          
+          /* Calculate ranges: grows with radio output power */
+          double tagTransmissionRange = TAG_TRANSMITTING_RANGE
+          * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
+          
+/**/      System.out.println("tagTransmissionRange: " + tagTransmissionRange);
+          
+          double tagInterferenceRange = TAG_INTERFERENCE_RANGE
+          * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
+
+/**/      System.out.println("tagInterferenceRange: " + tagInterferenceRange);
+
             Position recvPos = recv.getPosition();
             double distance = senderPos.getDistanceTo(recvPos);
 /**/        System.out.println("senderRecvDistance: " + distance);
@@ -415,36 +502,39 @@ public class UDGMBS extends UDGM {
 /**/System.out.println("return newConnection");        
     return newConnection;    
   }
+ 
   
   
- @Override
- /* A little bit of a Hack */
- public double getRxSuccessProbability(Radio source, Radio dest) {
-   double rxSuccessProbability = 0.0;
-   
-   /* Store the usual transmitting range of the parent medium */
-   double transmittingRange = super.TRANSMITTING_RANGE;
-   
-   /*
-    * In case the source is  a tag assign the tag's transmitting range 
-    * to the transmitting range of the parent so as it can be used by
-    * the parent method
-    */
-   if (source.isBackscatterTag()) {
-     super.TRANSMITTING_RANGE = TAG_TRANSMITTING_RANGE;
-   }
-   
-   rxSuccessProbability = super.getRxSuccessProbability(source, dest);
-   
-   /* 
-    * Re-estate the stored transmitting range so as it can be used
-    * by cc2420 radios
-    */
-   super.TRANSMITTING_RANGE = transmittingRange;
-   
-   return rxSuccessProbability;
- }
   
+  @Override
+  /* A little bit of a Hack */
+  public double getRxSuccessProbability(Radio source, Radio dest) {
+    double rxSuccessProbability = 0.0;
+    
+    /* Store the usual transmitting range of the parent medium */
+    double transmittingRange = super.TRANSMITTING_RANGE;
+    
+    /*
+     * In case the source is  a tag assign the tag's transmitting range 
+     * to the transmitting range of the parent so as it can be used by
+     * the parent method
+     */
+    if (source.isBackscatterTag()) {
+      super.TRANSMITTING_RANGE = TAG_TRANSMITTING_RANGE;
+    }
+   
+    rxSuccessProbability = super.getRxSuccessProbability(source, dest);
+   
+    /* 
+     * Re-estate the stored transmitting range so as it can be used
+     * by cc2420 radios.
+     */
+    super.TRANSMITTING_RANGE = transmittingRange;
+   
+    return rxSuccessProbability;
+  }
+  
+ 
   @Override
   public void updateSignalStrengths() {
     /* Override: uses distance as signal strength factor */
@@ -455,6 +545,16 @@ public class UDGMBS extends UDGM {
     for (Radio radio : getRegisteredRadios()) {
       radio.setCurrentSignalStrength(getBaseRssi(radio));      
 /**/  System.out.printf("Reset Radio: %d, Signal strength: %.2f\n", radio.getMote().getID(), radio.getCurrentSignalStrength());
+      
+      RadioConnection lastConn = getLastConnection();
+      if (lastConn != null) {
+        if(radio.isBackscatterTag()) {
+          if(lastConn.isDestination(radio)) {
+/**/        System.out.println("1.lastConnID: " + lastConn.getID());
+            radio.updateTagTXPowers(lastConn);
+          }
+        }
+      }
     }
     
     HashSet<Integer> txChannels = new HashSet<Integer>();
@@ -481,25 +581,32 @@ public class UDGMBS extends UDGM {
 
         double dist = conn.getSource().getPosition().getDistanceTo(dstRadio.getPosition());
 /**///    System.out.printf("dist = %.2f\n", dist);
-        
-        double maxTxDist = 0;  
 
+        double transmittingRange = 0.0;
+        double currentOutputPowerIndicator = 0.0;
+        double currentOutputPowerIndicatorMax = 0.0;
+        
 /**/    System.out.println("source: " + conn.getSource().getMote().getID());
         
-        if (!conn.getSource().isBackscatterTag()) {
-/**/      System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
-          maxTxDist = TRANSMITTING_RANGE
-          * ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-/**///      System.out.printf("maxTxDist = %.2f\n", maxTxDist);
+        if (conn.getSource().isBackscatterTag()) {
+/**/      System.out.println("TAG_TRANSMITTING_RANGE: " + TAG_TRANSMITTING_RANGE);
+          transmittingRange = TAG_TRANSMITTING_RANGE;
+          currentOutputPowerIndicator = conn.getSource().getTagTXPower(dstRadio.getChannel());
+          currentOutputPowerIndicatorMax = conn.getSource().getTagCurrentOutputPowerMax(dstRadio.getChannel())
+                                            - GT - GR - REFLECTIONLOSS; 
         } else {
-/**/      System.out.println("TAG_TRANSMITTING_RANGE: " + TAG_TRANSMITTING_RANGE);          
-          maxTxDist = TAG_TRANSMITTING_RANGE
-          * ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-/**///      System.out.printf("maxTxDist = %.2f\n", maxTxDist);
-        }  
+/**/      System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
+          transmittingRange = TRANSMITTING_RANGE;
+          currentOutputPowerIndicator = (double) conn.getSource().getCurrentOutputPowerIndicator();
+          currentOutputPowerIndicatorMax = (double) conn.getSource().getOutputPowerIndicatorMax();
+        }
+        double maxTxDist = transmittingRange
+        * (Math.pow(10, (currentOutputPowerIndicator / 10)) / Math.pow(10, (currentOutputPowerIndicatorMax / 10)));    
+
+/**/    System.out.printf("maxTxDist = %.2f\n", maxTxDist);
         
         double distFactor = dist/maxTxDist;
-/**///    System.out.printf("distFactor = %.2f\n", distFactor);
+/**/    System.out.printf("distFactor = %.2f\n", distFactor);
 
         double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {
@@ -543,26 +650,32 @@ public class UDGMBS extends UDGM {
 /**/    System.out.printf("2.intfRadio = %d\n", intfRadio.getMote().getID()) ;        
         
         double dist = conn.getSource().getPosition().getDistanceTo(intfRadio.getPosition());
-/**///    System.out.printf("dist = %.2f\n", dist);
+/**/    System.out.printf("dist = %.2f\n", dist);
 
-        double maxTxDist = 0;  
-
+        double transmittingRange = 0.0;
+        double currentOutputPowerIndicator = 0.0;
+        double currentOutputPowerIndicatorMax = 0.0;
+        
 /**/    System.out.println("source: " + conn.getSource().getMote().getID());
         
-        if (!conn.getSource().isBackscatterTag()) {
-/**/      System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
-          maxTxDist = TRANSMITTING_RANGE
-          * ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-/**///      System.out.printf("maxTxDist = %.2f\n", maxTxDist);
+        if (conn.getSource().isBackscatterTag()) {
+/**/      System.out.println("TAG_TRANSMITTING_RANGE: " + TAG_TRANSMITTING_RANGE);
+          transmittingRange = TAG_TRANSMITTING_RANGE;
+          currentOutputPowerIndicator = conn.getSource().getTagTXPower(intfRadio.getChannel());
+          currentOutputPowerIndicatorMax = conn.getSource().getTagCurrentOutputPowerMax(intfRadio.getChannel()) 
+                                            - GT - GR - REFLECTIONLOSS; 
         } else {
-/**/      System.out.println("TAG_TRANSMITTING_RANGE: " + TAG_TRANSMITTING_RANGE);          
-          maxTxDist = TAG_TRANSMITTING_RANGE
-          * ((double) conn.getSource().getCurrentOutputPowerIndicator() / (double) conn.getSource().getOutputPowerIndicatorMax());
-/**///      System.out.printf("maxTxDist = %.2f\n", maxTxDist);
-        }  
+/**/      System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
+          transmittingRange = TRANSMITTING_RANGE;
+          currentOutputPowerIndicator = (double) conn.getSource().getCurrentOutputPowerIndicator();
+          currentOutputPowerIndicatorMax = (double) conn.getSource().getOutputPowerIndicatorMax();
+        }        
+        
+        double maxTxDist = transmittingRange
+        * (Math.pow(10, (currentOutputPowerIndicator / 10)) / Math.pow(10, (currentOutputPowerIndicatorMax / 10)));    
         
         double distFactor = dist/maxTxDist;
-/**///    System.out.printf("distFactor = %.2f\n", distFactor);
+/**/    System.out.printf("distFactor = %.2f\n", distFactor);
 
         if (distFactor < 1) {
           double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);

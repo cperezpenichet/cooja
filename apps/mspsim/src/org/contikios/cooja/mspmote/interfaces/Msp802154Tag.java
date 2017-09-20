@@ -64,7 +64,7 @@ import org.contikios.cooja.RadioConnection;
 @ClassDescription("IEEE 802.15.4 Tag")
 public class Msp802154Tag extends Msp802154Radio {
   private static Logger logger = Logger.getLogger(Msp802154Tag.class);
-
+  
   private final BackscatterTXRadio tag;
 
   private boolean isListeningCarrier = false;
@@ -72,13 +72,6 @@ public class Msp802154Tag extends Msp802154Radio {
   /* Keeps a record of the transmitted power from the tag */
   private Hashtable<Integer, Hashtable<RadioConnection, Double>> tagTXPower = 
                                                 new Hashtable<Integer, Hashtable<RadioConnection, Double>>(); 
-  
-  /* Keeps a record of the maximum transmitted power from the tag */
-  private Hashtable<Integer, Hashtable<RadioConnection, Double>> tagTXPowerMax = 
-                                                new Hashtable<Integer, Hashtable<RadioConnection, Double>>(); 
-
-  
-  
   
   
   public Msp802154Tag(Mote m) {
@@ -245,7 +238,7 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/System.out.println("1.tagTXPower: " + tagTXPower);
   }
   
-  public double getTagTXPower(int channel) {
+  public double getTagCurrentOutputPower(int channel) {
 /**/System.out.println("getTagTXPower");
 /**/System.out.println("2.tagTXPower: " + tagTXPower);
 /**/System.out.println(tagTXPower.get(channel).values());
@@ -263,18 +256,19 @@ public class Msp802154Tag extends Msp802154Radio {
     while (conns.hasMoreElements()) {
       conn = conns.nextElement();
       if(tagTXPower.get(channel).get(conn) == tagPower) {
-        return (double) conn.getSource().getCurrentOutputPowerIndicator();
+        double transmitttedPowerMax = 0.0;
+        /* Transform power level into output power in dBm */
+        for (int i =0; i < CC2420OutputPower.length; i++) {
+          if((double) conn.getSource().getCurrentOutputPowerIndicator() == i) {
+            transmitttedPowerMax = CC2420OutputPower[i];
+/**/        System.out.println("transmitttedPower: " + transmitttedPowerMax);
+            return transmitttedPowerMax;
+          }
+        }
       }
     }
     return 0.0;
   }
-  
-  
-     
-//  @Override
-//  public int getOutputPowerIndicatorMax() {
-//    return 31;
-//  }
   
   @Override
   public boolean isRadioOn() {

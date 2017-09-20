@@ -73,6 +73,17 @@ public abstract class Radio extends MoteInterface {
     PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED,
     CARRIER_LISTENING_STARTED, CARRIER_LISTENING_STOPPED
   }
+  
+  /* Output power of CC240 radio tranceiver in dBm,(p.51 - cc2420 datasheet) */
+  public final double[] CC2420OutputPower = {
+    -37.92, -32.98, -28.7, -25.0, -21.84, -19.15, 
+    -16.89, -15.0, -13.42, -12.1, -10.98, -10.0, 
+    -9.12, -8.33, -7.63, -7.0, -6.44, -5.94, -5.47, 
+    -5.0, -4.52, -4.03, -3.52, -3.0, -2.47, -1.95, 
+    -1.45, -1.0, -0.61, -0.3, -0.09, 0.0
+  };
+
+
 
   /**
    * Register the radio packet that is being received during a connection. This
@@ -281,7 +292,7 @@ public abstract class Radio extends MoteInterface {
     return 0.0;
   }
 
-  public double getTagTXPower(int channel){
+  public double getTagCurrentOutputPower(int channel){
     return 0.0;
   }
   

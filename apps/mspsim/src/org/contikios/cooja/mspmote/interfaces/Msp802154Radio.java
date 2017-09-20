@@ -71,7 +71,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     (long) (1000.0*Simulation.MILLISECOND/(250000.0/8.0)); /* us. Corresponds to 250kbit/s */
 
   private RadioEvent lastEvent = RadioEvent.UNKNOWN;
-
+  
   protected final MspMote mote;
   protected final Radio802154 radio;
   

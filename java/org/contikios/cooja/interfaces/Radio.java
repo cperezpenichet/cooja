@@ -74,7 +74,7 @@ public abstract class Radio extends MoteInterface {
     CARRIER_LISTENING_STARTED, CARRIER_LISTENING_STOPPED
   }
   
-  /* Output power of CC240 radio tranceiver in dBm,(p.51 - cc2420 datasheet) */
+  /* Output power of CC240 radio transceiver in dBm,(p.51 - cc2420 datasheet) */
   public final double[] CC2420OutputPower = {
     -37.92, -32.98, -28.7, -25.0, -21.84, -19.15, 
     -16.89, -15.0, -13.42, -12.1, -10.98, -10.0, 
@@ -82,8 +82,6 @@ public abstract class Radio extends MoteInterface {
     -5.0, -4.52, -4.03, -3.52, -3.0, -2.47, -1.95, 
     -1.45, -1.0, -0.61, -0.3, -0.09, 0.0
   };
-
-
 
   /**
    * Register the radio packet that is being received during a connection. This
@@ -120,22 +118,6 @@ public abstract class Radio extends MoteInterface {
   public abstract void signalReceptionEnd();
 
   /**
-   * Signal that the carrier listening just begun. This method should normally be 
-   * called from the radio medium on interfered radios.
-   * 
-   * @see void carrierListeningEnd()
-   */
-  public void carrierListeningStart() {}
-  
-  /**
-   * Signal that the carrier listening was ended. This method should normally be 
-   * called from the radio medium on interfered radios.
-   * 
-   * @see void carrierListeningStart()
-   */
-  public void carrierListeningEnd() {}
-  
-  /**
    * Returns last event at this radio. This method should be used to learn the
    * reason when a radio notifies a change to observers.
    *
@@ -152,27 +134,6 @@ public abstract class Radio extends MoteInterface {
       return false;
   }
   
-  /**
-   * Returns true if this radio is generating a carrier, or just finished generating one.
-   * 
-   * @see #isTransmitting()
-   * @return True if radio is generating a carrier.
-   */
-  public boolean isGeneratingCarrier() {
-/**/  System.out.println("No this isGeneratingCarrier");
-	  return false;
-  }
-  
-  /**
-   * Returns true if this radio is listening a carrier, or just finished listening one.
-   * 
-   * @see #isTransmitting()
-   * @return True if radio is listening the carrier.
-   */
-  public boolean isListeningCarrier() {
-	  return false;
-  }
-
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,
    * data.
@@ -285,6 +246,45 @@ public abstract class Radio extends MoteInterface {
    * @return Mote
    */
   public abstract Mote getMote();
+  
+  /* Concerning the backscattering communication */
+  
+  /**
+   * Signal that the carrier listening just begun. This method should normally be 
+   * called from the radio medium on interfered radios.
+   * 
+   * @see void carrierListeningEnd()
+   */
+  public void carrierListeningStart() {}
+  
+  /**
+   * Signal that the carrier listening was ended. This method should normally be 
+   * called from the radio medium on interfered radios.
+   * 
+   * @see void carrierListeningStart()
+   */
+  public void carrierListeningEnd() {}
+  
+  /**
+   * Returns true if this radio is generating a carrier, or just finished generating one.
+   * 
+   * @see #isTransmitting()
+   * @return True if radio is generating a carrier.
+   */
+  public boolean isGeneratingCarrier() {
+/**/  System.out.println("No this isGeneratingCarrier");
+    return false;
+  }
+  
+  /**
+   * Returns true if this radio is listening a carrier, or just finished listening one.
+   * 
+   * @see #isTransmitting()
+   * @return True if radio is listening the carrier.
+   */
+  public boolean isListeningCarrier() {
+    return false;
+  }
   
   public void updateTagTXPowers(RadioConnection conn) {};
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower){};

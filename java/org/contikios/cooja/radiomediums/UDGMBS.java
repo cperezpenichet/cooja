@@ -98,15 +98,14 @@ public class UDGMBS extends UDGM {
   public final double GT = 0;
   /* Gain of the transmitting antenna */
   public final double GR = 0;
-  ///* Gain of the antenna of the backscatter tag */
-  //public static final double GTAG = 3;
-  
   /* Wavelength */
   public final double WAVELENGTH = 0.122;
   /* Energy loss */
   public final double ENERGYLOSS = 4.4;
   /* Reflection loss */
   public final double REFLECTIONLOSS = 15 - ENERGYLOSS;
+  /* Sensitivity threshold for Tmote sky */
+  public final double STH = -92 ;
   
   
   /* 
@@ -117,6 +116,12 @@ public class UDGMBS extends UDGM {
   public double TAG_INTERFERENCE_RANGE = 100; /* Interference range for tag. Ignored if below transmission range. */
   /* This variable fixes the transmission and interference range based on the backscatter concept */
   public double SCALING_FACTOR = 30;
+  
+  ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
+  ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
+  ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
+
+
   
   private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
   
@@ -319,6 +324,7 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println("Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
+            carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
             /* Incident power in dBm */
             double incidentPower = friisEquation(sender, r);
@@ -399,10 +405,10 @@ public class UDGMBS extends UDGM {
                is consistent with the case when receiver is turned off. */
             newConnection.addInterfered(recv);
           } else {
-  /**/      System.out.println("recvID: " + recv.getMote().getID());
-  /**/      System.out.println("recvChannel: " + recv.getChannel());
+/**/        System.out.println("recvID: " + recv.getMote().getID());
+/**/        System.out.println("recvChannel: " + recv.getChannel());
             double tagCurrentOutputPowerIndicator = sender.getTagCurrentOutputPower(recv.getChannel());
- /**/       System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
+/**/        System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
             double tagCurrentOutputPowerIndicatorMax = sender.getTagCurrentOutputPowerMax(recv.getChannel()) 
                                                         + GT + GR - REFLECTIONLOSS;
             
@@ -413,28 +419,46 @@ public class UDGMBS extends UDGM {
   
             
             /* Calculate ranges: grows with radio output power in mW */
-            double tagTransmissionRange = SCALING_FACTOR * TAG_TRANSMITTING_RANGE
-            * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
+//            double tagTransmissionRange = SCALING_FACTOR * TAG_TRANSMITTING_RANGE
+//            * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
+//            
+//            double tagTransmissionRange = TAG_TRANSMITTING_RANGE 
+//            * (Math.pow(10, (GT + GR + Math.pow(10, ((tagCurrentOutputPowerIndicator - SS_WEAK) / 10)) + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
+//                
+            double tagTransmissionRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
             
-  //          double tagTransmissionRange = TAG_TRANSMITTING_RANGE
-  //          * (tagCurrentOutputPowerIndicator / tagCurrentOutputPowerIndicatorMax);
+/**/        System.out.println("tagTransmissionRange: " + tagTransmissionRange);
+            
+//            double tagInterferenceRange = SCALING_FACTOR * TAG_INTERFERENCE_RANGE
+//            * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
+//  
+//            double tagInterferenceRange = SCALING_FACTOR * TAG_INTERFERENCE_RANGE
+//                * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
+//      
+            
+            double tagInterferenceRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
             
             
-  /**/      System.out.println("tagTransmissionRange: " + tagTransmissionRange);
-            
-            double tagInterferenceRange = SCALING_FACTOR * TAG_INTERFERENCE_RANGE
-            * (Math.pow(10, (tagCurrentOutputPowerIndicator / 10)) / Math.pow(10, (tagCurrentOutputPowerIndicatorMax / 10)));
-  
 /**/        System.out.println("tagInterferenceRange: " + tagInterferenceRange);
   
             Position recvPos = recv.getPosition();
             double distance = senderPos.getDistanceTo(recvPos);
-  /**/      System.out.println("senderRecvDistance: " + distance);
+            tagToRecvDist.add(distance);
+/**/        System.out.println("senderRecvDistance: " + distance);
+
+            double receivedPower = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(distance);
+            receivedPowerLst.add(receivedPower);
+/**/        System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
+
+
+/**/        System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/        System.out.println("tagToRecvDist: " + tagToRecvDist);
+/**/        System.out.println("receivedPowerLst: " + receivedPowerLst);
+
   
             if (distance <= tagTransmissionRange) {
               /* Within transmission range */
-  /**/        System.out.println("WithinTR");
-  //              System.out.println("sender: " + sender.getMote().getID() + " isListeningCarrier= " + sender.isListeningCarrier());
+/**/          System.out.println("WithinTR");
   
               if (!recv.isRadioOn()) {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " - radio is off");

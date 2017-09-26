@@ -60,6 +60,7 @@ import org.apache.log4j.Logger;
 
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
+import org.contikios.cooja.RadioConnection;
 import org.contikios.cooja.Simulation;
 import org.contikios.cooja.SupportedArguments;
 import org.contikios.cooja.interfaces.Position;
@@ -298,11 +299,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
     boolean tagSelected = false;
 
-    for (Mote mote: selectedMotes) {
-/**/  System.out.println("selectedMote: " + mote.getID());
-    
-    }
-
     Area intRangeArea = new Area();
     Area intRangeMaxArea = new Area();
     Area trxRangeArea = new Area();
@@ -312,15 +308,18 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
 
     for (Mote selectedMote : selectedMotes) {
+/**/  System.out.println("selectedMote: " + selectedMote.getID());
       if (selectedMote.getInterfaces().getRadio() == null) {
         continue;
       }
       
 /**/  System.out.println("UDGMBS.selectedMoteID: " + selectedMote.getID());
       
+      RadioConnection[] conns = radioMedium.getActiveConnections();
       if (selectedMote.getInterfaces().getRadio().isBackscatterTag()) {
 /**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());        
-
+        
+        
         /* Paint transmission and interference range for selected mote */
         Position motePos = selectedMote.getInterfaces().getPosition();
 
@@ -338,6 +337,31 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
                 = radioMedium.TAG_TRANSMITTING_RANGE
                 * ((double) selectedRadio.getCurrentOutputPowerIndicator()
                 / (double) selectedRadio.getOutputPowerIndicatorMax());
+        
+//        if(conns != null) {
+//          for (RadioConnection conn : conns) {
+//           if (conn.getSource() == selectedMote.getInterfaces().getRadio()) {
+//             for (Radio dstRadio : conn.getDestinations()) {
+//               double tagInterferenceRange
+//                     = radioMedium.TAG_INTERFERENCE_RANGE
+//                     * (selectedRadio.getTagCurrentOutputPower(dstRadio.getChannel())
+//                     / (double) selectedRadio.getOutputPowerIndicatorMax());
+//               double tagTransmissionRange
+//                     = radioMedium.TAG_TRANSMITTING_RANGE
+//                     * ((double) selectedRadio.getCurrentOutputPowerIndicator()
+//                     / (double) selectedRadio.getOutputPowerIndicatorMax());
+//       
+//           }
+//        }
+//        
+        
+        
+        
+        
+        
+        
+        
+        
 
         Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
         Point translatedInterference

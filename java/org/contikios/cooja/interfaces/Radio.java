@@ -286,15 +286,41 @@ public abstract class Radio extends MoteInterface {
     return false;
   }
   
+  /**
+   * Removes from the hashtable of the tag the entry that concerns the given connection
+   * that was finished. 
+   *  
+   * @param conn
+   */
   public void updateTagTXPowers(RadioConnection conn) {};
+  
+  /**
+   *
+   * Keeps a record of the output power of the tag concerning each time the corresponding
+   * connection from which it was produced as well as the appropriate transmission channel 
+   * derived from the carrier generator that created that connection. 
+   * 
+   * @param channel, conn, tagCurrentTXPower
+   */
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower){};
+  
+  /**
+   * Returns the output power of the tag with respect to the given channel to which the
+   * backscatter tag will transmit.
+   * 
+   * @param channel
+   * @return
+   */
+  public double getTagCurrentOutputPower(int channel){
+    return 0.0;
+  }
+  
+  
   public double getTagCurrentOutputPowerMax(int channel) {
     return 0.0;
   }
 
-  public double getTagCurrentOutputPower(int channel){
-    return 0.0;
-  }
+  
   
   
   

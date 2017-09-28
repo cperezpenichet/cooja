@@ -128,17 +128,13 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 		return activeConnections.toArray(new RadioConnection[0]);
 	}
 	
-	public Simulation getSimulation() {
-	  return simulation;
+	public ArrayList<RadioConnection> getActiveConns() {
+    return activeConnections;
+  }
+	
+	public void setLastConnection(RadioConnection lastConn) {
+	  this.lastConnection = lastConn;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	/**
@@ -207,6 +203,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	 * @param radio Radio
 	 */
 	private void removeFromActiveConnections(Radio radio) {
+/**/System.out.println("Abstract.removeFromActiveConnections");
 		/* This radio must not be a connection source */
 		RadioConnection connection = getActiveConnectionFrom(radio);
 		if (connection != null) {
@@ -244,13 +241,13 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				return;
 			}
 			
-/**/		System.out.println("ARM.radioEventsObserver");
+/**/  System.out.println("ARM.radioEventsObserver");
 			
 			Radio radio = (Radio) obs;
 			
 			final Radio.RadioEvent event = radio.getLastEvent();
 			
-/**/        System.out.println("ARM.radio: " + radio.getMote().getID() + " - event= " + event);
+/**/  System.out.println("ARM.radio: " + radio.getMote().getID() + " - event= " + event);
 			
 			switch (event) {
 				case RECEPTION_STARTED:
@@ -520,12 +517,13 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	}
 	
 	public void unregisterRadioInterface(Radio radio, Simulation sim) {
+/**/	  System.out.println("Abstract.unregisterRadioInterface");
 		if (!registeredRadios.contains(radio)) {
 			logger.warn("No radio to unregister: " + radio);
 			return;
 		}
 		
-/**/    System.out.println("ARM.unregisterRadioInterface");
+/**/System.out.println("ARM.unregisterRadioInterface");
 		
 		radio.deleteObserver(radioEventsObserver);
 		registeredRadios.remove(radio);
@@ -645,6 +643,10 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	public RadioConnection getLastConnection() {
 		return lastConnection;
 	}
+	
+	public Simulation getSimulation() {
+    return simulation;
+  }
 	
 	public Collection<Element> getConfigXML() {
 		Collection<Element> config = new ArrayList<Element>();

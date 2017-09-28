@@ -226,7 +226,7 @@ public class Msp802154Tag extends Msp802154Radio {
     } else { //remove it in the end
 /**/  System.out.println("No connection was inserted");
     }
-      /**/System.out.println("4.tagTXPower: " + tagTXPower);
+/**/System.out.println("4.tagTXPower: " + tagTXPower);
   }
   
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower) {
@@ -246,10 +246,16 @@ public class Msp802154Tag extends Msp802154Radio {
   public double getTagCurrentOutputPower(int channel) {
 /**/System.out.println("getTagTXPower");
 /**/System.out.println("2.tagTXPower: " + tagTXPower);
-/**/System.out.println(tagTXPower.get(channel).values());
-/**/System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
+    if (!tagTXPower.isEmpty()) {
+/**/  System.out.println(tagTXPower.get(channel).values());
+/**/  System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
+       /* In case there are more than one carriers with the same channel 
+        * return the max output power of those that were produced by them */
+      return Collections.max(tagTXPower.get(channel).values(), null);
+
+    }
+    return 0.0;
     
-    return Collections.max(tagTXPower.get(channel).values(), null);
   }
   
   public double getTagCurrentOutputPowerMax(int channel) {

@@ -420,17 +420,17 @@ public class UDGMBS extends UDGM {
 
             Position recvPos = recv.getPosition();
             double distance = senderPos.getDistanceTo(recvPos);
-            tagToRecvDist.add(distance);
-/**/        System.out.println("senderRecvDistance: " + distance);
+            //tagToRecvDist.add(distance);
+/**/        System.out.println("TagRecvDistance: " + distance);
 
             double receivedPower = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(distance);
-            receivedPowerLst.add(receivedPower);
-/**/        System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
+            //receivedPowerLst.add(receivedPower);
+/**/        //System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
 
 
-/**/        System.out.println("carrierToTagDist: " + carrierToTagDist);
-/**/        System.out.println("tagToRecvDist: " + tagToRecvDist);
-/**/        System.out.println("receivedPowerLst: " + receivedPowerLst);
+/**/        //System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/        //System.out.println("tagToRecvDist: " + tagToRecvDist);
+/**/        //System.out.println("receivedPowerLst: " + receivedPowerLst);
 
   
             if (distance <= tagTransmissionRange) {
@@ -494,102 +494,85 @@ public class UDGMBS extends UDGM {
   }
  
   
-  
-  
-  
-//  @Override 
-//  public double getRxSuccessProbability(Radio source, Radio dest) {
-//    HashSet<Integer> txChannels = new HashSet<Integer>();
-//    
-//    double distance = source.getPosition().getDistanceTo(dest.getPosition());
-//  /**/System.out.println("UDGM.distance: " + distance);
-//    double distanceSquared = Math.pow(distance,2.0);
-//  /**/System.out.println("UDGM.distanceSquared: " + distanceSquared);
-//  
-//    double transmittingRange = 0.0;
-//    double currentOutputPowerIndicator = 0.0;
-//    double currentOutputPowerIndicatorMax = 0.0;
-//    
-//    if (source.isBackscatterTag()) {
-//      txChannels = getTXChannels(source);
-//  
-//      if(dest.getChannel() >= 0 && txChannels.contains(dest.getChannel())) {
-//  
-//  /**/  System.out.println("UDGMBS.TAG_TRANSMITTING_RANGE: " + TAG_TRANSMITTING_RANGE);
-//        transmittingRange = TAG_TRANSMITTING_RANGE;
-//        currentOutputPowerIndicator = source.getTagCurrentOutputPower(dest.getChannel());
-//        currentOutputPowerIndicatorMax = source.getTagCurrentOutputPowerMax(dest.getChannel())
-//                                                 + GT + GR - REFLECTIONLOSS; 
-//      } 
-//    } else {
-//  /**/System.out.println("UDGMBS.TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
-//      transmittingRange = TRANSMITTING_RANGE;
-//      return super.getRxSuccessProbability(source, dest);
-//    }
-//    
-//  /**/System.out.println();
-//  /**/System.out.println("UDGMBS.Power Indicator");
-//  /**/System.out.println("UDGMBS.source.getCurrentOutputPowerIndicator(): " + currentOutputPowerIndicator);
-//  /**/System.out.println("UDGMBS.source.getCurrentOutputPowerIndicatorMax(): " + currentOutputPowerIndicatorMax);
-//  
-//  /**/System.out.println("UDGMBS.TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
-//    
-//    double distanceMax = transmittingRange
-//    * (Math.pow(10, (currentOutputPowerIndicator / 10)) / Math.pow(10, (currentOutputPowerIndicatorMax / 10)));    
-//    
-//    if (distanceMax == 0.0) {
-//      return 0.0;
-//    }
-//
-///**/System.out.println("UDGMBS.distanceMax: " + distanceMax);
-//
-//  double distanceMaxSquared = Math.pow(distanceMax,2.0);
-//
-///**/System.out.println("UDGMBS.distanceMaxSquared: " + distanceMaxSquared);
-//
-//  double ratio = distanceSquared / distanceMaxSquared;
-///**/System.out.println("UDGMBS.ratio: " + ratio);
-//  
-//  if (ratio > 1.0) {
-//    return 0.0;
-//  }
-//  
-///**/System.out.println("UDGMBS.SUCCESS_RATIO_RX: " + SUCCESS_RATIO_RX);
-//
-//  
-//  return 1.0 - ratio*(1.0-SUCCESS_RATIO_RX);
-//  }
+  public double getRxSuccessProbability(Radio source, Radio dest) {
+/**/System.out.println("UDGMBS.getRxSuccessProbability");
+
+    double rxSuccessProbability = 0.0;
+
+    
+    if(!source.isBackscatterTag()) {
+      rxSuccessProbability = super.getRxSuccessProbability(source, dest);
+    } else {
+      double distance = source.getPosition().getDistanceTo(dest.getPosition());
+/**/  System.out.println("UDGMBS.distance: " + distance);
+      double distanceSquared = Math.pow(distance,2.0);
+/**/  System.out.println("UDGMBs.distanceSquared: " + distanceSquared);
+      double tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPower(dest.getChannel());
+      
+/**/  System.out.println();
+/**/  System.out.println("UDGMBS.Power Indicator");
+      double distanceMax = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
+/**/  System.out.println("UDGMBS.distanceMax: " + distanceMax);
+
+      if (distanceMax == 0.0) {
+        return 0.0;
+      }      
+      
+
+      double distanceMaxSquared = Math.pow(distanceMax,2.0);
+
+  /**/System.out.println("UDGMBs.distanceMaxSquared: " + distanceMaxSquared);
+
+      double ratio = distanceSquared / distanceMaxSquared;
+      /**/System.out.println("UDGMBS.ratio: " + ratio);
+      
+      if (ratio > 1.0) {
+        return 0.0;
+      }
+/**/System.out.println("UDGMBS.SUCCESS_RATIO_RX: " + SUCCESS_RATIO_RX);
+
+      rxSuccessProbability = 1.0 - ratio*(1.0-SUCCESS_RATIO_RX);
+    }
+    return rxSuccessProbability;
+        
+  }
 
   
   
   
-  @Override
-  /* A little bit of a Hack */
-  public double getRxSuccessProbability(Radio source, Radio dest) {
-    double rxSuccessProbability = 0.0;
-    
-    /* Store the usual transmitting range of the parent medium */
-    double transmittingRange = super.TRANSMITTING_RANGE;
-    
-    /*
-     * In case the source is  a tag assign the tag's transmitting range 
-     * to the transmitting range of the parent so as it can be used by
-     * the parent method
-     */
-    if (source.isBackscatterTag()) {
-      super.TRANSMITTING_RANGE = TAG_TRANSMITTING_RANGE;
-    }
-   
-    rxSuccessProbability = super.getRxSuccessProbability(source, dest);
-   
-    /* 
-     * Re-estate the stored transmitting range so as it can be used
-     * by cc2420 radios.
-     */
-    super.TRANSMITTING_RANGE = transmittingRange;
-   
-    return rxSuccessProbability;
-  }
+
+  
+  
+  
+//  @Override
+//  /* A little bit of a Hack */
+//  public double getRxSuccessProbability(Radio source, Radio dest) {
+///**/System.out.println("UDGMBS.getRxSuccessProbability");
+//
+//    double rxSuccessProbability = 0.0;
+//    
+//    /* Store the usual transmitting range of the parent medium */
+//    double transmittingRange = super.TRANSMITTING_RANGE;
+//    
+//    /*
+//     * In case the source is  a tag assign the tag's transmitting range 
+//     * to the transmitting range of the parent so as it can be used by
+//     * the parent method
+//     */
+//    if (source.isBackscatterTag()) {
+//      super.TRANSMITTING_RANGE = TAG_TRANSMITTING_RANGE;
+//    }
+//   
+//    rxSuccessProbability = super.getRxSuccessProbability(source, dest);
+//   
+//    /* 
+//     * Re-estate the stored transmitting range so as it can be used
+//     * by cc2420 radios.
+//     */
+//    super.TRANSMITTING_RANGE = transmittingRange;
+//   
+//    return rxSuccessProbability;
+//  }
   
  
   @Override

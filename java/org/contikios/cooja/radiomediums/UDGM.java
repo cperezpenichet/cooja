@@ -299,12 +299,18 @@ public class UDGM extends AbstractRadioMedium {
   }
   
   public double getSuccessProbability(Radio source, Radio dest) {
+/**/System.out.println("UDGM.getSuccessProbability");
   	return getTxSuccessProbability(source) * getRxSuccessProbability(source, dest);
   }
+  
   public double getTxSuccessProbability(Radio source) {
+/**/System.out.println("UDGM.getTxSuccessProbability");
     return SUCCESS_RATIO_TX;
   }
+  
   public double getRxSuccessProbability(Radio source, Radio dest) {
+/**/System.out.println("UDGM.getRxSuccessProbability");
+    
   	double distance = source.getPosition().getDistanceTo(dest.getPosition());
 /**/System.out.println("UDGM.distance: " + distance);
     double distanceSquared = Math.pow(distance,2.0);

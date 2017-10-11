@@ -411,11 +411,15 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
             
             /* Calculate ranges: grows with radio output power in mW */
-            double tagTransmissionRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
+            double tagTransmissionRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH 
+                                                       + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
             
 /**/        System.out.println("tagTransmissionRange: " + tagTransmissionRange);
+
+            double tagInterferenceRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - (STH - 3)
+                                                        + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
             
-            double tagInterferenceRange = (Math.pow(10, (GT + GR - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
+//            double tagInterferenceRange = (Math.pow(10, (GT + GR - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
 /**/        System.out.println("maxRange: " + tagInterferenceRange);
 
             Position recvPos = recv.getPosition();
@@ -499,7 +503,6 @@ public class UDGMBS extends UDGM {
 
     double rxSuccessProbability = 0.0;
 
-    
     if(!source.isBackscatterTag()) {
       rxSuccessProbability = super.getRxSuccessProbability(source, dest);
     } else {
@@ -518,7 +521,6 @@ public class UDGMBS extends UDGM {
         return 0.0;
       }      
       
-
       double distanceMaxSquared = Math.pow(distanceMax,2.0);
 
   /**/System.out.println("UDGMBs.distanceMaxSquared: " + distanceMaxSquared);

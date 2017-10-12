@@ -38,6 +38,7 @@ import java.awt.Point;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.beans.PropertyVetoException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -102,6 +103,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
   private JInternalFrame rrFrame;
   private Box ratioRX, ratioTX, rangeTX, rangeINT;
+  
+  private ArrayList<Integer> ch = new ArrayList<Integer>();
+
 
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
@@ -309,7 +313,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 /**/System.out.println("UDGMBS.paintBeforeMotesSTART");
     
 
-    for (Mote selectedMote : selectedMotes) {
+    for (Mote selectedMote : selectedMotes) { 
 /**/  System.out.println("selectedMote: " + selectedMote.getID());
       if (selectedMote.getInterfaces().getRadio() == null) {
         continue;
@@ -335,7 +339,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           
           for (int channel: tagTXChannels) {
             
+//            if (ch.contains(channel)) { 
+//              continue;
+//            }
             double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPower(channel);
+            
+//            ch.add(channel);
             
             double tagTransmissionRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH 
                                                + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
@@ -423,19 +432,19 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 /**/        System.out.println("UDGMBS.Graphics2D");
                 
             g2d.setColor(COLOR_INT);
-            g2d.fill(intRangeArea);
+            g2d.fill(intRangeArea); // fill the circle with color
             g.setColor(Color.GRAY);
-            g2d.draw(intRangeMaxArea);
+            g2d.draw(intRangeMaxArea); 
               
             g.setColor(COLOR_TX);
             g2d.fill(trxRangeArea);
             g.setColor(Color.GRAY);
-            g2d.draw(trxRangeMaxArea);
+            g2d.draw(trxRangeMaxArea); // draw the circle
           }
         
                        
           FontMetrics fm = g.getFontMetrics();
-          g.setColor(Color.BLACK);
+          g.setColor(Color.BLACK); // black color in text (100%))
           
           /* Print transmission success probabilities only if single mote is selected */
           if (selectedMotes.size() == 1) {
@@ -480,8 +489,77 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
   
   @Override
   public void paintAfterMotes(Graphics g) {
-/**/System.out.println("UDGMBS.paintAfterMotes");         
+/**/System.out.println("UDGMBS.paintAfterMotes");
+
+    Set<Mote> selectedMotes = visualizer.getSelectedMotes();
+    if (simulation == null || selectedMotes == null) {
+/**/  System.out.println("simulation || selectedMotes = null");      
+      return;
+    }
+    
+/**/System.out.println("UDGMBS.paintBeforeMotesSTART");
+    
+    for (Mote selectedMote : selectedMotes) { 
+/**/  System.out.println("selectedMote: " + selectedMote.getID());
+      if (selectedMote.getInterfaces().getRadio() == null) {
+        continue;
+      }
       
+/**/  System.out.println("UDGMBS.selectedMoteID: " + selectedMote.getID());
+      
+      RadioConnection[] conns = radioMedium.getActiveConnections();
+      if (selectedMote.getInterfaces().getRadio().isBackscatterTag()) {
+/**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());
+    
+        HashSet<Integer> tagTXChannels = new HashSet<Integer>();
+        tagTXChannels = radioMedium.getTXChannels(selectedMote.getInterfaces().getRadio());
+    
+        /* Paint transmission and interference range for selected mote */
+        Position motePos = selectedMote.getInterfaces().getPosition();
+        
+        Point pixelCoord = visualizer.transformPositionToPixel(motePos);
+        int x = pixelCoord.x;
+        int y = pixelCoord.y;
+    
+        Radio selectedRadio = selectedMote.getInterfaces().getRadio();
+          
+        for (int channel: tagTXChannels) {
+          for (RadioConnection conn: conns) {
+            if(channel - 2 == conn.getSource().getChannel()) {
+              if (conn.getSource().isGeneratingCarrier()) {
+                if(conn.isDestination(selectedRadio)) {
+                  Position sourcePos = conn.getSource().getPosition();
+                  
+                  Point pixelCoordin = visualizer.transformPositionToPixel(sourcePos);
+                  int xi = pixelCoordin.x;
+                  int yi = pixelCoordin.y;
+                  
+                  if (selectedMotes.contains(selectedMote)) {
+                  
+            /**/    System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
+                    /* If mote is selected, highlight with red circle
+                     and semitransparent gray overlay */
+                    g.setColor(new Color(51, 102, 255));
+                    g.drawOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
+                               2 * getVisualizer().MOTE_RADIUS);
+                    g.drawOval(xi - getVisualizer().MOTE_RADIUS - 1, yi - getVisualizer().MOTE_RADIUS - 1, 2 * getVisualizer().MOTE_RADIUS + 2,
+                               2 * getVisualizer().MOTE_RADIUS + 2);
+                    //g.setColor(new Color(128, 128, 128, 128));
+                    g.setColor(COLOR_TX);
+                    g.fillOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
+                               2 * getVisualizer().MOTE_RADIUS);
+                  } else {
+                    g.setColor(Color.BLACK);
+                    g.drawOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
+                               2 * getVisualizer().MOTE_RADIUS);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   public static class RangeMenuAction implements SimulationMenuAction {

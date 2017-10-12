@@ -248,6 +248,8 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     super("Network", gui);
     this.gui = gui;
     this.simulation = simulation;
+    
+/**/System.out.println("VISUALIZER");
 
     /* Register external visualizers */
     String[] skins = gui.getProjectConfig().getStringArrayValue(Visualizer.class, "SKINS");
@@ -1269,6 +1271,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   public void paintMotes(Graphics g) {
+/**/System.out.println("VISUALIZER.paintMotes");    
     Mote[] allMotes = simulation.getMotes();
 
     /* Paint mote relations */
@@ -1333,6 +1336,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       }
 
       if (getSelectedMotes().contains(mote)) {
+/**/    System.out.println("getSelectedMotes().contains(mote)");        
         /* If mote is selected, highlight with red circle
          and semitransparent gray overlay */
         g.setColor(new Color(51, 102, 255));

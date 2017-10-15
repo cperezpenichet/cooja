@@ -247,12 +247,13 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/System.out.println("getTagTXPower");
 /**/System.out.println("2.tagTXPower: " + tagTXPower);
     if (!tagTXPower.isEmpty()) {
+      //if(tagTXPower.get(channel) !=null) {
 /**/  System.out.println(tagTXPower.get(channel).values());
 /**/  System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
        /* In case there are more than one carriers with the same channel 
         * return the max output power of those that were produced by them */
       return Collections.max(tagTXPower.get(channel).values(), null);
-
+      //}
     }
     return 0.0;
     

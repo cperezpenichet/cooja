@@ -792,7 +792,7 @@ public class UDGMBS extends UDGM {
               intRadio.signalReceptionEnd();
             }
           }
-          getActiveConns().remove(conn);
+          getActiveConnectionsArrayList().remove(conn);
           setLastConnection(conn);
         }
       }

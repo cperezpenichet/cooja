@@ -40,6 +40,7 @@ import java.awt.geom.Ellipse2D;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -70,8 +71,6 @@ import org.contikios.cooja.interfaces.Radio;
 import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.Visualizer.SimulationMenuAction;
 import org.contikios.cooja.plugins.VisualizerSkin;
-import org.contikios.cooja.radiomediums.AbstractRadioMedium;
-import org.contikios.cooja.radiomediums.UDGM;
 import org.contikios.cooja.radiomediums.UDGMBS;
 
 /**
@@ -104,8 +103,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
   private JInternalFrame rrFrame;
   private Box ratioRX, ratioTX, rangeTX, rangeINT;
   
-  private ArrayList<Integer> ch = new ArrayList<Integer>();
-
+  private ArrayList<Double> txRanges = new ArrayList<Double>();
+  private Hashtable<Integer, Integer> connRecord = new Hashtable<Integer, Integer>();
 
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
@@ -312,6 +311,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
 /**/System.out.println("UDGMBS.paintBeforeMotesSTART");
     
+/**/System.out.println("selectedMotes: " + selectedMotes);
 
     for (Mote selectedMote : selectedMotes) { 
 /**/  System.out.println("selectedMote: " + selectedMote.getID());
@@ -322,11 +322,15 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 /**/  System.out.println("UDGMBS.selectedMoteID: " + selectedMote.getID());
       
       RadioConnection[] conns = radioMedium.getActiveConnections();
+/**/  System.out.println("paintBeforeMotes.conns: " + conns);
+
+//      ArrayList<RadioConnection> activeConns = radioMedium.getActiveConnectionsArrayList();
+      
       if (selectedMote.getInterfaces().getRadio().isBackscatterTag()) {
 /**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());
 
-        HashSet<Integer> tagTXChannels = new HashSet<Integer>();
-        tagTXChannels = radioMedium.getTXChannels(selectedMote.getInterfaces().getRadio());
+//        HashSet<Integer> tagTXChannels = new HashSet<Integer>();
+//        tagTXChannels = radioMedium.getTXChannels(selectedMote.getInterfaces().getRadio());
 
         /* Paint transmission and interference range for selected mote */
         Position motePos = selectedMote.getInterfaces().getPosition();
@@ -335,114 +339,206 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         int x = pixelCoord.x;
         int y = pixelCoord.y;
   
-          Radio selectedRadio = selectedMote.getInterfaces().getRadio();
-          
-          for (int channel: tagTXChannels) {
-            
-//            if (ch.contains(channel)) { 
-//              continue;
-//            }
-            double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPower(channel);
-            
-//            ch.add(channel);
-            
-            double tagTransmissionRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH 
-                                               + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
-                
-//            double tagTransmissionRangeMax = (Math.pow(10, (radioMedium.GT + radioMedium.GR + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
-
-///**/        System.out.println("tagTransmissionRangeMax: " + tagTransmissionRangeMax);
-
-            double tagInterferenceRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - (radioMedium.STH - 3)
-                + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
-
-//            double tagInterferenceRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - (STH - 3)
-//                + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
-            
-//            double tagInterferenceRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR - radioMedium.STH
-//                                               + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
-                
-
-            Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
-            Point translatedInterference
-                    = visualizer.transformPositionToPixel(tagInterferenceRange, tagInterferenceRange, 0.0);
-            Point translatedTransmission
-                    = visualizer.transformPositionToPixel(tagTransmissionRange, tagTransmissionRange, 0.0);
-            
-//                Point translatedInterferenceMax
-//                        = visualizer.transformPositionToPixel(radioMedium.TAG_INTERFERENCE_RANGE, radioMedium.TAG_INTERFERENCE_RANGE, 0.0);
-//            Point translatedTransmissionMax
-//                    = visualizer.transformPositionToPixel(tagTransmissionRangeMax, tagTransmissionRangeMax, 0.0);
-
-            translatedInterference.x = Math.abs(translatedInterference.x - translatedZero.x);
-            translatedInterference.y = Math.abs(translatedInterference.y - translatedZero.y);
-            translatedTransmission.x = Math.abs(translatedTransmission.x - translatedZero.x);
-            translatedTransmission.y = Math.abs(translatedTransmission.y - translatedZero.y);
-//            translatedInterferenceMax.x = Math.abs(translatedInterferenceMax.x - translatedZero.x);
-//            translatedInterferenceMax.y = Math.abs(translatedInterferenceMax.y - translatedZero.y);
-//            translatedTransmissionMax.x = Math.abs(translatedTransmissionMax.x - translatedZero.x);
-//            translatedTransmissionMax.y = Math.abs(translatedTransmissionMax.y - translatedZero.y);
-
-            /* Interference range */
-            intRangeArea.add(new Area(new Ellipse2D.Double(
-                    x - translatedInterference.x,
-                    y - translatedInterference.y,
-                    2 * translatedInterference.x,
-                    2 * translatedInterference.y)));
-      
-            /* Transmission range */
-            trxRangeArea.add(new Area(new Ellipse2D.Double(
-                    x - translatedTransmission.x,
-                    y - translatedTransmission.y,
-                    2 * translatedTransmission.x,
-                    2 * translatedTransmission.y)));
-            
-            /* Interference range (MAX) */
-            intRangeMaxArea.add(new Area(new Ellipse2D.Double(
-                    x - translatedInterference.x,
-                    y - translatedInterference.y,
-                    2 * translatedInterference.x,
-                    2 * translatedInterference.y)));
-            
-            /* Transmission range (MAX) */
-            trxRangeMaxArea.add(new Area(new Ellipse2D.Double(
-                    x - translatedTransmission.x,
-                    y - translatedTransmission.y,
-                    2 * translatedTransmission.x,
-                    2 * translatedTransmission.y)));
-                            
-            
-//            intRangeMaxArea.add(new Area(new Ellipse2D.Double(
-//                    x - translatedInterferenceMax.x,
-//                    y - translatedInterferenceMax.y,
-//                    2 * translatedInterferenceMax.x,
-//                    2 * translatedInterferenceMax.y)));
-//          
-//            /* Transmission range (MAX) */
-//            trxRangeMaxArea.add(new Area(new Ellipse2D.Double(
-//                    x - translatedTransmissionMax.x,
-//                    y - translatedTransmissionMax.y,
-//                    2 * translatedTransmissionMax.x,
-//                    2 * translatedTransmissionMax.y)));
-//            
-          
-            tagSelected = true;
-            
-            Graphics2D g2d = (Graphics2D) g;
-/**/        System.out.println("UDGMBS.Graphics2D");
-                
-            g2d.setColor(COLOR_INT);
-            g2d.fill(intRangeArea); // fill the circle with color
-            g.setColor(Color.GRAY);
-            g2d.draw(intRangeMaxArea); 
-              
-            g.setColor(COLOR_TX);
-            g2d.fill(trxRangeArea);
-            g.setColor(Color.GRAY);
-            g2d.draw(trxRangeMaxArea); // draw the circle
-          }
+        Radio selectedRadio = selectedMote.getInterfaces().getRadio();
         
-                       
+        for(int i=conns.length; i>0; i--) {
+/**/      System.out.println("lenght of conns: " + conns.length);
+          RadioConnection lastConnFromCarrier = conns[conns.length-1];
+          if(lastConnFromCarrier.getSource().isGeneratingCarrier()) {
+            if (lastConnFromCarrier.isDestination(selectedRadio)) {
+              
+///**/          System.out.println("carrierConn: " + lastConnFromCarrier.getID());
+/**/          System.out.println("sourceChannel: " + lastConnFromCarrier.getSource().getChannel());
+              
+              double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPower(lastConnFromCarrier.getSource().getChannel()+2);
+                
+              double tagTransmissionRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH 
+                                                   + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+              
+///**/            System.out.println("tagTransmissionRangeMax: " + tagTransmissionRangeMax);
+              
+              double tagInterferenceRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - (radioMedium.STH - 3)
+                                                   + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+            
+              Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
+              Point translatedInterference
+                        = visualizer.transformPositionToPixel(tagInterferenceRange, tagInterferenceRange, 0.0);
+              Point translatedTransmission
+                       = visualizer.transformPositionToPixel(tagTransmissionRange, tagTransmissionRange, 0.0);
+                
+            
+              translatedInterference.x = Math.abs(translatedInterference.x - translatedZero.x);
+              translatedInterference.y = Math.abs(translatedInterference.y - translatedZero.y);
+              translatedTransmission.x = Math.abs(translatedTransmission.x - translatedZero.x);
+              translatedTransmission.y = Math.abs(translatedTransmission.y - translatedZero.y);
+            
+              /* Interference range */
+              intRangeArea.add(new Area(new Ellipse2D.Double(
+                      x - translatedInterference.x,
+                      y - translatedInterference.y,
+                      2 * translatedInterference.x,
+                      2 * translatedInterference.y)));
+            
+              /* Transmission range */
+              trxRangeArea.add(new Area(new Ellipse2D.Double(
+                      x - translatedTransmission.x,
+                      y - translatedTransmission.y,
+                      2 * translatedTransmission.x,
+                      2 * translatedTransmission.y)));
+              
+              /* Interference range (MAX) */
+              intRangeMaxArea.add(new Area(new Ellipse2D.Double(
+                      x - translatedInterference.x,
+                      y - translatedInterference.y,
+                      2 * translatedInterference.x,
+                      2 * translatedInterference.y)));
+              
+              /* Transmission range (MAX) */
+              trxRangeMaxArea.add(new Area(new Ellipse2D.Double(
+                      x - translatedTransmission.x,
+                      y - translatedTransmission.y,
+                      2 * translatedTransmission.x,
+                      2 * translatedTransmission.y)));
+            
+              Graphics2D g2d = (Graphics2D) g;
+/**/          System.out.println("UDGMBS.Graphics2D");
+              
+              g2d.setColor(COLOR_INT);
+              g2d.fill(intRangeArea); // fill the circle with color
+              g.setColor(Color.GRAY);
+              g2d.draw(intRangeMaxArea); 
+                
+              g.setColor(COLOR_TX);
+              g2d.fill(trxRangeArea);
+              g.setColor(Color.GRAY);
+              g2d.draw(trxRangeMaxArea); // draw the circle
+              
+              tagSelected = true;
+
+              break;
+            }
+          } else {
+            continue;
+          }
+        }
+      } else {
+        super.paintBeforeMotes(g);
+      } 
+    }
+        
+        
+////        activeConns.lastIndexOf(o)
+//          
+//        for (RadioConnection conn: conns) {
+//          
+//          if (conn.getSource().isGeneratingCarrier()) {
+//            if (conn.isDestination(selectedRadio)) {
+///**/          System.out.println("1.connRecord: " + connRecord);
+//              if (!connRecord.containsKey(conn.getID())) {
+//                connRecord.put(conn.getID(), conn.getSource().getChannel());
+///**/            System.out.println("2.connRecord: " + connRecord);
+//
+//                System.out.println("sourceChannel: " + connRecord.get(conn.getID()));
+//                
+//                double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPower(connRecord.get(conn.getID())+2);
+//                  
+//                double tagTransmissionRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH 
+//                                                     + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+//                
+/////**/            System.out.println("tagTransmissionRangeMax: " + tagTransmissionRangeMax);
+//                
+//                double tagInterferenceRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - (radioMedium.STH - 3)
+//                                                     + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+//              
+//                    
+//                
+//                Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
+//                Point translatedInterference
+//                          = visualizer.transformPositionToPixel(tagInterferenceRange, tagInterferenceRange, 0.0);
+//                Point translatedTransmission
+//                         = visualizer.transformPositionToPixel(tagTransmissionRange, tagTransmissionRange, 0.0);
+//                  
+//              
+//                translatedInterference.x = Math.abs(translatedInterference.x - translatedZero.x);
+//                translatedInterference.y = Math.abs(translatedInterference.y - translatedZero.y);
+//                translatedTransmission.x = Math.abs(translatedTransmission.x - translatedZero.x);
+//                translatedTransmission.y = Math.abs(translatedTransmission.y - translatedZero.y);
+//              
+//                /* Interference range */
+//                intRangeArea.add(new Area(new Ellipse2D.Double(
+//                        x - translatedInterference.x,
+//                        y - translatedInterference.y,
+//                        2 * translatedInterference.x,
+//                        2 * translatedInterference.y)));
+//              
+//                /* Transmission range */
+//                trxRangeArea.add(new Area(new Ellipse2D.Double(
+//                        x - translatedTransmission.x,
+//                        y - translatedTransmission.y,
+//                        2 * translatedTransmission.x,
+//                        2 * translatedTransmission.y)));
+//                
+//                /* Interference range (MAX) */
+//                intRangeMaxArea.add(new Area(new Ellipse2D.Double(
+//                        x - translatedInterference.x,
+//                        y - translatedInterference.y,
+//                        2 * translatedInterference.x,
+//                        2 * translatedInterference.y)));
+//                
+//                /* Transmission range (MAX) */
+//                trxRangeMaxArea.add(new Area(new Ellipse2D.Double(
+//                        x - translatedTransmission.x,
+//                        y - translatedTransmission.y,
+//                        2 * translatedTransmission.x,
+//                        2 * translatedTransmission.y)));
+//                
+//                
+//
+//                                
+//              }
+//              
+//              Graphics2D g2d = (Graphics2D) g;
+///**/            System.out.println("UDGMBS.Graphics2D");
+//              
+//              g2d.setColor(COLOR_INT);
+//              g2d.fill(intRangeArea); // fill the circle with color
+//              g.setColor(Color.GRAY);
+//              g2d.draw(intRangeMaxArea); 
+//                
+//              g.setColor(COLOR_TX);
+//              g2d.fill(trxRangeArea);
+//              g.setColor(Color.GRAY);
+//              g2d.draw(trxRangeMaxArea); // draw the circle
+//              
+//              
+//              
+//              
+//              
+//              
+//            }
+//          }
+//        }
+//        tagSelected = true;
+//        
+//      } else {
+//        super.paintBeforeMotes(g);
+//      } 
+//    }
+//            Graphics2D g2d = (Graphics2D) g;
+///**/        System.out.println("UDGMBS.Graphics2D");
+//                
+//            g2d.setColor(COLOR_INT);
+//            g2d.fill(intRangeArea); // fill the circle with color
+//            g.setColor(Color.GRAY);
+//            g2d.draw(intRangeMaxArea); 
+//              
+//            g.setColor(COLOR_TX);
+//            g2d.fill(trxRangeArea);
+//            g.setColor(Color.GRAY);
+//            g2d.draw(trxRangeMaxArea); // draw the circle
+            
+            
+        if (tagSelected) {       
           FontMetrics fm = g.getFontMetrics();
           g.setColor(Color.BLACK); // black color in text (100%))
           
@@ -451,6 +547,10 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 /**/        System.out.println("UDGMBS.selectedMotes.size(): " + selectedMotes.size());      
             Mote selectedMotee = selectedMotes.toArray(new Mote[0])[0];
             Radio selectedRadioo = selectedMotee.getInterfaces().getRadio();
+            
+            HashSet<Integer> tagTXChannels = new HashSet<Integer>();
+            tagTXChannels = radioMedium.getTXChannels(selectedMotee.getInterfaces().getRadio());
+            
             for (Mote m : simulation.getMotes()) {
               if (m == selectedMotee) { 
                  continue;
@@ -476,13 +576,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
               int msgWidth = fm.stringWidth(msg);
               g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
             }
+            tagSelected = false;
           }
+        }
         //}
              
-      } else {
-        super.paintBeforeMotes(g);
-      } 
-    }
+     
 /**/System.out.println("UDGMBS.paintBeforeMotesSTOP");
 
   }
@@ -491,75 +590,75 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
   public void paintAfterMotes(Graphics g) {
 /**/System.out.println("UDGMBS.paintAfterMotes");
 
-    Set<Mote> selectedMotes = visualizer.getSelectedMotes();
-    if (simulation == null || selectedMotes == null) {
-/**/  System.out.println("simulation || selectedMotes = null");      
-      return;
-    }
-    
-/**/System.out.println("UDGMBS.paintBeforeMotesSTART");
-    
-    for (Mote selectedMote : selectedMotes) { 
-/**/  System.out.println("selectedMote: " + selectedMote.getID());
-      if (selectedMote.getInterfaces().getRadio() == null) {
-        continue;
-      }
-      
-/**/  System.out.println("UDGMBS.selectedMoteID: " + selectedMote.getID());
-      
-      RadioConnection[] conns = radioMedium.getActiveConnections();
-      if (selectedMote.getInterfaces().getRadio().isBackscatterTag()) {
-/**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());
-    
-        HashSet<Integer> tagTXChannels = new HashSet<Integer>();
-        tagTXChannels = radioMedium.getTXChannels(selectedMote.getInterfaces().getRadio());
-    
-        /* Paint transmission and interference range for selected mote */
-        Position motePos = selectedMote.getInterfaces().getPosition();
-        
-        Point pixelCoord = visualizer.transformPositionToPixel(motePos);
-        int x = pixelCoord.x;
-        int y = pixelCoord.y;
-    
-        Radio selectedRadio = selectedMote.getInterfaces().getRadio();
-          
-        for (int channel: tagTXChannels) {
-          for (RadioConnection conn: conns) {
-            if(channel - 2 == conn.getSource().getChannel()) {
-              if (conn.getSource().isGeneratingCarrier()) {
-                if(conn.isDestination(selectedRadio)) {
-                  Position sourcePos = conn.getSource().getPosition();
-                  
-                  Point pixelCoordin = visualizer.transformPositionToPixel(sourcePos);
-                  int xi = pixelCoordin.x;
-                  int yi = pixelCoordin.y;
-                  
-                  if (selectedMotes.contains(selectedMote)) {
-                  
-            /**/    System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
-                    /* If mote is selected, highlight with red circle
-                     and semitransparent gray overlay */
-                    g.setColor(new Color(51, 102, 255));
-                    g.drawOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
-                               2 * getVisualizer().MOTE_RADIUS);
-                    g.drawOval(xi - getVisualizer().MOTE_RADIUS - 1, yi - getVisualizer().MOTE_RADIUS - 1, 2 * getVisualizer().MOTE_RADIUS + 2,
-                               2 * getVisualizer().MOTE_RADIUS + 2);
-                    //g.setColor(new Color(128, 128, 128, 128));
-                    g.setColor(COLOR_TX);
-                    g.fillOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
-                               2 * getVisualizer().MOTE_RADIUS);
-                  } else {
-                    g.setColor(Color.BLACK);
-                    g.drawOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
-                               2 * getVisualizer().MOTE_RADIUS);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+//    Set<Mote> selectedMotes = visualizer.getSelectedMotes();
+//    if (simulation == null || selectedMotes == null) {
+///**/  System.out.println("simulation || selectedMotes = null");      
+//      return;
+//    }
+//    
+///**/System.out.println("UDGMBS.paintAfterMotesSTART");
+//    
+//    for (Mote selectedMote : selectedMotes) { 
+///**/  System.out.println("selectedMote: " + selectedMote.getID());
+//      if (selectedMote.getInterfaces().getRadio() == null) {
+//        continue;
+//      }
+//      
+///**/  System.out.println("UDGMBS.selectedMoteID: " + selectedMote.getID());
+//      
+//      RadioConnection[] conns = radioMedium.getActiveConnections();
+//      if (selectedMote.getInterfaces().getRadio().isBackscatterTag()) {
+///**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());
+//    
+//        HashSet<Integer> tagTXChannels = new HashSet<Integer>();
+//        tagTXChannels = radioMedium.getTXChannels(selectedMote.getInterfaces().getRadio());
+//    
+//        /* Paint transmission and interference range for selected mote */
+//        Position motePos = selectedMote.getInterfaces().getPosition();
+//        
+//        Point pixelCoord = visualizer.transformPositionToPixel(motePos);
+//        int x = pixelCoord.x;
+//        int y = pixelCoord.y;
+//    
+//        Radio selectedRadio = selectedMote.getInterfaces().getRadio();
+//          
+//        for (int channel: tagTXChannels) {
+//          for (RadioConnection conn: conns) {
+//            if(channel - 2 == conn.getSource().getChannel()) {
+//              if (conn.getSource().isGeneratingCarrier()) {
+//                if(conn.isDestination(selectedRadio)) {
+//                  Position sourcePos = conn.getSource().getPosition();
+//                  
+//                  Point pixelCoordin = visualizer.transformPositionToPixel(sourcePos);
+//                  int xi = pixelCoordin.x;
+//                  int yi = pixelCoordin.y;
+//                  
+//                  if (selectedMotes.contains(selectedMote)) {
+//                  
+//            /**/    System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
+//                    /* If mote is selected, highlight with red circle
+//                     and semitransparent gray overlay */
+//                    g.setColor(new Color(51, 102, 255));
+//                    g.drawOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
+//                               2 * getVisualizer().MOTE_RADIUS);
+//                    g.drawOval(xi - getVisualizer().MOTE_RADIUS - 1, yi - getVisualizer().MOTE_RADIUS - 1, 2 * getVisualizer().MOTE_RADIUS + 2,
+//                               2 * getVisualizer().MOTE_RADIUS + 2);
+//                    //g.setColor(new Color(128, 128, 128, 128));
+//                    g.setColor(COLOR_TX);
+//                    g.fillOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
+//                               2 * getVisualizer().MOTE_RADIUS);
+//                  } else {
+//                    g.setColor(Color.BLACK);
+//                    g.drawOval(xi - getVisualizer().MOTE_RADIUS, yi - getVisualizer().MOTE_RADIUS, 2 * getVisualizer().MOTE_RADIUS,
+//                               2 * getVisualizer().MOTE_RADIUS);
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
   }
 
   public static class RangeMenuAction implements SimulationMenuAction {

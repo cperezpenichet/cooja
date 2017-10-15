@@ -1044,6 +1044,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
 
     switch (mouseActionState) {
       case DEFAULT_PRESS:
+/**/    System.out.println("MouseDrag.DEFAULT_PRESS");        
         if (cursorMote == null) {
           mouseActionState = MotesActionState.PANNING;
         }
@@ -1061,6 +1062,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
         }
         break;
       case MOVING:
+/**/    System.out.println("MouseDrag.MOVING");        
         canvas.setCursor(MOVE_CURSOR);
         for (Mote moveMote : selectedMotes) {
           moveMote.getInterfaces().getPosition().setCoordinates(
@@ -1074,9 +1076,11 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
         }
         break;
       case PAN_PRESS:
+/**/    System.out.println("MouseDrag.PAN_PRESS");        
         mouseActionState = MotesActionState.PANNING;
         break;
       case PANNING:
+/**/    System.out.println("MouseDrag.PANNING");        
         /* The current mouse position should correspond to where panning started */
         viewportTransform.translate(
                 currPos.getXCoordinate() - pressedPos.getXCoordinate(),
@@ -1085,10 +1089,12 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
         repaint();
         break;
       case SELECT_PRESS:
+/**/    System.out.println("MouseDrag.SELECT_PRESS");        
         mouseActionState = MotesActionState.SELECTING;
         selection.setEnabled(true);
         break;
       case SELECTING:
+/**/    System.out.println("MouseDrag.SELECTING");        
         int pressedX = transformToPixelX(pressedPos.getXCoordinate());
         int pressedY = transformToPixelY(pressedPos.getYCoordinate());
         int currX = transformToPixelX(currPos.getXCoordinate());

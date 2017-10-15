@@ -128,7 +128,11 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 		return activeConnections.toArray(new RadioConnection[0]);
 	}
 	
-	public ArrayList<RadioConnection> getActiveConns() {
+	
+	/**
+   * @return All active connections as an ArrayList
+   */
+	public ArrayList<RadioConnection> getActiveConnectionsArrayList() {
     return activeConnections;
   }
 	

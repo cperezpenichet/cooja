@@ -437,6 +437,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
           return;
         }
 
+/**/    System.out.println("addMoteHighlightObserver".toUpperCase());
         final Timer timer = new Timer(100, null);
         final Mote mote = (Mote) obj;
         timer.addActionListener(new ActionListener() {

@@ -31,6 +31,7 @@ package org.contikios.cooja.interfaces;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Observable;
 import java.util.Observer;
@@ -311,15 +312,16 @@ public abstract class Radio extends MoteInterface {
    * @param channel
    * @return
    */
-  public double getTagCurrentOutputPower(int channel){
-    return 0.0;
-  }
+  public double getTagCurrentOutputPower(int channel) { return 0.0; }
+  
+  public RadioConnection getConnectionFromMaxOutputPower(int channel) { return null; }
   
   
-  public double getTagCurrentOutputPowerMax(int channel) {
-    return 0.0;
-  }
-
+  
+//  public double getTagCurrentOutputPowerMax(int channel) {
+//    return 0.0;
+//  }
+//
   
   
   

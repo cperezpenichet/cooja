@@ -216,7 +216,7 @@ public class Msp802154Tag extends Msp802154Radio {
   public void updateTagTXPowers(RadioConnection conn) {
 /**/System.out.println("updateTagTXPowers");
 /**/System.out.println("2.lastConnID: " + conn.getID());
-/**/System.out.println("3.tagTXPower: " + tagTXPower); 
+/**/System.out.println("3.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower); 
     //if(tagTXPower.get(conn.getSource().getChannel()+2).containsKey(conn)) {
     if (tagTXPower.get(conn.getSource().getChannel()+2) != null) {
       tagTXPower.get(conn.getSource().getChannel()+2).remove(conn);
@@ -226,7 +226,7 @@ public class Msp802154Tag extends Msp802154Radio {
     } else { //remove it in the end
 /**/  System.out.println("No connection was inserted");
     }
-/**/System.out.println("4.tagTXPower: " + tagTXPower);
+/**/System.out.println("4.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
   }
   
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower) {
@@ -245,42 +245,67 @@ public class Msp802154Tag extends Msp802154Radio {
   
   public double getTagCurrentOutputPower(int channel) {
 /**/System.out.println("getTagTXPower");
-/**/System.out.println("2.tagTXPower: " + tagTXPower);
+/**/System.out.println("2.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
     if (!tagTXPower.isEmpty()) {
-      //if(tagTXPower.get(channel) !=null) {
-/**/  System.out.println(tagTXPower.get(channel).values());
-/**/  System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
+      /* Skip  the case where the channel that is trying to be indexed is -1(tag) */
+      if (tagTXPower.get(channel) !=null) {
+/**/    System.out.println(tagTXPower.get(channel).values());
+/**/    System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
        /* In case there are more than one carriers with the same channel 
         * return the max output power of those that were produced by them */
-      return Collections.max(tagTXPower.get(channel).values(), null);
-      //}
+        return Collections.max(tagTXPower.get(channel).values(), null);
+      } else {
+/**/    System.out.println("tagTXPower.get(" + channel + ")" + " == null");
+/**/    System.out.println(channel == -1 ? "tag channel is: " + channel : "channel: " + channel);
+      }
     }
     return 0.0;
     
   }
   
-  public double getTagCurrentOutputPowerMax(int channel) {
-    
-    RadioConnection conn = null;
-    
-    double tagPower = Collections.max(tagTXPower.get(channel).values(), null);
-    Enumeration<RadioConnection > conns = tagTXPower.get(channel).keys();
-    while (conns.hasMoreElements()) {
-      conn = conns.nextElement();
-      if(tagTXPower.get(channel).get(conn) == tagPower) {
-        double transmitttedPowerMax = 0.0;
-        /* Transform power level into output power in dBm */
-        for (int i =0; i < CC2420OutputPower.length; i++) {
-          if((double) conn.getSource().getCurrentOutputPowerIndicator() == i) {
-            transmitttedPowerMax = CC2420OutputPower[i];
-/**/        System.out.println("transmitttedPower: " + transmitttedPowerMax);
-            return transmitttedPowerMax;
-          }
-        }
+  public RadioConnection getConnectionFromMaxOutputPower(int channel) {
+    /*
+     * channel parameter corresponds to the channel of the carrier generator,
+     * but in the tagTXPower Hashtable the indexing is done based on the destination
+     * TX channel which is the channel of the carrier generator increased by 2.
+     */
+    int indexChannel = channel+2; 
+    double maxPower = this.getTagCurrentOutputPower(indexChannel);
+    Enumeration<RadioConnection> carrierConns = tagTXPower.get(indexChannel).keys();
+    while (carrierConns.hasMoreElements()) {
+      RadioConnection carrierConn = (RadioConnection)carrierConns.nextElement();
+/**/   System.out.println("1.carrierConn: " + carrierConn);
+      if (tagTXPower.get(indexChannel).get(carrierConn) == maxPower) {
+/**/    System.out.println("2.carrierConn: " + carrierConn);
+        return carrierConn;
       }
     }
-    return 0.0;
+    return null;
+    
   }
+  
+//  public double getTagCurrentOutputPowerMax(int channel) {
+//    
+//    RadioConnection conn = null;
+//    
+//    double tagPower = Collections.max(tagTXPower.get(channel).values(), null);
+//    Enumeration<RadioConnection > conns = tagTXPower.get(channel).keys();
+//    while (conns.hasMoreElements()) {
+//      conn = conns.nextElement();
+//      if(tagTXPower.get(channel).get(conn) == tagPower) {
+//        double transmitttedPowerMax = 0.0;
+//        /* Transform power level into output power in dBm */
+//        for (int i =0; i < CC2420OutputPower.length; i++) {
+//          if((double) conn.getSource().getCurrentOutputPowerIndicator() == i) {
+//            transmitttedPowerMax = CC2420OutputPower[i];
+///**/        System.out.println("transmitttedPower: " + transmitttedPowerMax);
+//            return transmitttedPowerMax;
+//          }
+//        }
+//      }
+//    }
+//    return 0.0;
+//  }
   
   @Override
   public boolean isRadioOn() {

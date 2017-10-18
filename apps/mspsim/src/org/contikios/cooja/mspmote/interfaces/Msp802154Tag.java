@@ -259,7 +259,8 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/    System.out.println(channel == -1 ? "tag channel is: " + channel : "channel: " + channel);
       }
     }
-    return 0.0;
+    /* When there is no entry in the Hashtable return something really small */
+    return Double.NEGATIVE_INFINITY;
     
   }
   

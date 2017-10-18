@@ -114,14 +114,10 @@ public class UDGMBS extends UDGM {
    */
   public double TAG_TRANSMITTING_RANGE = 50; /* Transmission range for tag */ 
   public double TAG_INTERFERENCE_RANGE = 100; /* Interference range for tag. Ignored if below transmission range. */
-  /* This variable fixes the transmission and interference range based on the backscatter concept */
-  public double SCALING_FACTOR = 30;
   
   ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
   ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
-
-
   
   private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
   
@@ -189,8 +185,7 @@ public class UDGMBS extends UDGM {
       /* Register visualizer skin */
       Visualizer.registerVisualizerSkin(UDGMBSVisualizerSkin.class);
       
-    }
-  
+  }
   
   public void removed() {
      // super.removed();
@@ -497,7 +492,7 @@ public class UDGMBS extends UDGM {
     return newConnection;    
   }
  
-  
+  @Override
   public double getRxSuccessProbability(Radio source, Radio dest) {
 /**/System.out.println("UDGMBS.getRxSuccessProbability");
 

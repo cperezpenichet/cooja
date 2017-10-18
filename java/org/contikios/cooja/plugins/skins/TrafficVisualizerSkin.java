@@ -66,7 +66,7 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
 
   private final int MAX_HISTORY_SIZE = 200;
   private final float TRANSMITTED_COLOR_RGB[] = Color.BLUE.getRGBColorComponents(null);
-  private final float UNTRANSMITTED_COLOR_RGB[] = Color.RED.getRGBColorComponents(null);
+  private final float UNTRANSMITTED_COLOR_RGB[] = Color.BLACK.getRGBColorComponents(null);
 
   private boolean active = false;
   private Simulation simulation = null;

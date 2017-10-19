@@ -93,6 +93,9 @@ import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 @ClassDescription("Unit Disk Graph Medium for Backscaterring Communications (UDGMBS): Distance Loss")
 public class UDGMBS extends UDGM {
   private static Logger logger = Logger.getLogger(UDGMBS.class);
+  
+  public double SUCCESS_RATIO_TX = 1.0; /* Success ratio of TX. If this fails, no radios receive the packet */
+  public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
  
   /* Gain of the transmitting antenna */
   public final double GT = 0;
@@ -106,15 +109,7 @@ public class UDGMBS extends UDGM {
   public final double REFLECTIONLOSS = 15 - ENERGYLOSS;
   /* Sensitivity threshold for Tmote sky in dBm */
   public final double STH = -92 ;
-  
-  
-  /* 
-   * Backscatter tag has smaller TX and INTF ranges because of the reflection 
-   * it causes to the incident wave transmitted by the carrier generator.
-   */
-  public double TAG_TRANSMITTING_RANGE = 50; /* Transmission range for tag */ 
-  public double TAG_INTERFERENCE_RANGE = 100; /* Interference range for tag. Ignored if below transmission range. */
-  
+
   ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
   ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
@@ -143,7 +138,7 @@ public class UDGMBS extends UDGM {
                 continue;
               }
               double distance = sourcePos.getDistanceTo(destPos);
-              if (distance < Math.max(TAG_TRANSMITTING_RANGE, TAG_INTERFERENCE_RANGE)) {
+              if (distance < Math.max(TRANSMITTING_RANGE, INTERFERENCE_RANGE)) {
                 /* Add potential destination */
                 addEdge(
                     new DirectedGraphMedium.Edge(source, 
@@ -193,15 +188,16 @@ public class UDGMBS extends UDGM {
       Visualizer.unregisterVisualizerSkin(UDGMBSVisualizerSkin.class);
   }
   
-  public void setTagTxRange(double r) {
-    TAG_TRANSMITTING_RANGE = r;
-    dgrm.requestEdgeAnalysis();
-  }
-
-  public void setTagInterferenceRange(double r) {
-    TAG_INTERFERENCE_RANGE = r;
-    dgrm.requestEdgeAnalysis();
-  }
+  
+//  public void setTagTxRange(double r) {
+//    TAG_TRANSMITTING_RANGE = r;
+//    dgrm.requestEdgeAnalysis();
+//  }
+//
+//  public void setTagInterferenceRange(double r) {
+//    TAG_INTERFERENCE_RANGE = r;
+//    dgrm.requestEdgeAnalysis();
+//  }
   
   
   /**

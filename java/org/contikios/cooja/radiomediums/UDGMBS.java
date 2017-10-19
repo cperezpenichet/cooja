@@ -53,12 +53,10 @@ import org.contikios.cooja.Simulation;
 import org.contikios.cooja.TimeEvent;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.Radio;
-//import org.contikios.cooja.mspmote.interfaces.Msp802154Radio;
 import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.skins.UDGMBSVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 
-//import se.sics.mspsim.chip.CC2420;
 
 
 /**
@@ -226,6 +224,15 @@ public class UDGMBS extends UDGM {
     return receivedPower;
   }
   
+  
+  /**
+   * Returns a hashset with the appropriate TX channels of each 
+   * tag considering only the ongoing connections created by a
+   * carrier generator whose carrier the tag is currently listening
+   * to.
+   * 
+   * @param sender
+   */
   public HashSet<Integer> getTXChannels(Radio sender) {
     /* Store the channels for an active or backscatter transmission */
     HashSet<Integer> txChannels = new HashSet<Integer>();
@@ -398,7 +405,7 @@ public class UDGMBS extends UDGM {
           } else {
 /**/        System.out.println("recvID: " + recv.getMote().getID());
 /**/        System.out.println("recvChannel: " + recv.getChannel());
-            double tagCurrentOutputPowerIndicator = sender.getTagCurrentOutputPower(recv.getChannel());
+            double tagCurrentOutputPowerIndicator = sender.getTagCurrentOutputPowerMax(recv.getChannel());
 /**/        System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
             
             /* Calculate ranges: grows with radio output power in mW */
@@ -501,7 +508,7 @@ public class UDGMBS extends UDGM {
 /**/  System.out.println("UDGMBS.distance: " + distance);
       double distanceSquared = Math.pow(distance,2.0);
 /**/  System.out.println("UDGMBs.distanceSquared: " + distanceSquared);
-      double tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPower(dest.getChannel());
+      double tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPowerMax(dest.getChannel());
       
 /**/  System.out.println();
 /**/  System.out.println("UDGMBS.Power Indicator");
@@ -529,44 +536,6 @@ public class UDGMBS extends UDGM {
     return rxSuccessProbability;
         
   }
-
-  
-  
-  
-
-  
-  
-  
-//  @Override
-//  /* A little bit of a Hack */
-//  public double getRxSuccessProbability(Radio source, Radio dest) {
-///**/System.out.println("UDGMBS.getRxSuccessProbability");
-//
-//    double rxSuccessProbability = 0.0;
-//    
-//    /* Store the usual transmitting range of the parent medium */
-//    double transmittingRange = super.TRANSMITTING_RANGE;
-//    
-//    /*
-//     * In case the source is  a tag assign the tag's transmitting range 
-//     * to the transmitting range of the parent so as it can be used by
-//     * the parent method
-//     */
-//    if (source.isBackscatterTag()) {
-//      super.TRANSMITTING_RANGE = TAG_TRANSMITTING_RANGE;
-//    }
-//   
-//    rxSuccessProbability = super.getRxSuccessProbability(source, dest);
-//   
-//    /* 
-//     * Re-estate the stored transmitting range so as it can be used
-//     * by cc2420 radios.
-//     */
-//    super.TRANSMITTING_RANGE = transmittingRange;
-//   
-//    return rxSuccessProbability;
-//  }
-  
  
   @Override
   public void updateSignalStrengths() {
@@ -630,7 +599,7 @@ public class UDGMBS extends UDGM {
         double signalStrength = 0.0;
 
         if (conn.getSource().isBackscatterTag()) {
-          double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPower(dstRadio.getChannel());
+          double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPowerMax(dstRadio.getChannel());
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
           
@@ -693,7 +662,7 @@ public class UDGMBS extends UDGM {
 /**/    System.out.println("source: " + conn.getSource().getMote().getID());
         
         if (conn.getSource().isBackscatterTag()) {
-          double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPower(intfRadio.getChannel());
+          double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPowerMax(intfRadio.getChannel());
           
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           double signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
@@ -746,7 +715,7 @@ public class UDGMBS extends UDGM {
 /**/System.out.println("UDGMBS.removeFromActiveConnections");
     /* 
      * When a carrier generator is removed from an ongoing connection
-     * every tag that was receiving the carrier updates the corresponding
+     * every tag that was receiving its carrier updates the corresponding
      * entry in its Hashtable and stops any current backscatter transmission .
      */
     if (radio.isGeneratingCarrier()) {

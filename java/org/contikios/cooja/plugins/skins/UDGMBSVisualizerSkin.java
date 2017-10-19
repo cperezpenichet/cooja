@@ -366,7 +366,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
                   int tagTxChannel = carrierChannel+2;
 /**/              System.out.println("tagTxChannel: " + tagTxChannel);
 
-                  /* Paint the Tx and Int ranges of each tag */
+                  /* Paint the TX and INT range of each tag */
                   paintTxAndIxRanges(g, r, tagTxChannel);
                 }
               }
@@ -427,10 +427,11 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
             if (lastConnFromCarrier.isDestination(selectedRadio)) {
               
               int carrierChannel = lastConnFromCarrier.getSource().getChannel();
+              int tagTxChannel = carrierChannel+2;
               
               /* Gives the connection responsible for the tag's maximum output power, in case the carrier 
                * generators of more than one connections have the same channel */
-              RadioConnection connFromMaxPower = selectedRadio.getConnectionFromMaxOutputPower(carrierChannel);
+              RadioConnection connFromMaxPower = selectedRadio.getConnectionFromMaxOutputPower(tagTxChannel);
               
 /**/          System.out.println("carrierSource: " +  connFromMaxPower.getSource().getMote().getID() + " is responsible for the max output power");
 
@@ -509,7 +510,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
   
   private void updateRatioRangeFrame() {
 /**/System.out.println("UDGMBS.updateRatioRangeFrame");         
-      
     if (rrFrame.getDesktopPane() == null) {
       visualizer.getDesktopPane().add(rrFrame);
     }
@@ -536,7 +536,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
   
   /**
-   * Paint the Tx and Int ranges of the given radio which change dynamically based on 
+   * Paint the TX and INT ranges of the given radio which change dynamically based on 
    * the output power indexed by the given tag's tx channel.
    *   
    * @param g
@@ -544,6 +544,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
    * @param channel
    */
   private void paintTxAndIxRanges(Graphics g, Radio radio, int tagTxChanel) {
+/**/System.out.println("paintTxAndIxRanges");
+    
+    Set<Mote> selectedMotes = visualizer.getSelectedMotes();
     
     Area intRangeArea = new Area();
     Area intRangeMaxArea = new Area();
@@ -557,7 +560,19 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     int x = pixelCoord.x;
     int y = pixelCoord.y;
     
-    double tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPower(tagTxChanel);
+    double tagCurrentOutputPowerIndicator = 0.0;
+
+    for (Mote selectedMote : selectedMotes) {
+      Radio selectedRadio = selectedMote.getInterfaces().getRadio();
+      if (selectedRadio.isGeneratingCarrier()) {
+/**/    System.out.println("selectedRadio: " + selectedRadio.getMote().getID() + " is a  carrier");
+        /* Tag's output power given the specific carrier generator (selectedRadio) */ 
+        tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPower(selectedRadio, tagTxChanel);
+      } else {
+/**/    System.out.println("selectedRadio: " + selectedRadio.getMote().getID() + " is a tag");
+        tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPowerMax(tagTxChanel);
+      }
+    }
     
     double tagTransmissionRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH 
                                          + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
@@ -696,6 +711,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
    * @param g
    */
   private void paintCarrierColor(Set<Mote> selectedMotes, Mote selectedMote, Graphics g) {
+/**/ System.out.println("paintCarrierColor");    
     /* Get the position of the carrier generator */
     Position carrierPos = selectedMote.getInterfaces().getPosition();
     

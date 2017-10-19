@@ -288,15 +288,14 @@ public abstract class Radio extends MoteInterface {
   }
   
   /**
-   * Removes from the hashtable of the tag the entry that concerns the given connection
-   * that was finished. 
+   * Removes the entry that concerns the already finished connection that is given from 
+   * the hashtable of the tag.
    *  
    * @param conn
    */
   public void updateTagTXPowers(RadioConnection conn) {};
   
   /**
-   *
    * Keeps a record of the output power of the tag concerning each time the corresponding
    * connection from which it was produced as well as the appropriate transmission channel 
    * derived from the carrier generator that created that connection. 
@@ -306,39 +305,31 @@ public abstract class Radio extends MoteInterface {
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower){};
   
   /**
-   * Returns the output power of the tag with respect to the given channel to which the
-   * backscatter tag will transmit.
+   * In case there are more than one connections created by carrier generators with the 
+   * same channel this method returns the output power of the tag that corresponds to the 
+   * connection created by the given radio (carrier generator). 
+   * 
+   * @param radio
+   * @param channel
+   */
+  public double getTagCurrentOutputPower(Radio radio, int channel) { return 0.0; }
+  
+  /**
+   * In case there are more than one connections created by carrier generators with the 
+   * same channel this method returns the max output power of the tag that corresponds to the 
+   * connection created by the carrier generator which is closer to the tag. 
+
+   * @param channel
+   */
+  public double getTagCurrentOutputPowerMax(int channel) { return 0.0; }
+  
+  /**
+   * Returns the connection responsible for the tag's maximum output power, in case the carrier 
+   * generators of more than one connections have the same channel.
    * 
    * @param channel
-   * @return
    */
-  public double getTagCurrentOutputPower(int channel) { return 0.0; }
-  
   public RadioConnection getConnectionFromMaxOutputPower(int channel) { return null; }
-  
-  
-  
-//  public double getTagCurrentOutputPowerMax(int channel) {
-//    return 0.0;
-//  }
-//
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
 
   public JPanel getInterfaceVisualizer() {
     JPanel panel = new JPanel(new BorderLayout());

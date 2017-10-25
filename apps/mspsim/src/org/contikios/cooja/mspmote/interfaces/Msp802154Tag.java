@@ -205,7 +205,7 @@ public class Msp802154Tag extends Msp802154Radio {
   
   /* 
    * Based on the absence of the receiving capabilities of
-   * the tag, it does not get interfered. 
+   * the tag, tag does not get interfered. 
    */
   public void interfereAnyReception() {
 /**/System.out.println("tag: " + mote.getID() + " does not get interfered");

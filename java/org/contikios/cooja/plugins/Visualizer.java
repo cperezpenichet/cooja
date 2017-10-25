@@ -991,6 +991,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void handleMousePress(MouseEvent mouseEvent) {
+/**/System.out.println("handleMousePress");
     int x = mouseEvent.getX();
     int y = mouseEvent.getY();
 
@@ -1041,6 +1042,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   Map<Mote, double[]> moveStartPositions = new HashMap<>();
 
   private void handleMouseDrag(MouseEvent e, boolean stop) {
+/**///System.out.println("handleMouseDrag");    
     Position currPos = transformPixelToPosition(e.getPoint());
 
     switch (mouseActionState) {
@@ -1115,6 +1117,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void handleMouseRelease(MouseEvent mouseEvent) {
+/**/System.out.println("handleMouseRelease");
 
     switch (mouseActionState) {
       case PAN_PRESS:

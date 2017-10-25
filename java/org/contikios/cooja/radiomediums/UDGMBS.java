@@ -88,7 +88,7 @@ import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
  * @see UDGMVisualizerSkin
  * @author Fredrik Osterlind
  */
-@ClassDescription("Unit Disk Graph Medium for Backscaterring Communications (UDGMBS): Distance Loss")
+@ClassDescription("Unit Disk Graph Medium for Backscater Communication (UDGMBS): Distance Loss")
 public class UDGMBS extends UDGM {
   private static Logger logger = Logger.getLogger(UDGMBS.class);
   
@@ -171,8 +171,8 @@ public class UDGMBS extends UDGM {
       }
       dgrm.requestEdgeAnalysis();
       
-      //this.addRadioTransmissionObserver(radioMediumConnectionActivityObserver);
-      
+      /* Remove the UDGMVisualizerSkin since visualization 
+       * is being handled by UDGMBSVisualizerSkin */
       super.removed();
 
       /* Register visualizer skin */
@@ -181,8 +181,6 @@ public class UDGMBS extends UDGM {
   }
   
   public void removed() {
-     // super.removed();
-
       Visualizer.unregisterVisualizerSkin(UDGMBSVisualizerSkin.class);
   }
   
@@ -303,7 +301,7 @@ public class UDGMBS extends UDGM {
 /**/  System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length);
 /**/  System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
       if(sender.isGeneratingCarrier()) {
-/**/    System.out.println("sender:" + sender.getMote().getID() + " is a carrier generator");      
+/**/    System.out.println("sender: " + sender.getMote().getID() + " is a carrier generator");      
         
         for (Radio r: newConnection.getAllDestinations()) {
           if (!r.isBackscatterTag()) {
@@ -418,7 +416,7 @@ public class UDGMBS extends UDGM {
                                                         + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
             
 //            double tagInterferenceRange = (Math.pow(10, (GT + GR - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
-/**/        System.out.println("maxRange: " + tagInterferenceRange);
+/**/        System.out.println("tagInterferenceRange: " + tagInterferenceRange);
 
             Position recvPos = recv.getPosition();
             double distance = senderPos.getDistanceTo(recvPos);
@@ -455,6 +453,8 @@ public class UDGMBS extends UDGM {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
               } else if (recv.isReceiving() || (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " - isReceiving");
+/**/            System.out.println("recv.isReceiving(): " + recv.isReceiving());
+/**/            System.out.println("random.nextDouble(): " + random.nextDouble());
                 /* Was receiving, or reception failed: start interfering */
                 newConnection.addInterfered(recv);
 /**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
@@ -478,6 +478,7 @@ public class UDGMBS extends UDGM {
 /**/              System.out.println("recv: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
                 }
               }
+              /* Everything beyond this range is not considered as a valid destination */
             } else if (distance <= tagInterferenceRange) {
 /**/          System.out.println("WithinIR");
               /* Within interference range */
@@ -492,8 +493,9 @@ public class UDGMBS extends UDGM {
       }
     }
 /**/System.out.println("return newConnection");        
-    return newConnection;    
-  }
+    return newConnection;
+    
+  } /* createConnections */
  
   @Override
   public double getRxSuccessProbability(Radio source, Radio dest) {
@@ -545,14 +547,12 @@ public class UDGMBS extends UDGM {
     /* Reset signal strengths */
 /**/System.out.printf("Reset signal strength \n");
     for (Radio radio : getRegisteredRadios()) {
-      /* 
-       * Update the Hashtable of the tag in case it is a 
-       * destination to the connection that just finished
-       */
+      /* Update the Hashtable of the tag in case it is a 
+       * destination to the connection that just finished. */
       if(radio.isBackscatterTag()) {
 /**/    System.out.println("IN" );
-        
-        radio.setCurrentSignalStrength(-100);
+        /* Would be enabled if the tag had receiving capabilities */
+        //radio.setCurrentSignalStrength(-100);
         RadioConnection lastConn = getLastConnection();
         if (lastConn != null) {
           if(lastConn.isDestination(radio)) {
@@ -564,7 +564,6 @@ public class UDGMBS extends UDGM {
         radio.setCurrentSignalStrength(getBaseRssi(radio));      
       }
 /**/  System.out.printf("Reset Radio: %d, Signal strength: %.2f\n", radio.getMote().getID(), radio.getCurrentSignalStrength());
-
     }
     
     HashSet<Integer> txChannels = new HashSet<Integer>();
@@ -602,8 +601,10 @@ public class UDGMBS extends UDGM {
           double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPowerMax(dstRadio.getChannel());
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
-          
+/**/      System.out.println("1.signalStrength: " + signalStrength);          
         } else {
+          /* In case the source radio is a carrier generator its dest will be a tag 
+           * which does not have receiving capabilities. */
           if (!conn.getSource().isGeneratingCarrier()) {
 /**/        System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
             
@@ -615,23 +616,20 @@ public class UDGMBS extends UDGM {
             double distFactor = dist/maxTxDist;
 /**/        System.out.printf("distFactor = %.2f\n", distFactor);
             signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
+/**/        System.out.println("2.signalStrength: " + signalStrength);          
           }
         }
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {
           dstRadio.setCurrentSignalStrength(signalStrength);
 /**/      System.out.printf("dstRadio = %d , signal = %.2f\n", dstRadio.getMote().getID(), dstRadio.getCurrentSignalStrength());
         }
-        
-        /* 
-         * In case the tag stops listening the carrier from one connection but
-         * it is still listening the carrier from another connection keep it signaled.
-         */
+        /* In case the tag stops listening the carrier from one connection but
+         * it is still listening the carrier from another connection keep it signaled. */
         if(dstRadio.isBackscatterTag() && !dstRadio.isListeningCarrier()) {
 /**/      System.out.println("dstRadio: " + dstRadio.getMote().getID() + " is not listening the carrier...but");
           if (conn.getSource().isGeneratingCarrier()) {
 /**/        System.out.println("conn: " + conn.getID() + " is still active");
-/**/        System.out.println("and its source: " + conn.getSource().getMote().getID() + " isGeneratingCarrier(): " 
-                               + conn.getSource().isGeneratingCarrier());
+/**/        System.out.println("and its source: " + conn.getSource().getMote().getID() + " isGeneratingCarrier(): " + conn.getSource().isGeneratingCarrier());
             dstRadio.signalReceptionStart();
           }
         }
@@ -642,16 +640,15 @@ public class UDGMBS extends UDGM {
 
     /* Set signal strength to below weak on interfered */
     for (RadioConnection conn : conns) {
-/**/    System.out.println("\nSet signal strength to below weak on interfered");
-/**/    System.out.println("\nconn: " + conn.getID() + " - source: " + conn.getSource().getMote().getID());  
-        txChannels = getTXChannels(conn.getSource());
+/**/  System.out.println("\nSet signal strength to below weak on interfered");
+/**/  System.out.println("\nconn: " + conn.getID() + " - source: " + conn.getSource().getMote().getID());  
+      txChannels = getTXChannels(conn.getSource());
   
-        
       for (Radio intfRadio : conn.getInterfered()) {
 /**/    System.out.println("ActiveConnID: " + conn.getID());
 /**/    System.out.printf("1.intfRadio = %d\n", intfRadio.getMote().getID()) ;        
         if(intfRadio.getChannel() >= 0 && !txChannels.contains(intfRadio.getChannel())) {
-            continue;
+          continue;
         }
 
 /**/    System.out.printf("2.intfRadio = %d\n", intfRadio.getMote().getID()) ;        
@@ -666,11 +663,14 @@ public class UDGMBS extends UDGM {
           
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           double signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
+/**/      System.out.println("intfRadio.getCurrentSignalStrength(): " + intfRadio.getCurrentSignalStrength());          
           if (intfRadio.getCurrentSignalStrength() < signalStrength) {
             intfRadio.setCurrentSignalStrength(signalStrength);
   /**/      System.out.printf("1.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
           }
         } else {
+          /* In case the source radio is a carrier generator its dest will be a tag 
+           * which does not have receiving capabilities. */
           if (!conn.getSource().isGeneratingCarrier()) {
 /**/        System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
             double maxTxDist = TRANSMITTING_RANGE
@@ -710,6 +710,7 @@ public class UDGMBS extends UDGM {
     }
 
   } /* uptadeSignalStrengths */
+  
   
   private void removeFromActiveConnections(Radio radio) {
 /**/System.out.println("UDGMBS.removeFromActiveConnections");
@@ -758,8 +759,7 @@ public class UDGMBS extends UDGM {
       }
     }
 
-    
-  }
+  } /* removeFromActiveConnections */
   
   @Override
   public void unregisterRadioInterface(Radio radio, Simulation sim) {
@@ -773,16 +773,7 @@ public class UDGMBS extends UDGM {
     /* Update signal strengths */
     updateSignalStrengths();
     
-  }
+  } /* unregisterRadioInterface */
+
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-} /* createConnections */
+} /* UDGMBS */

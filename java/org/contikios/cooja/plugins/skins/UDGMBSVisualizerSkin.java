@@ -268,8 +268,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     rrFrame.getContentPane().add(BorderLayout.CENTER, main);
     rrFrame.pack();
     
-    /* Predefined colors for each one of the sixteen 
-     * 802.15.4 channels. */
+    /* Set predefined colors for each one of the  
+     * sixteen 802.15.4 channels. */
     setColorsForTagTXChannel();
   }
 
@@ -329,15 +329,16 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         /* Search among the active connections only for the last one that was created by 
          * a carrier generator and paint the Tx and Int ranges of the selectedRadio (tag)
          * that is listening to its carrier. */
+
+        int tagTxChannel = 0;
         for(int i=conns.length; i>0; i--) {
 /**/      System.out.println("lenght of conns: " + conns.length);
 /**/      System.out.println("i: " + i);
           RadioConnection lastConnFromCarrier = conns[i-1];
           if(lastConnFromCarrier.getSource().isGeneratingCarrier()) {
             if (lastConnFromCarrier.isDestination(selectedRadio)) {
-              
               int carrierChannel = lastConnFromCarrier.getSource().getChannel();
-              int tagTxChannel = carrierChannel+2;
+              tagTxChannel = carrierChannel+2;
 /**/          System.out.println("tagTxChannel: " + tagTxChannel);
 
               /* Paint the Tx and Int range of the tag */
@@ -346,7 +347,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
             break;
           }
         }
-        showProbability(selectedMotes, g);
+        showProbability(selectedMotes, g, tagTxChannel);
       } else if (selectedRadio.isGeneratingCarrier()) {
         super.paintBeforeMotes(g);
 /**/    System.out.println();
@@ -381,7 +382,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       }
     }
 /**/System.out.println("UDGMBS.paintBeforeMotesSTOP");
-
 
   } /* paintBeforeMotes */
   
@@ -452,7 +452,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       }
     }
 /**/System.out.println("UDGMBS.paintAfterMotesSTOP");
-
 
   } /* paintAfterMotes */
 
@@ -532,8 +531,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     catch (PropertyVetoException ex) {
       logger.warn("Failed getting focus");
     }
+    
   }
-
   
   /**
    * Paint the TX and INT ranges of the given radio which change dynamically based on 
@@ -658,21 +657,79 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
   } /* paintTxAndIxRanges */
   
+  /**
+   * Show the probability beneath each tag of the Set selectedMotes for the given
+   * TX channel of the tag and the given graphics g.  
+   * 
+   * @param selectedMotes
+   * @param g
+   * @param channel
+   */
+  private void showProbability(Set<Mote> selectedMotes, Graphics g, int channel) {
+/**/System.out.println("1.showProbability");    
+    
+    FontMetrics fm = g.getFontMetrics();
+    g.setColor(Color.BLACK);
+    
+    /* Print transmission success probabilities only if single mote is selected */
+    if (selectedMotes.size() == 1) {
+/**/  System.out.println("1.UDGMBS.selectedMotes.size(): " + selectedMotes.size());      
+      
+      Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
+      Radio selectedRadio = selectedMote.getInterfaces().getRadio();
+      
+      double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPowerMax(channel);
+      double distanceMax = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH + 
+                                         20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+      
+      for (Mote m : simulation.getMotes()) {
+        if (m == selectedMote) {
+          continue;
+        }
+/**/    System.out.println("1.UDGMBS.m: " + m.getID());      
+        
+        double prob = 0.0;
+
+        double distance = selectedRadio.getPosition().getDistanceTo(m.getInterfaces().getPosition());
+/**/    System.out.println("1.distance: " + distance);
+/**/    System.out.println("1.distanceMax: " + distanceMax);
+        if (distance <= distanceMax) {
+          prob = 1.0;
+        } else {
+          prob = 0.0;
+        }
+      
+/**/    System.out.println("1.UDGMBS.PROB: " + prob);
+        
+        if (prob == 0.0d) {
+          continue;
+        }
+        String msg = (((int) (1000 * prob)) / 10.0) + "%";
+        Position pos = m.getInterfaces().getPosition();
+        Point pixel = visualizer.transformPositionToPixel(pos);
+        int msgWidth = fm.stringWidth(msg);
+        g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
+      }
+    }
+
+  } /* showProbability */
   
   /**
-   * Show the probability beneath each node of the Set selectedMotes for
+   * Show the probability beneath each active radio node of the Set selectedMotes for
    * the given graphics g. 
    * 
    * @param selectedMotes
    * @param g
    */
   private void showProbability(Set<Mote> selectedMotes, Graphics g) {
+/**/System.out.println("2.showProbability");    
+    
     FontMetrics fm = g.getFontMetrics();
     g.setColor(Color.BLACK);
     
     /* Print transmission success probabilities only if single mote is selected */
     if (selectedMotes.size() == 1) {
-/**/  System.out.println("UDGMBS.selectedMotes.size(): " + selectedMotes.size());      
+/**/  System.out.println("2.UDGMBS.selectedMotes.size(): " + selectedMotes.size());      
       
       Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
@@ -680,12 +737,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         if (m == selectedMote) {
           continue;
         }
-/**/    System.out.println("UDGMBS.m: " + m.getID());      
-     
-        double prob
-                = ((UDGMBS) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, m.getInterfaces().getRadio());
-       
-/**/    System.out.println("UDGMBS.PROB: " + prob);
+/**/    System.out.println("2.UDGMBS.m: " + m.getID());      
+        
+        double  prob = ((UDGMBS) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, 
+                           m.getInterfaces().getRadio());
+      
+/**/    System.out.println("2.UDGMBS.PROB: " + prob);
         
         if (prob == 0.0d) {
           continue;
@@ -698,9 +755,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       }
     }
     
-
   } /* showProbability */
-  
 
   /**
    * From the given set of motes paint the carrier generator (selectedMote), which is currently
@@ -744,7 +799,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
     
   } /* paintCarrierColor */
-
   
   /**
    * From the given set of motes paint the carrier generator (radio), whose carrier the selectedMote
@@ -785,9 +839,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
                  2 * Visualizer.MOTE_RADIUS);
     }
     
-    
   } /* paintCarrierColor */
-  
   
   /**
    * Set a different color for each one of the 16 available 802.15.4 channels (ch.11-26).
@@ -814,9 +866,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       color = Color.HSBtoRGB((float)(i*15)/(float)360, (float)1.0, (float)1.0);
       carrierColor.put(tagTXChannel, color);
     }
-/**/System.out.println("1.carrierColor: " + carrierColor);    
+/**/System.out.println("1.carrierColor: " + carrierColor);   
+
   } /* setColorsForTagTXChannel */
-  
   
   @Override
   public Visualizer getVisualizer() {

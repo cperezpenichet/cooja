@@ -153,8 +153,7 @@ public class UDGM extends AbstractRadioMedium {
 
   public void removed() {
   	super.removed();
-  	
-	Visualizer.unregisterVisualizerSkin(UDGMVisualizerSkin.class);
+  	Visualizer.unregisterVisualizerSkin(UDGMVisualizerSkin.class);
   }
   
   public void setTxRange(double r) {

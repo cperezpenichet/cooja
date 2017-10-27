@@ -586,9 +586,12 @@ public class UDGMBS extends UDGM {
       
       for (Radio dstRadio : conn.getDestinations()) {
 /**/    System.out.println("ActiveConnID: " + conn.getID());
+/**/    System.out.printf("1.dstRadio = %d\n", dstRadio.getMote().getID()) ;        
         if(dstRadio.getChannel() >= 0 && !txChannels.contains(dstRadio.getChannel())) {
             continue;
         }
+        
+/**/    System.out.printf("2.dstRadio = %d\n", dstRadio.getMote().getID()) ;        
 
         double dist = conn.getSource().getPosition().getDistanceTo(dstRadio.getPosition());
 /**/    System.out.printf("dist = %.2f\n", dist);

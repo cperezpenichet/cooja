@@ -102,7 +102,8 @@ public class UDGM extends AbstractRadioMedium {
          * XXX May be slow for mobile networks */
         clearEdges();
         for (Radio source: UDGM.this.getRegisteredRadios()) {
-            System.out.println("UDGM.DirectedGraphMedium");  
+/**/      System.out.println("A.source: " + source.getMote().getID());            
+          System.out.println("UDGM.DirectedGraphMedium");  
           Position sourcePos = source.getPosition();
           for (Radio dest: UDGM.this.getRegisteredRadios()) {
             Position destPos = dest.getPosition();

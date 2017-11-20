@@ -4,7 +4,7 @@
   router="FAN">  
   <class id="1" language="java" name="org.contikios.cooja.mspmote.MspMoteType" project="Cooja_test" 
     file="/Cooja_test/apps/mspsim/src/org/contikios/cooja/mspmote/MspMoteType.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="49" width="261" x="189" y="-116"/>    
+    <position height="714" width="312" x="48" y="-149"/>    
     <display autosize="false" stereotype="true" package="true" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -13,8 +13,8 @@
   </class>  
   <class id="2" language="java" name="org.contikios.cooja.mspmote.SkyMoteType" project="Cooja_test" 
     file="/Cooja_test/apps/mspsim/src/org/contikios/cooja/mspmote/SkyMoteType.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="49" width="260" x="191" y="-32"/>    
-    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="false" 
+    <position height="-1" width="-1" x="489" y="452"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
@@ -23,21 +23,34 @@
   <class id="3" language="java" name="org.contikios.cooja.mspmote.BackscatterTagType" project="Cooja_test" 
     file="/Cooja_test/apps/mspsim/src/org/contikios/cooja/mspmote/BackscatterTagType.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="50" width="259" x="190" y="55"/>    
-    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="false" 
+    <position height="-1" width="-1" x="696" y="451"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="false" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <generalization id="4">    
+  <interface id="4" language="java" name="org.contikios.cooja.MoteType" project="Cooja_test" 
+    file="/Cooja_test/java/org/contikios/cooja/MoteType.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="609" y="104"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="false" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <generalization id="5">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="1"/>  
   </generalization>  
-  <generalization id="5">    
+  <generalization id="6">    
     <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="2"/>  
   </generalization>  
+  <realization id="7">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="false" 
     sort-features="false" accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

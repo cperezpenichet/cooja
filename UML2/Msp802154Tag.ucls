@@ -4,7 +4,7 @@
   <class id="1" language="java" name="org.contikios.cooja.mspmote.interfaces.Msp802154Tag" project="Cooja_test" 
     file="/Cooja_test/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/Msp802154Tag.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="49" width="260" x="170" y="-1364"/>    
+    <position height="783" width="264" x="21" y="-770"/>    
     <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
@@ -14,8 +14,8 @@
   <class id="2" language="java" name="org.contikios.cooja.mspmote.interfaces.Msp802154Radio" project="Cooja_test" 
     file="/Cooja_test/apps/mspsim/src/org/contikios/cooja/mspmote/interfaces/Msp802154Radio.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="49" width="260" x="168" y="-1447"/>    
-    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="-1" width="-1" x="638" y="-904"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
@@ -23,8 +23,8 @@
   </class>  
   <class id="3" language="java" name="org.contikios.cooja.interfaces.Radio" project="Cooja_test" 
     file="/Cooja_test/java/org/contikios/cooja/interfaces/Radio.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="49" width="261" x="166" y="-1533"/>    
-    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="-1" width="-1" x="149" y="-1161"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
@@ -32,8 +32,8 @@
   </class>  
   <class id="4" language="java" name="org.contikios.cooja.MoteInterface" project="Cooja_test" 
     file="/Cooja_test/java/org/contikios/cooja/MoteInterface.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="49" width="261" x="165" y="-1618"/>    
-    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="-1" width="-1" x="168" y="-1597"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
@@ -41,28 +41,49 @@
   </class>  
   <class id="5" language="java" name="java.util.Observable" project="Cooja_test" 
     file="/usr/lib/jvm/java-8-oracle/jre/lib/rt.jar" binary="true" corner="BOTTOM_RIGHT">    
-    <position height="49" width="260" x="165" y="-1702"/>    
-    <display autosize="false" stereotype="true" package="true" initial-value="false" signature="true" 
+    <position height="-1" width="-1" x="630" y="-1583"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <generalization id="6">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="5"/>  
-  </generalization>  
+  <interface id="6" language="java" name="org.contikios.cooja.interfaces.CustomDataRadio" project="Cooja_test" 
+    file="/Cooja_test/java/org/contikios/cooja/interfaces/CustomDataRadio.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="-1" width="-1" x="650" y="-233"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
   <generalization id="7">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="2"/>  
+  </generalization>  
+  <dependency id="8">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="5"/>  
+  </dependency>  
+  <realization id="9">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="6"/>  
+  </realization>  
+  <generalization id="10">    
     <end type="SOURCE" refId="3"/>    
     <end type="TARGET" refId="4"/>  
   </generalization>  
-  <generalization id="8">    
+  <dependency id="11">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="3"/>  
+  </dependency>  
+  <generalization id="12">    
     <end type="SOURCE" refId="2"/>    
     <end type="TARGET" refId="3"/>  
   </generalization>  
-  <generalization id="9">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="2"/>  
+  <generalization id="13">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="5"/>  
   </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    

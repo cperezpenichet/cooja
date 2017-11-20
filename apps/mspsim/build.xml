@@ -8,7 +8,7 @@
   <property name="cooja" location="../.."/>
   
   <property name="cooja_jar" value="${cooja}/dist/cooja.jar"/>
-  <property name="mspsim" location="/home/george/UbuntuMasterThesis/mspsim-test/mspsim"/>
+  <property name="mspsim" location="/home/george/UbuntuMasterThesis/CoojaSimulatorTesting/mspsim-test/mspsim"/>
   <property name="mspsim_jar" value="${mspsim}/mspsim.jar"/>
   <property name="coffee" location="../../../coffee-manager"/>
   <property name="coffee_jar" value="${lib}/coffee.jar"/>

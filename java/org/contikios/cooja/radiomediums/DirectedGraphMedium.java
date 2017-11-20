@@ -91,6 +91,7 @@ public class DirectedGraphMedium extends AbstractRadioMedium {
 
   public void addEdge(Edge e) {
     edges.add(e);
+/**///System.out.println("edges: " + edges);    
     requestEdgeAnalysis();
 
     radioTransmissionObservable.setChangedAndNotify();
@@ -194,6 +195,7 @@ public class DirectedGraphMedium extends AbstractRadioMedium {
    * Generates hash table using current edges for efficient lookup.
    */
   protected void analyzeEdges() {
+/**/System.out.println("3.analyzeEdges");          
     Hashtable<Radio,ArrayList<DGRMDestinationRadio>> listTable =
       new Hashtable<Radio,ArrayList<DGRMDestinationRadio>>();
 
@@ -221,6 +223,9 @@ public class DirectedGraphMedium extends AbstractRadioMedium {
 
     this.edgesTable = arrTable;
     edgesDirty = false;
+/**/System.out.println("2.edgesDirty: " + edgesDirty);
+    
+/**/System.out.println("edgesTable.size(): " + edgesTable.size());
     
     /* Radio Medium changed here so notify Observers */
     radioMediumObservable.setChangedAndNotify();
@@ -234,6 +239,7 @@ public class DirectedGraphMedium extends AbstractRadioMedium {
    * @return All potential destination radios
    */
   public DGRMDestinationRadio[] getPotentialDestinations(Radio source) {
+/**/System.out.println("1.edgesDirty: " + edgesDirty);
     if (edgesDirty) {
       analyzeEdges();
     }
@@ -309,7 +315,7 @@ public class DirectedGraphMedium extends AbstractRadioMedium {
          for (RadioConnection conn : getActiveConnections()) {
            for (Radio dstRadio : conn.getDestinations()) {
              if (dstRadio == dest.radio) {
-               conn.addInterfered(dest.radio);;
+               conn.addInterfered(dest.radio);
                break;
              }
            }

@@ -1166,6 +1166,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void beginMoveRequest(Mote selectedMote, boolean withTiming, boolean confirm) {
+/**/System.out.println("beginMoveRequest");    
     if (withTiming) {
       moveStartTime = System.currentTimeMillis();
     }

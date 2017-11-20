@@ -97,6 +97,7 @@ public class UDGM extends AbstractRadioMedium {
     random = simulation.getRandomGenerator();
     dgrm = new DirectedGraphMedium() {
       protected void analyzeEdges() {
+/**/    System.out.println("1.analyzeEdges");          
 /**/    System.out.println("1.DirectedGraphMedium: " + dgrm);          
         /* Create edges according to distances.
          * XXX May be slow for mobile networks */
@@ -111,6 +112,7 @@ public class UDGM extends AbstractRadioMedium {
             if (source == dest) {
               continue;
             }
+/**/        System.out.println("A.dest: " + dest.getMote().getID());            
             double distance = sourcePos.getDistanceTo(destPos);
             if (distance < Math.max(TRANSMITTING_RANGE, INTERFERENCE_RANGE)) {
               /* Add potential destination */
@@ -129,6 +131,7 @@ public class UDGM extends AbstractRadioMedium {
      * If any positions change, re-analyze potential receivers. */
     final Observer positionObserver = new Observer() {
       public void update(Observable o, Object arg) {
+/**/    System.out.println("Posistion changed!");
         dgrm.requestEdgeAnalysis();
       }
     };
@@ -493,5 +496,14 @@ public class UDGM extends AbstractRadioMedium {
     }
     return true;
   }
+  
+  public DirectedGraphMedium getDirectedGraphMedium() {
+    return dgrm;
+  }
+  
+  public Random getRandom() {
+    return random;
+  }
+  
 
 }

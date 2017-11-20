@@ -112,64 +112,67 @@ public class UDGMBS extends UDGM {
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
   ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
   
-  private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
+  //private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
   
-  private Random random = null;
+  //private Random random = null;
   
   public UDGMBS(Simulation simulation) {
       super(simulation);
   /**/System.out.println("UDGMBS");
-      random = simulation.getRandomGenerator();
-      dgrm = new DirectedGraphMedium() {
-        protected void analyzeEdges() {
-  /**/    System.out.println("2.DirectedGraphMedium: " + dgrm);          
-          /* Create edges according to distances.
-           * XXX May be slow for mobile networks */
-          clearEdges();
-          for (Radio source: UDGMBS.this.getRegisteredRadios()) {
-            System.out.println("UDGMBS.DirectedGraphMedium");  
-            Position sourcePos = source.getPosition();
-            for (Radio dest: UDGMBS.this.getRegisteredRadios()) {
-              Position destPos = dest.getPosition();
-              /* Ignore ourselves */
-              if (source == dest) {
-                continue;
-              }
-              double distance = sourcePos.getDistanceTo(destPos);
-              if (distance < Math.max(TRANSMITTING_RANGE, INTERFERENCE_RANGE)) {
-                /* Add potential destination */
-                addEdge(
-                    new DirectedGraphMedium.Edge(source, 
-                        new DGRMDestinationRadio(dest)));
-              }
-            }
-          }
-          super.analyzeEdges();
-        }
-      };
-
-      /* Register as position observer.
-       * If any positions change, re-analyze potential receivers. */
-      final Observer positionObserver = new Observer() {
-        public void update(Observable o, Object arg) {
-          dgrm.requestEdgeAnalysis();
-        }
-      };
-      /* Re-analyze potential receivers if radios are added/removed. */
-      simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
-        public void moteWasAdded(Mote mote) {
-          mote.getInterfaces().getPosition().addObserver(positionObserver);
-          dgrm.requestEdgeAnalysis();
-        }
-        public void moteWasRemoved(Mote mote) {
-          mote.getInterfaces().getPosition().deleteObserver(positionObserver);
-          dgrm.requestEdgeAnalysis();
-        }
-      });
-      for (Mote mote: simulation.getMotes()) {
-        mote.getInterfaces().getPosition().addObserver(positionObserver);
-      }
-      dgrm.requestEdgeAnalysis();
+//      random = simulation.getRandomGenerator();
+//      dgrm = new DirectedGraphMedium() {
+//        protected void analyzeEdges() {
+///**/      System.out.println("2.analyzeEdges");          
+// /**/     System.out.println("2.DirectedGraphMedium: " + dgrm);          
+//          /* Create edges according to distances.
+//           * XXX May be slow for mobile networks */
+//          clearEdges();
+//          for (Radio source: UDGMBS.this.getRegisteredRadios()) {
+///**/        System.out.println("B.source: " + source.getMote().getID());            
+///**/        System.out.println("UDGMBS.DirectedGraphMedium");  
+//            Position sourcePos = source.getPosition();
+//            for (Radio dest: UDGMBS.this.getRegisteredRadios()) {
+//              Position destPos = dest.getPosition();
+//              /* Ignore ourselves */
+//              if (source == dest) {
+//                continue;
+//              }
+///**/          System.out.println("B.dest: " + dest.getMote().getID());            
+//              double distance = sourcePos.getDistanceTo(destPos);
+//              if (distance < Math.max(TRANSMITTING_RANGE, INTERFERENCE_RANGE)) {
+//                /* Add potential destination */
+//                addEdge(
+//                    new DirectedGraphMedium.Edge(source, 
+//                        new DGRMDestinationRadio(dest)));
+//              }
+//            }
+//          }
+//          super.analyzeEdges();
+//        }
+//      };
+//
+//      /* Register as position observer.
+//       * If any positions change, re-analyze potential receivers. */
+//      final Observer positionObserver = new Observer() {
+//        public void update(Observable o, Object arg) {
+//          dgrm.requestEdgeAnalysis();
+//        }
+//      };
+//      /* Re-analyze potential receivers if radios are added/removed. */
+//      simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
+//        public void moteWasAdded(Mote mote) {
+//          mote.getInterfaces().getPosition().addObserver(positionObserver);
+//          dgrm.requestEdgeAnalysis();
+//        }
+//        public void moteWasRemoved(Mote mote) {
+//          mote.getInterfaces().getPosition().deleteObserver(positionObserver);
+//          dgrm.requestEdgeAnalysis();
+//        }
+//      });
+//      for (Mote mote: simulation.getMotes()) {
+//        mote.getInterfaces().getPosition().addObserver(positionObserver);
+//      }
+//      dgrm.requestEdgeAnalysis();
       
       /* Remove the UDGMVisualizerSkin since visualization 
        * is being handled by UDGMBSVisualizerSkin */
@@ -183,18 +186,6 @@ public class UDGMBS extends UDGM {
   public void removed() {
       Visualizer.unregisterVisualizerSkin(UDGMBSVisualizerSkin.class);
   }
-  
-  
-//  public void setTagTxRange(double r) {
-//    TAG_TRANSMITTING_RANGE = r;
-//    dgrm.requestEdgeAnalysis();
-//  }
-//
-//  public void setTagInterferenceRange(double r) {
-//    TAG_INTERFERENCE_RANGE = r;
-//    dgrm.requestEdgeAnalysis();
-//  }
-  
   
   /**
    * Returns the loss in signal strength of the propagation wave
@@ -357,7 +348,7 @@ public class UDGMBS extends UDGM {
       newConnection = new RadioConnection(sender);
       
       /* Fail radio transmission randomly - no radios will hear this transmission */
-      if (getTxSuccessProbability(sender) < 1.0 && random.nextDouble() > getTxSuccessProbability(sender)) {
+      if (getTxSuccessProbability(sender) < 1.0 && getRandom().nextDouble() > getTxSuccessProbability(sender)) {
         return newConnection;
       }
       
@@ -375,7 +366,7 @@ public class UDGMBS extends UDGM {
         }
           
         /* Get all potential destination radios */
-        DestinationRadio[] potentialDestinations = dgrm.getPotentialDestinations(sender);
+        DestinationRadio[] potentialDestinations = getDirectedGraphMedium().getPotentialDestinations(sender);
         if (potentialDestinations == null) {
           return newConnection;
         }
@@ -451,10 +442,10 @@ public class UDGMBS extends UDGM {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " - isTransmitting");
                 newConnection.addInterfered(recv);
 /**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
-              } else if (recv.isReceiving() || (random.nextDouble() > getRxSuccessProbability(sender, recv))) {
+              } else if (recv.isReceiving() || (getRandom().nextDouble() > getRxSuccessProbability(sender, recv))) {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " - isReceiving");
 /**/            System.out.println("recv.isReceiving(): " + recv.isReceiving());
-/**/            System.out.println("random.nextDouble(): " + random.nextDouble());
+/**/            System.out.println("random.nextDouble(): " + getRandom().nextDouble());
                 /* Was receiving, or reception failed: start interfering */
                 newConnection.addInterfered(recv);
 /**/            System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
@@ -672,7 +663,7 @@ public class UDGMBS extends UDGM {
   /**/      System.out.printf("1.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
           }
         } else {
-          /* In case the source radio is a carrier generator its dest will be a tag 
+          /* In case the radio source is a carrier generator its dest will be a tag 
            * which does not have receiving capabilities. */
           if (!conn.getSource().isGeneratingCarrier()) {
 /**/        System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);

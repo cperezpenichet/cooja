@@ -119,60 +119,6 @@ public class UDGMBS extends UDGM {
   public UDGMBS(Simulation simulation) {
       super(simulation);
   /**/System.out.println("UDGMBS");
-//      random = simulation.getRandomGenerator();
-//      dgrm = new DirectedGraphMedium() {
-//        protected void analyzeEdges() {
-///**/      System.out.println("2.analyzeEdges");          
-// /**/     System.out.println("2.DirectedGraphMedium: " + dgrm);          
-//          /* Create edges according to distances.
-//           * XXX May be slow for mobile networks */
-//          clearEdges();
-//          for (Radio source: UDGMBS.this.getRegisteredRadios()) {
-///**/        System.out.println("B.source: " + source.getMote().getID());            
-///**/        System.out.println("UDGMBS.DirectedGraphMedium");  
-//            Position sourcePos = source.getPosition();
-//            for (Radio dest: UDGMBS.this.getRegisteredRadios()) {
-//              Position destPos = dest.getPosition();
-//              /* Ignore ourselves */
-//              if (source == dest) {
-//                continue;
-//              }
-///**/          System.out.println("B.dest: " + dest.getMote().getID());            
-//              double distance = sourcePos.getDistanceTo(destPos);
-//              if (distance < Math.max(TRANSMITTING_RANGE, INTERFERENCE_RANGE)) {
-//                /* Add potential destination */
-//                addEdge(
-//                    new DirectedGraphMedium.Edge(source, 
-//                        new DGRMDestinationRadio(dest)));
-//              }
-//            }
-//          }
-//          super.analyzeEdges();
-//        }
-//      };
-//
-//      /* Register as position observer.
-//       * If any positions change, re-analyze potential receivers. */
-//      final Observer positionObserver = new Observer() {
-//        public void update(Observable o, Object arg) {
-//          dgrm.requestEdgeAnalysis();
-//        }
-//      };
-//      /* Re-analyze potential receivers if radios are added/removed. */
-//      simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
-//        public void moteWasAdded(Mote mote) {
-//          mote.getInterfaces().getPosition().addObserver(positionObserver);
-//          dgrm.requestEdgeAnalysis();
-//        }
-//        public void moteWasRemoved(Mote mote) {
-//          mote.getInterfaces().getPosition().deleteObserver(positionObserver);
-//          dgrm.requestEdgeAnalysis();
-//        }
-//      });
-//      for (Mote mote: simulation.getMotes()) {
-//        mote.getInterfaces().getPosition().addObserver(positionObserver);
-//      }
-//      dgrm.requestEdgeAnalysis();
       
       /* Remove the UDGMVisualizerSkin since visualization 
        * is being handled by UDGMBSVisualizerSkin */
@@ -196,6 +142,15 @@ public class UDGMBS extends UDGM {
     return 20*Math.log10(WAVELENGTH / (4*Math.PI*distance));
   }
   
+  
+  /**
+   * Returns the incident power that reaches the destination
+   * considering the energy loss due to the distance between
+   * the source and the destination.  
+   * 
+   * @param source
+   * @param dest
+   */
   public double friisEquation(Radio source, Radio dest) {
     double distance = source.getPosition().getDistanceTo(dest.getPosition());
 /**/System.out.println("distance: " + distance);
@@ -209,8 +164,8 @@ public class UDGMBS extends UDGM {
 /**/    System.out.println("transmitttedPower: " + transmitttedPower);
       }
     }
-    double receivedPower = transmitttedPower + GT + GR + pathLoss(distance);
-    return receivedPower;
+    double incidentPower = transmitttedPower + GT + GR + pathLoss(distance);
+    return incidentPower;
   }
   
   
@@ -304,9 +259,10 @@ public class UDGMBS extends UDGM {
 /**/        //System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
             //r.interfereAnyReception();
           } else {
-            // Calculate the incident power that each tag receives from the carrier gen.
-            // and keep a record of that power indexing it by the appropriate backscatter
-            // channel derived by the carrier generator that created that incident power.
+            /* Calculate the output power of the tag subtracting the REFLECTION LOSS of the 
+               target (backscatter tag) from the incident power that reaches it. Keep a record 
+               of that output power indexing it by the appropriate backscatter transmission  
+               channel derived by the carrier generator from which that incident power came. */
 /**/        System.out.println();
 /**/        System.out.println("Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
@@ -324,13 +280,15 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println("Stop keeping a record of the tagTXPower");
 /**/        System.out.println();
           } 
-        } 
+        }
       } else {
 /**/    System.out.println("sender:" + sender.getMote().getID() + " is an active sender");      
         for (Radio r: newConnection.getAllDestinations()) {
           if (r.isBackscatterTag()) {
             newConnection.removeDestination(r);
-/**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
+/**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length);
+            /* tag (r) is added to Interfered but without setting any flag since the tag 
+               has no receiving capabilities. */
             newConnection.addInterfered(r);
 /**/        System.out.println("r:" + r.getMote().getID() + " is removed from destinations");      
 /**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
@@ -397,7 +355,7 @@ public class UDGMBS extends UDGM {
             double tagCurrentOutputPowerIndicator = sender.getTagCurrentOutputPowerMax(recv.getChannel());
 /**/        System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
             
-            /* Calculate ranges: grows with radio output power in mW */
+            /* Calculate ranges: grows with radio output power measured in mW */
             double tagTransmissionRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH 
                                                        + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
             
@@ -411,18 +369,17 @@ public class UDGMBS extends UDGM {
 
             Position recvPos = recv.getPosition();
             double distance = senderPos.getDistanceTo(recvPos);
-            //tagToRecvDist.add(distance);
+            tagToRecvDist.add(distance);
 /**/        System.out.println("TagRecvDistance: " + distance);
 
             double receivedPower = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(distance);
-            //receivedPowerLst.add(receivedPower);
+            receivedPowerLst.add(receivedPower);
 /**/        //System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
 
-
-/**/        //System.out.println("carrierToTagDist: " + carrierToTagDist);
-/**/        //System.out.println("tagToRecvDist: " + tagToRecvDist);
-/**/        //System.out.println("receivedPowerLst: " + receivedPowerLst);
-
+            
+/**/        System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/        System.out.println("tagToRecvDist: " + tagToRecvDist);
+/**/        System.out.println("receivedPowerLst: " + receivedPowerLst);
   
             if (distance <= tagTransmissionRange) {
               /* Within transmission range */

@@ -131,17 +131,20 @@ public class UDGM extends AbstractRadioMedium {
      * If any positions change, re-analyze potential receivers. */
     final Observer positionObserver = new Observer() {
       public void update(Observable o, Object arg) {
-/**/    System.out.println("Posistion changed!");
+        Position pos = (Position) o;
+/**/    System.out.println("Position of " +  pos.getMote().getID() + " changed!");
         dgrm.requestEdgeAnalysis();
       }
     };
     /* Re-analyze potential receivers if radios are added/removed. */
     simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
       public void moteWasAdded(Mote mote) {
+/**/    System.out.println("moteWasAdded from UDGM");        
         mote.getInterfaces().getPosition().addObserver(positionObserver);
         dgrm.requestEdgeAnalysis();
       }
       public void moteWasRemoved(Mote mote) {
+/**/    System.out.println("moteWasRemoved from UDGM");        
         mote.getInterfaces().getPosition().deleteObserver(positionObserver);
         dgrm.requestEdgeAnalysis();
       }
@@ -149,6 +152,7 @@ public class UDGM extends AbstractRadioMedium {
     for (Mote mote: simulation.getMotes()) {
       mote.getInterfaces().getPosition().addObserver(positionObserver);
     }
+/**/System.out.println("requestEdgeAnalysisONCE");    
     dgrm.requestEdgeAnalysis();
 
     /* Register visualizer skin */

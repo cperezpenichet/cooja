@@ -76,7 +76,7 @@ public class Position extends MoteInterface {
    * @param z New Z coordinate
    */
   public void setCoordinates(double x, double y, double z) {
-/**/System.out.println("setCoordinates");    
+/**///System.out.println("setCoordinates");    
     coords[0] = x;
     coords[1] = y;
     coords[2] = z;
@@ -208,6 +208,11 @@ public class Position extends MoteInterface {
     }
 
     setCoordinates(x, y, z);
+  }
+  
+  /* My addition */
+  public Mote getMote() {
+    return mote;
   }
 
 }

@@ -112,10 +112,6 @@ public class UDGMBS extends UDGM {
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
   ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
   
-  //private DirectedGraphMedium dgrm; /* Used only for efficient destination lookup */
-  
-  //private Random random = null;
-  
   public UDGMBS(Simulation simulation) {
       super(simulation);
   /**/System.out.println("UDGMBS");
@@ -142,7 +138,6 @@ public class UDGMBS extends UDGM {
     return 20*Math.log10(WAVELENGTH / (4*Math.PI*distance));
   }
   
-  
   /**
    * Returns the incident power that reaches the destination
    * considering the energy loss due to the distance between
@@ -167,7 +162,6 @@ public class UDGMBS extends UDGM {
     double incidentPower = transmitttedPower + GT + GR + pathLoss(distance);
     return incidentPower;
   }
-  
   
   /**
    * Returns a hashset with the appropriate TX channels of each 
@@ -239,11 +233,11 @@ public class UDGMBS extends UDGM {
       newConnection = super.createConnections(sender);
 
       /* 
-       * In case the sender is a carrier generator, every radio that was added
-       * as destination, except for a tag, is removed from destinations and is 
-       * added to interfered. Whereas, in case the sender is transmitting a packet
-       * only a tag is moved from destinations to the interfered radios.
-       */  
+       * In case the sender is a carrier generator, every radio within its TX 
+       * range that was added as destination, except for a tag, is removed from 
+       * the destinations and is added to the interfered. The opposite happens 
+       * only in case the tag is within carrier generator's INT range.
+       */ 
 /**/  System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length);
 /**/  System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
       if(sender.isGeneratingCarrier()) {
@@ -263,11 +257,13 @@ public class UDGMBS extends UDGM {
                target (backscatter tag) from the incident power that reaches it. Keep a record 
                of that output power indexing it by the appropriate backscatter transmission  
                channel derived by the carrier generator from which that incident power came. */
+            
+/**/        System.out.println("TAG IS IN DESTINATIONS");            
 /**/        System.out.println();
 /**/        System.out.println("Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
-            carrierToTagDist.add(dist);
+            //carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
             /* Incident power in dBm */
             double incidentPower = friisEquation(sender, r);
@@ -281,7 +277,35 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println();
           } 
         }
+        for (Radio r: newConnection.getInterfered()) {
+          if (r.isBackscatterTag()) {
+/**/        System.out.println("TAG WAS INTERFERED");            
+            // NOTE: the node is only removed only from the onlyInterfered ArrayList
+            // and not from the allInterfered ArrayList.
+            newConnection.addDestination(r);
+/**/        System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
+/**/        System.out.println("UDGMBS.AllDestinations: " + newConnection.getAllDestinations().length); 
+/**/        System.out.println();
+/**/        System.out.println("Start keeping a record of the tagTXPower");
+/**/        System.out.println("backTag: " + r.getMote().getID());
+            double dist = sender.getPosition().getDistanceTo(r.getPosition());
+            //carrierToTagDist.add(dist);
+/**/        System.out.println("dist: " + dist);
+            /* Incident power in dBm */
+            double incidentPower = friisEquation(sender, r);
+/**/        System.out.println("incidentPower: " + incidentPower);
+            /* Current power of the tag in dBm */
+            double tagCurrentTXPower = incidentPower - REFLECTIONLOSS;
+/**/        System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
+/**/        System.out.println(newConnection);
+            r.putTagTXPower(sender.getChannel() + 2, newConnection, tagCurrentTXPower);
+/**/        System.out.println("Stop keeping a record of the tagTXPower");
+/**/        System.out.println();
+          }
+        }
       } else {
+        /* In case the sender transmits a packet and the tag is within its TX
+         * range the tag is removed from the destinations and added to the interfered. */
 /**/    System.out.println("sender:" + sender.getMote().getID() + " is an active sender");      
         for (Radio r: newConnection.getAllDestinations()) {
           if (r.isBackscatterTag()) {
@@ -369,17 +393,16 @@ public class UDGMBS extends UDGM {
 
             Position recvPos = recv.getPosition();
             double distance = senderPos.getDistanceTo(recvPos);
-            tagToRecvDist.add(distance);
+            //tagToRecvDist.add(distance);
 /**/        System.out.println("TagRecvDistance: " + distance);
 
             double receivedPower = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(distance);
-            receivedPowerLst.add(receivedPower);
-/**/        //System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
+/**/        System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
+            //receivedPowerLst.add(receivedPower);
 
-            
-/**/        System.out.println("carrierToTagDist: " + carrierToTagDist);
-/**/        System.out.println("tagToRecvDist: " + tagToRecvDist);
-/**/        System.out.println("receivedPowerLst: " + receivedPowerLst);
+/**/        //System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/        //System.out.println("tagToRecvDist: " + tagToRecvDist);
+/**/        //System.out.println("receivedPowerLst: " + receivedPowerLst);
   
             if (distance <= tagTransmissionRange) {
               /* Within transmission range */
@@ -648,8 +671,8 @@ public class UDGMBS extends UDGM {
           }
         }       
         if (!intfRadio.isInterfered()) {
-          /* Note: The tag cannot get interfered */
-          if (!intfRadio.isBackscatterTag()) {
+          /* Note: The tag cannot be interfered */
+          if (!intfRadio.isBackscatterTag()) { //Can be deleted since the tag has no reception capabilities
             /*logger.warn("Radio was not interfered: " + intfRadio);*/
 /**/        System.out.printf("intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
             intfRadio.interfereAnyReception();
@@ -704,8 +727,8 @@ public class UDGMBS extends UDGM {
               intRadio.signalReceptionEnd();
             }
           }
-          getActiveConnectionsArrayList().remove(conn);
           setLastConnection(conn);
+          getActiveConnectionsArrayList().remove(conn);
         }
       }
     }

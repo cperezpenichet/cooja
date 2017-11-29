@@ -104,10 +104,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
       final private byte[] syncSeq = {0,0,0,0,0x7A};
       
       public void receivedByte(byte data) {
-/**/    System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + "- receivedByte");
-/**/    System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - isTransmitting: " + isTransmitting());
+/**/    System.out.println("mote: " + mote.getID() + " (" + ((CC2420)radio).hashCode() + ")" + "- receivedByte");
+/**/    System.out.println("mote: " + mote.getID() + " (" + ((CC2420)radio).hashCode() + ")" + " - isTransmitting: " + isTransmitting());
         if (!isTransmitting()) {
-/**/      System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + "- receivedByte, isTransmitting");        	
+/**/      System.out.println("mote: " + mote.getID() + " (" + ((CC2420)radio).hashCode() + ")" + "- receivedByte, isTransmitting");        	
           lastEvent = RadioEvent.TRANSMISSION_STARTED;
           lastOutgoingPacket = null;
           isTransmitting = true;
@@ -222,12 +222,12 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
   protected void finishTransmission() {
     if (isTransmitting()) {
-/**/  System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - Within finishedTransmission");        
-/**/  System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - 1.isTransmitting: " + isTransmitting());
+/**/  System.out.println("mote: " + mote.getID() + " - Within finishedTransmission");        
+/**/  System.out.println("mote: " + mote.getID() + " - 1.isTransmitting: " + isTransmitting());
       //logger.debug("----- 802.15.4 TRANSMISSION FINISHED -----");
       isTransmitting = false;
       isSynchronized = false;
-/**/  System.out.println("mote: " + mote.getID() + " (" + mote.hashCode() + ")" + " - 2.isTransmitting: " + isTransmitting());
+/**/  System.out.println("mote: " + mote.getID() + " (" + ((CC2420)radio).hashCode() + ")" + " - 2.isTransmitting: " + isTransmitting());
       lastEvent = RadioEvent.TRANSMISSION_FINISHED;
       setChanged();
       notifyObservers();

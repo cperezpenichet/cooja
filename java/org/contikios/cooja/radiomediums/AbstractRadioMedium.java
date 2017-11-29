@@ -298,25 +298,27 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 /**/			System.out.println("ARM.AllDestinations: " + newConnection.getAllDestinations().length);
 /**/      System.out.println("ARM.InterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
 
-					for (Radio r : newConnection.getAllDestinations()) {
-						if (newConnection.getDestinationDelay(r) == 0) {
-/**/			    System.out.println("ARM.r: " + r.getMote().getID() + " signalReceptionStart");
-              r.signalReceptionStart();
+           //if(radio.isListeningCarrier())
 
-						} else {
-						  System.out.println("ARM.EXPERIMENTAL_TRANSMISSION_STARTED");
-							/* EXPERIMENTAL: Simulating propagation delay */
-							final Radio delayedRadio = r;
-							TimeEvent delayedEvent = new TimeEvent(0) {
-								public void execute(long t) {
-/**/						  System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionStart");
-                  delayedRadio.signalReceptionStart();
-								}
-							};
-							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(r));
-							
-						}
-					} 
+  					for (Radio r : newConnection.getAllDestinations()) {
+  						if (newConnection.getDestinationDelay(r) == 0) {
+  /**/			    System.out.println("ARM.r: " + r.getMote().getID() + " signalReceptionStart");
+                r.signalReceptionStart();
+  
+  						} else {
+  						  System.out.println("ARM.EXPERIMENTAL_TRANSMISSION_STARTED");
+  							/* EXPERIMENTAL: Simulating propagation delay */
+  							final Radio delayedRadio = r;
+  							TimeEvent delayedEvent = new TimeEvent(0) {
+  								public void execute(long t) {
+  /**/						  System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionStart");
+                    delayedRadio.signalReceptionStart();
+  								}
+  							};
+  							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(r));
+  							
+  						}
+  					} 
 					
 					/* Update signal strengths */
 					updateSignalStrengths();

@@ -90,11 +90,11 @@ public class Msp802154Tag extends Msp802154Radio {
       final private byte[] syncSeq = {0,0,0,0,0x7A};
       
       public void receivedByte(byte data) {
-/**/    System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + " - receivedByte");
-/**/    System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + " - isTransmitting: " + isTransmitting());
+/**/    System.out.println("tag: " + mote.getID() + " (" + tag.hashCode() + ")" + " - receivedByte");
+/**/    System.out.println("tag: " + mote.getID() + " (" + tag.hashCode() + ")" + " - isTransmitting: " + isTransmitting());
         if (!isTransmitting()) {
-/**/        System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + "- receivedByte, isTransmitting");
-/**/        System.out.println("tag: " + mote.getID() + " (" + mote.hashCode() + ")" + " - isListeningCarrier: " + isListeningCarrier());
+/**/        System.out.println("tag: " + mote.getID() + " (" + tag.hashCode() + ")" + "- receivedByte, isTransmitting");
+/**/        System.out.println("tag: " + mote.getID() + " (" + tag.hashCode() + ")" + " - isListeningCarrier: " + isListeningCarrier());
             if(isListeningCarrier()) {
               setLastEvent(RadioEvent.TRANSMISSION_STARTED);  
               setLastOutgoingtPacket(null);
@@ -118,6 +118,8 @@ public class Msp802154Tag extends Msp802154Radio {
 
         len ++;
 
+/**/    System.out.println("LEN: " + len + " - tag: " + mote.getID() + " - " + tag.hashCode());        
+
         if (len == 5) {
           setSynchronized(true);
           for (int i=0; i<5; i++) {
@@ -130,7 +132,7 @@ public class Msp802154Tag extends Msp802154Radio {
           }
         }
         else if (len == 6) {
-//          System.out.println("## CC2420 Packet of length: " + data + " expected...");
+          System.out.println("## CC2420 Packet of length: " + data + " expected...");
           expMpduLen = data & 0xFF;
           if ((expMpduLen & 0x80) != 0) {
             logger.error("Outgoing length field is larger than 127: " + expMpduLen);

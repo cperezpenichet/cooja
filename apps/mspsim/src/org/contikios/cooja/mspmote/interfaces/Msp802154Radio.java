@@ -70,22 +70,22 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public static final long DELAY_BETWEEN_BYTES =
     (long) (1000.0*Simulation.MILLISECOND/(250000.0/8.0)); /* us. Corresponds to 250kbit/s */
 
-  private RadioEvent lastEvent = RadioEvent.UNKNOWN;
+  protected RadioEvent lastEvent = RadioEvent.UNKNOWN;
   
   protected final MspMote mote;
   protected final Radio802154 radio;
   
-  private boolean isInterfered = false;
-  private boolean isTransmitting = false;
-  private boolean isReceiving = false;
-  private boolean isSynchronized = false;
+  protected boolean isInterfered = false;
+  protected boolean isTransmitting = false;
+  protected boolean isReceiving = false;
+  protected boolean isSynchronized = false;
   private boolean isGeneratingCarrier = false;
   
-  private byte lastOutgoingByte;
-  private byte lastIncomingByte;
+  protected byte lastOutgoingByte;
+  protected byte lastIncomingByte;
 
-  private RadioPacket lastOutgoingPacket = null;
-  private RadioPacket lastIncomingPacket = null;
+  protected RadioPacket lastOutgoingPacket = null;
+  protected RadioPacket lastIncomingPacket = null;
   
 
   public Msp802154Radio(Mote m) { 
@@ -252,10 +252,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     return lastIncomingPacket;
   }
   
-  public void setLastOutgoingtPacket(RadioPacket lastOutgoingPacket) {
-      this.lastOutgoingPacket = lastOutgoingPacket;
-  }
-
   public void setReceivedPacket(RadioPacket packet) {
     /* Note:
      * Only nodes at other abstraction levels deliver full packets.
@@ -322,10 +318,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 
   }
   
-  public void setLastOutgoingByte(byte lastOutgoingByte) {
-    this.lastOutgoingByte = lastOutgoingByte;
-  }
-
   public boolean isGeneratingCarrier() {
 /**///  System.out.println("mote: " + mote.getID() + " - THIS isGeneratingCarrier");
 	  return isGeneratingCarrier;
@@ -335,10 +327,6 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 /**///System.out.println("I am a radio");
 /**///System.out.println("isTransmitting: "  + isTransmitting); 
     return isTransmitting;
-  }
-  
-  public void setTransmitting(boolean isTransmitting) {
-      this.isTransmitting = isTransmitting;
   }
   
   public boolean isReceiving() {
@@ -351,32 +339,12 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     return isInterfered;
   }
   
-  public void setInterfered(boolean isInterfered) {
-      this.isInterfered = isInterfered;
-  }
-
-  public boolean getSynchronized() {
-      return isSynchronized;
-  }
-  
-  public void setSynchronized(boolean isSynchronized) {
-      this.isSynchronized = isSynchronized;
-  }
-  
   public int getChannel() {
       return radio.getActiveChannel();
   }
 
   public int getFrequency() {
     return radio.getActiveFrequency();
-  }
-  
-  public RadioEvent getLastEvent() {
-      return lastEvent;
-  }
-
-  public void setLastEvent(RadioEvent lastEvent) {
-    this.lastEvent = lastEvent;
   }
 
   public void signalReceptionStart() {
@@ -397,6 +365,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     /*logger.debug("----- 802.15.4 RECEPTION FINISHED -----");*/
     setChanged();
     notifyObservers();
+  }
+  
+  public RadioEvent getLastEvent() {
+    return lastEvent;
   }
   
   public void interfereAnyReception() {

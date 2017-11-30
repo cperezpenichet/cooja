@@ -298,7 +298,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 /**/			System.out.println("ARM.AllDestinations: " + newConnection.getAllDestinations().length);
 /**/      System.out.println("ARM.InterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
 
-           //if(radio.isListeningCarrier())
+          //if(radio.isListeningCarrier()){
 
   					for (Radio r : newConnection.getAllDestinations()) {
   						if (newConnection.getDestinationDelay(r) == 0) {
@@ -318,7 +318,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
   							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(r));
   							
   						}
-  					} 
+  					}
+          //}
 					
 					/* Update signal strengths */
 					updateSignalStrengths();

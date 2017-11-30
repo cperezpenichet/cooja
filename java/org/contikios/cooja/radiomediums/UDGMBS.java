@@ -279,6 +279,15 @@ public class UDGMBS extends UDGM {
         }
         for (Radio r: newConnection.getInterfered()) {
           if (r.isBackscatterTag()) {
+//            if (r.isTransmitting() && !r.isListeningCarrier()) {
+//              RadioConnection[] conns = getActiveConnections();
+//              for (RadioConnection conn: conns) {
+//                if (conn.getSource() == r) {
+//                  
+//                }
+//              }
+//            }
+            
 /**/        System.out.println("TAG WAS INTERFERED");            
             // NOTE: the node is only removed only from the onlyInterfered ArrayList
             // and not from the allInterfered ArrayList.
@@ -334,7 +343,7 @@ public class UDGMBS extends UDGM {
         return newConnection;
       }
       
-      if (sender.isListeningCarrier()) {
+      //if (sender.isListeningCarrier()) {
 /**/    System.out.println("\nNewBackscatteringConnID: " + newConnection.getID());
 
         /* Collect the channels for backscattering communication */
@@ -459,9 +468,9 @@ public class UDGMBS extends UDGM {
             }
           }  
         } 
-      } else {
-        return newConnection;
-      }
+//      } else {
+//        return newConnection;
+//      }
     }
 /**/System.out.println("return newConnection");        
     return newConnection;
@@ -640,7 +649,7 @@ public class UDGMBS extends UDGM {
 /**/      System.out.println("intfRadio.getCurrentSignalStrength(): " + intfRadio.getCurrentSignalStrength());          
           if (intfRadio.getCurrentSignalStrength() < signalStrength) {
             intfRadio.setCurrentSignalStrength(signalStrength);
-  /**/      System.out.printf("1.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
+/**/        System.out.printf("1.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
           }
         } else {
           /* In case the radio source is a carrier generator its dest will be a tag 

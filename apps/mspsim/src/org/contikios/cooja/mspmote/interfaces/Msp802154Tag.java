@@ -95,7 +95,7 @@ public class Msp802154Tag extends Msp802154Radio {
         if (!isTransmitting()) {
 /**/        System.out.println("tag: " + mote.getID() + " (" + tag.hashCode() + ")" + "- receivedByte, isTransmitting");
 /**/        System.out.println("tag: " + mote.getID() + " (" + tag.hashCode() + ")" + " - isListeningCarrier: " + isListeningCarrier());
-            if(isListeningCarrier()) {
+            //if(isListeningCarrier()) {
               setLastEvent(RadioEvent.TRANSMISSION_STARTED);  
               setLastOutgoingtPacket(null);
               setTransmitting(true);
@@ -104,7 +104,7 @@ public class Msp802154Tag extends Msp802154Radio {
               setChanged();
               notifyObservers();
               /*logger.debug("----- 802.15.4 TRANSMISSION STARTED -----");*/
-            }
+            //}
         }
 
         /* send this byte to all nodes */

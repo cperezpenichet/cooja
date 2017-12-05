@@ -166,8 +166,8 @@ public class Msp802154Tag extends Msp802154Radio {
    */
   @Override
   public boolean isReceiving() {
-/**/System.out.println("I am a tag");
-/**/System.out.println("isReceiving: "  + false);      
+/**///System.out.println("I am a tag");
+/**/System.out.println("Tag - isReceiving: "  + false);      
     return false;
    }
   
@@ -277,7 +277,6 @@ public class Msp802154Tag extends Msp802154Radio {
     /* When there is no entry in the Hashtable 
      * return something really small */
     return Double.NEGATIVE_INFINITY;
-    
   }
   
   public RadioConnection getConnectionFromMaxOutputPower(int channel) {

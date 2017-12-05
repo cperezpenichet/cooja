@@ -83,7 +83,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	
 	private ArrayList<RadioConnection> activeConnections = new ArrayList<RadioConnection>();
 	
-	private RadioConnection lastConnection = null;
+	protected RadioConnection lastConnection = null;
 	
 	private Simulation simulation = null;
 	
@@ -132,14 +132,9 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	/**
    * @return All active connections as an ArrayList
    */
-	public ArrayList<RadioConnection> getActiveConnectionsArrayList() {
+	protected ArrayList<RadioConnection> getActiveConnectionsArrayList() {
     return activeConnections;
   }
-	
-	public void setLastConnection(RadioConnection lastConn) {
-	  this.lastConnection = lastConn;
-	}
-	
 	
 	/**
 	 * Creates a new connection from given radio.
@@ -284,6 +279,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						 * receiving! Ok, but it won't receive the packet
 						 */
 						radio.interfereAnyReception();
+/**/        System.out.println("sender: " + radio.getMote().getID() + "tries to transmitt but it is already receiving");						
 						for (RadioConnection conn : activeConnections) {
 							if (conn.isDestination(radio)) {
 								conn.addInterfered(radio);

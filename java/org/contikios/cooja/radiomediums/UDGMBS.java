@@ -567,7 +567,7 @@ public class UDGMBS extends UDGM {
       
       for (Radio dstRadio : conn.getDestinations()) {
 /**/    System.out.println("ActiveConnID: " + conn.getID());
-/**/    System.out.printf("1.dstRadio = %d\n", dstRadio.getMote().getID()) ;        
+/**/    System.out.printf("1.dstRadio = %d\n", dstRadio.getMote().getID());        
         if(dstRadio.getChannel() >= 0 && !txChannels.contains(dstRadio.getChannel())) {
             continue;
         }
@@ -585,7 +585,7 @@ public class UDGMBS extends UDGM {
           double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPowerMax(dstRadio.getChannel());
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
-/**/      System.out.println("1.signalStrength: " + signalStrength);          
+/**/      System.out.println("1.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
         } else {
           /* In case the source radio is a carrier generator its dest will be a tag 
            * which does not have receiving capabilities. */
@@ -600,12 +600,12 @@ public class UDGMBS extends UDGM {
             double distFactor = dist/maxTxDist;
 /**/        System.out.printf("distFactor = %.2f\n", distFactor);
             signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
-/**/        System.out.println("2.signalStrength: " + signalStrength);          
+/**/      System.out.println("2.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
           }
         }
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {
           dstRadio.setCurrentSignalStrength(signalStrength);
-/**/      System.out.printf("dstRadio = %d , signal = %.2f\n", dstRadio.getMote().getID(), dstRadio.getCurrentSignalStrength());
+/**/      System.out.println("3.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + dstRadio.getCurrentSignalStrength());          
         }
         /* In case the tag stops listening the carrier from one connection but
          * it is still listening the carrier from another connection keep it signaled. */
@@ -647,10 +647,10 @@ public class UDGMBS extends UDGM {
           
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           double signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
-/**/      System.out.println("intfRadio.getCurrentSignalStrength(): " + intfRadio.getCurrentSignalStrength());          
+/**/      System.out.println("3.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
           if (intfRadio.getCurrentSignalStrength() < signalStrength) {
             intfRadio.setCurrentSignalStrength(signalStrength);
-/**/        System.out.printf("1.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
+/**/        System.out.println("4.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + intfRadio.getCurrentSignalStrength());          
           }
         } else {
           /* In case the radio source is a carrier generator its dest will be a tag 
@@ -667,15 +667,16 @@ public class UDGMBS extends UDGM {
             
             if (distFactor < 1) {
               double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
+/**/          System.out.println("5.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
               if (intfRadio.getCurrentSignalStrength() < signalStrength) {
                 intfRadio.setCurrentSignalStrength(signalStrength);
-/**/            System.out.printf("2.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
+/**/            System.out.println("6.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + intfRadio.getCurrentSignalStrength());          
               }
             } else {
               intfRadio.setCurrentSignalStrength(SS_WEAK);
               if (intfRadio.getCurrentSignalStrength() < SS_WEAK) {
                 intfRadio.setCurrentSignalStrength(SS_WEAK);
-/**/            System.out.printf("3.intfRadio = %d , signal = %.2f\n", intfRadio.getMote().getID(), intfRadio.getCurrentSignalStrength());
+/**/            System.out.println("7.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + intfRadio.getCurrentSignalStrength());          
               }
             }
           }

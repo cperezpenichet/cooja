@@ -393,6 +393,7 @@ public class UDGM extends AbstractRadioMedium {
 /**///    System.out.printf("distFactor = %.2f\n", distFactor);
 
         double signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
+/**/    System.out.println("2.signalStrength: " + signalStrength);          
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {
           dstRadio.setCurrentSignalStrength(signalStrength);
 /**/      System.out.printf("dstRadio = %d , signal = %.2f\n", dstRadio.getMote().getID(), dstRadio.getCurrentSignalStrength());

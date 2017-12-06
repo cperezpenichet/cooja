@@ -1168,7 +1168,7 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
 /**/              System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.CARRIER_GENERATED");
                   ev = new RadioRXTXEvent(
                       simulation.getSimulationTime(), RXTXRadioEvent.CARRIER_GENERATED);
-              } else if (!moteRadio.isListeningCarrier()) {
+              } else if (moteRadio.isBackscatterTag() && !moteRadio.isListeningCarrier()) {
                 // In case the tag starts trasmitting without having listened to the carrier first.
 /**/            System.out.println("moteRadio(tag): " + moteRadio.getMote().getID() + " isListeningCarrier: " +  !moteRadio.isListeningCarrier());
 /**/            System.out.println("moteRadio(tag): " + moteRadio.getMote().getID() + " - 1.RXTXRadioEvent.IDLE");

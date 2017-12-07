@@ -131,6 +131,7 @@ public class UDGM extends AbstractRadioMedium {
      * If any positions change, re-analyze potential receivers. */
     final Observer positionObserver = new Observer() {
       public void update(Observable o, Object arg) {
+/**/    System.out.println("UDGM_Position_Change ");        
         Position pos = (Position) o;
 /**/    System.out.println("Position of " +  pos.getMote().getID() + " changed!");
         dgrm.requestEdgeAnalysis();

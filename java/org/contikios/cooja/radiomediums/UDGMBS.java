@@ -115,6 +115,55 @@ public class UDGMBS extends UDGM {
   public UDGMBS(Simulation simulation) {
       super(simulation);
   /**/System.out.println("UDGMBS");
+  
+      final Observer positionObserver = new Observer() {
+        public void update(Observable o, Object arg) {
+/**/      System.out.println("UDGMBS_Position_Change ");          
+          Mote mote = (Mote) arg;
+          Radio radio = mote.getInterfaces().getRadio();
+          
+          /* Re-calculate the TX range of the tag when the position
+             of the tag or the carrier generator changes. */ 
+          if (radio.isBackscatterTag()) {
+            for (RadioConnection conn: getActiveConnections()) {
+              if (conn.isDestination(radio)) {
+/**/            System.out.println("2.Start keeping a record of the tagTXPower");
+/**/            System.out.println("2.backTag: " + radio.getMote().getID());
+
+                calculateTagCurrentTxPower(conn.getSource(), radio, conn);
+
+/**/            System.out.println("2.Stop keeping a record of the tagTXPower");
+/**/            System.out.println();
+              }
+            }
+          } else if (radio.isGeneratingCarrier()) {
+            for (RadioConnection conn: getActiveConnections()) {
+              if (conn.getSource() == radio) {
+                for (Radio dest: conn.getAllDestinations()) {
+                  if (dest.isBackscatterTag()) {
+                    calculateTagCurrentTxPower(radio, dest, conn);
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+  
+      /* Re-analyze potential receivers if radios are added/removed. */
+      simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
+        public void moteWasAdded(Mote mote) {
+    /**/    System.out.println("moteWasAdded from UDGM");        
+          mote.getInterfaces().getPosition().addObserver(positionObserver);
+        }
+        public void moteWasRemoved(Mote mote) {
+    /**/    System.out.println("moteWasRemoved from UDGM");        
+          mote.getInterfaces().getPosition().deleteObserver(positionObserver);
+        }
+      });
+      for (Mote mote: simulation.getMotes()) {
+        mote.getInterfaces().getPosition().addObserver(positionObserver);
+      }
       
       /* Remove the UDGMVisualizerSkin since visualization 
        * is being handled by UDGMBSVisualizerSkin */
@@ -161,6 +210,30 @@ public class UDGMBS extends UDGM {
     }
     double incidentPower = transmitttedPower + GT + GR + pathLoss(distance);
     return incidentPower;
+  }
+  
+  /**
+   * Calculate the transmission power of the tag for the given connection, conn, 
+   * and the given source of that connection, carrierGen.
+   * 
+   * @param carrierGen
+   * @param tag
+   * @param conn
+   */
+  public void calculateTagCurrentTxPower(Radio carrierGen,  Radio tag, RadioConnection conn) {
+    /* Calculate the output power of the tag subtracting the REFLECTION LOSS of the 
+    target (backscatter tag) from the incident power that reaches it. Keep a record 
+    of that output power indexing it by the appropriate backscatter transmission  
+    channel derived by the carrier generator from which that incident power came. */
+    
+    /* Incident power in dBm */
+    double incidentPower = friisEquation(carrierGen, tag);
+/**/System.out.println("incidentPower: " + incidentPower);
+    /* Current power of the tag in dBm */
+    double tagCurrentTXPower = incidentPower - REFLECTIONLOSS;
+/**/System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
+/**/System.out.println(conn);
+    tag.putTagTXPower(carrierGen.getChannel() + 2, conn, tagCurrentTXPower);
   }
   
   /**
@@ -253,41 +326,23 @@ public class UDGMBS extends UDGM {
 /**/        //System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
             //r.interfereAnyReception();
           } else {
-            /* Calculate the output power of the tag subtracting the REFLECTION LOSS of the 
-               target (backscatter tag) from the incident power that reaches it. Keep a record 
-               of that output power indexing it by the appropriate backscatter transmission  
-               channel derived by the carrier generator from which that incident power came. */
+            
             
 /**/        System.out.println("TAG IS IN DESTINATIONS");            
 /**/        System.out.println();
-/**/        System.out.println("Start keeping a record of the tagTXPower");
+/**/        System.out.println("1.Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
             //carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
-            /* Incident power in dBm */
-            double incidentPower = friisEquation(sender, r);
-/**/        System.out.println("incidentPower: " + incidentPower);
-            /* Current power of the tag in dBm */
-            double tagCurrentTXPower = incidentPower - REFLECTIONLOSS;
-/**/        System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
-/**/        System.out.println(newConnection);
-            r.putTagTXPower(sender.getChannel() + 2, newConnection, tagCurrentTXPower);
-/**/        System.out.println("Stop keeping a record of the tagTXPower");
+
+            calculateTagCurrentTxPower(sender, r, newConnection);
+/**/        System.out.println("1.Stop keeping a record of the tagTXPower");
 /**/        System.out.println();
           } 
         }
         for (Radio r: newConnection.getInterfered()) {
           if (r.isBackscatterTag()) {
-//            if (r.isTransmitting() && !r.isListeningCarrier()) {
-//              RadioConnection[] conns = getActiveConnections();
-//              for (RadioConnection conn: conns) {
-//                if (conn.getSource() == r) {
-//                  
-//                }
-//              }
-//            }
-            
 /**/        System.out.println("TAG WAS INTERFERED");            
             // NOTE: the node is only removed only from the onlyInterfered ArrayList
             // and not from the allInterfered ArrayList.
@@ -300,14 +355,7 @@ public class UDGMBS extends UDGM {
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
             //carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
-            /* Incident power in dBm */
-            double incidentPower = friisEquation(sender, r);
-/**/        System.out.println("incidentPower: " + incidentPower);
-            /* Current power of the tag in dBm */
-            double tagCurrentTXPower = incidentPower - REFLECTIONLOSS;
-/**/        System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
-/**/        System.out.println(newConnection);
-            r.putTagTXPower(sender.getChannel() + 2, newConnection, tagCurrentTXPower);
+            calculateTagCurrentTxPower(sender, r, newConnection);
 /**/        System.out.println("Stop keeping a record of the tagTXPower");
 /**/        System.out.println();
           }

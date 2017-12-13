@@ -104,9 +104,9 @@ public class UDGMBS extends UDGM {
   /* Energy loss */
   public final double ENERGYLOSS = 4.4;
   /* Reflection loss */
-  public final double REFLECTIONLOSS = 15 - ENERGYLOSS;
+  public final double REFLECTIONLOSS = 14 + ENERGYLOSS;
   /* Sensitivity threshold for Tmote sky in dBm */
-  public final double STH = -92 ;
+  public final double STH = -96.7;
 
   ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
@@ -184,7 +184,7 @@ public class UDGMBS extends UDGM {
    * @param distance
    */
   public double pathLoss(double distance) {
-    return 20*Math.log10(WAVELENGTH / (4*Math.PI*distance));
+    return 20*(Math.log10(WAVELENGTH / (4*Math.PI*distance)));
   }
   
   /**
@@ -234,6 +234,17 @@ public class UDGMBS extends UDGM {
 /**/System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
 /**/System.out.println(conn);
     tag.putTagTXPower(carrierGen.getChannel() + 2, conn, tagCurrentTXPower);
+  }
+  
+  public double calculateTagTransmissionRange (double tagCurrentOutputPowerIndicator) {
+    
+    return Math.pow(10,((GT + GR + tagCurrentOutputPowerIndicator - STH + 20*(Math.log10(WAVELENGTH / (4*Math.PI)))) / 20));
+  }
+  
+  
+  public double calculateTagInterferenceRange(double tagCurrentOutputPowerIndicator) {
+    
+    return Math.pow(10,((GT + GR + tagCurrentOutputPowerIndicator - (STH - 3) + 20*(Math.log10(WAVELENGTH / (4*Math.PI)))) / 20));
   }
   
   /**
@@ -440,13 +451,11 @@ public class UDGMBS extends UDGM {
 /**/      System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
           
           /* Calculate ranges: grows with radio output power measured in mW */
-          double tagTransmissionRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH 
-                                                     + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
-            
+          double tagTransmissionRange = calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
+          
 /**/      System.out.println("tagTransmissionRange: " + tagTransmissionRange);
 
-          double tagInterferenceRange = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - (STH - 3)
-                                                      + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
+          double tagInterferenceRange = calculateTagInterferenceRange(tagCurrentOutputPowerIndicator);
           
 /**/      System.out.println("tagInterferenceRange: " + tagInterferenceRange);
 
@@ -541,7 +550,7 @@ public class UDGMBS extends UDGM {
       
 /**/  System.out.println();
 /**/  System.out.println("UDGMBS.Power Indicator");
-      double distanceMax = (Math.pow(10, (GT + GR + tagCurrentOutputPowerIndicator - STH + 20*Math.log10(WAVELENGTH / (4*Math.PI))) / 20));
+      double distanceMax = calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
 /**/  System.out.println("UDGMBS.distanceMax: " + distanceMax);
 
       if (distanceMax == 0.0) {
@@ -648,7 +657,7 @@ public class UDGMBS extends UDGM {
             double distFactor = dist/maxTxDist;
 /**/        System.out.printf("distFactor = %.2f\n", distFactor);
             signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
-/**/      System.out.println("2.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
+/**/        System.out.println("2.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
           }
         }
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {

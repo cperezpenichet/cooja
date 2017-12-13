@@ -573,12 +573,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       }
     }
     
-    double tagTransmissionRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH 
-                                         + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+    double tagTransmissionRange = radioMedium.calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
+    double tagInterferenceRange = radioMedium.calculateTagInterferenceRange(tagCurrentOutputPowerIndicator);
     
-    double tagInterferenceRange = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - (radioMedium.STH - 3)
-                                         + 20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
-  
     Point translatedZero = visualizer.transformPositionToPixel(0.0, 0.0, 0.0);
     Point translatedInterference
               = visualizer.transformPositionToPixel(tagInterferenceRange, tagInterferenceRange, 0.0);
@@ -679,8 +676,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
       
       double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPowerMax(channel);
-      double distanceMax = (Math.pow(10, (radioMedium.GT + radioMedium.GR + tagCurrentOutputPowerIndicator - radioMedium.STH + 
-                                         20*Math.log10(radioMedium.WAVELENGTH / (4*Math.PI))) / 20));
+      double distanceMax = radioMedium.calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
       
       for (Mote m : simulation.getMotes()) {
         if (m == selectedMote) {

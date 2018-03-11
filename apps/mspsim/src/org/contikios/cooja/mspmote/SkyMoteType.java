@@ -81,6 +81,9 @@ public class SkyMoteType extends MspMoteType {
   public boolean configureAndInit(Container parentContainer, Simulation simulation, boolean visAvailable)
   throws MoteTypeCreationException {
 
+/**/System.out.println("Sky.configureAndInit");    
+
+    
     /* SPECIAL CASE: Cooja started in applet.
      * Use preconfigured Contiki firmware */
     if (Cooja.isVisualizedInApplet()) {
@@ -204,6 +207,7 @@ public class SkyMoteType extends MspMoteType {
   }
 
   public Class<? extends MoteInterface>[] getDefaultMoteInterfaceClasses() {
+/**/System.out.println("SkyMote.getDefaultMoteInterfaceClasses");      
 	  return getAllMoteInterfaceClasses();
   }
   public Class<? extends MoteInterface>[] getAllMoteInterfaceClasses() {

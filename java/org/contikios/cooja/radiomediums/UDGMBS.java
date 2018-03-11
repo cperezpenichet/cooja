@@ -96,17 +96,17 @@ public class UDGMBS extends UDGM {
   public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
  
   /* Gain of the transmitting antenna */
-  public final double GT = 0;
+  public final double GT = 3;
   /* Gain of the transmitting antenna */
-  public final double GR = 0;
+  public final double GR = 3;
   /* Wavelength */
   public final double WAVELENGTH = 0.122;
   /* Energy loss */
   public final double ENERGYLOSS = 4.4;
   /* Reflection loss */
-  public final double REFLECTIONLOSS = 14 + ENERGYLOSS;
+  public final double REFLECTIONLOSS = 13 + ENERGYLOSS;
   /* Sensitivity threshold for Tmote sky in dBm */
-  public final double STH = -96.7;
+  public final double STH = -86.4;
 
   ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
@@ -118,7 +118,7 @@ public class UDGMBS extends UDGM {
   
       final Observer positionObserver = new Observer() {
         public void update(Observable o, Object arg) {
-/**/      System.out.println("UDGMBS_Position_Change ");          
+/**/      System.out.println("UDGMBS_Position_Change");          
           Mote mote = (Mote) arg;
           Radio radio = mote.getInterfaces().getRadio();
           
@@ -202,12 +202,13 @@ public class UDGMBS extends UDGM {
     double transmitttedPower = 0.0;
     
     /* Transform power level into output power in dBm */
-    for (int i =0; i < source.CC2420OutputPower.length; i++) {
+    for (int i = 0; i < source.CC2420OutputPower.length; i++) {
       if((double) source.getCurrentOutputPowerIndicator() == i) {
         transmitttedPower = source.CC2420OutputPower[i];
 /**/    System.out.println("transmitttedPower: " + transmitttedPower);
       }
     }
+/**/System.out.println("pathLoss: " + pathLoss(distance));
     double incidentPower = transmitttedPower + GT + GR + pathLoss(distance);
     return incidentPower;
   }
@@ -234,13 +235,12 @@ public class UDGMBS extends UDGM {
 /**/System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
 /**/System.out.println(conn);
     tag.putTagTXPower(carrierGen.getChannel() + 2, conn, tagCurrentTXPower);
-  }
+  } 
   
   public double calculateTagTransmissionRange (double tagCurrentOutputPowerIndicator) {
     
     return Math.pow(10,((GT + GR + tagCurrentOutputPowerIndicator - STH + 20*(Math.log10(WAVELENGTH / (4*Math.PI)))) / 20));
   }
-  
   
   public double calculateTagInterferenceRange(double tagCurrentOutputPowerIndicator) {
     
@@ -337,14 +337,12 @@ public class UDGMBS extends UDGM {
 /**/        //System.out.println("r: " + r.getMote().getID() + " interfereAnyReception");
             //r.interfereAnyReception();
           } else {
-            
-            
 /**/        System.out.println("TAG IS IN DESTINATIONS");            
 /**/        System.out.println();
 /**/        System.out.println("1.Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
-            //carrierToTagDist.add(dist);
+            carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
 
             calculateTagCurrentTxPower(sender, r, newConnection);
@@ -364,7 +362,7 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println("Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
-            //carrierToTagDist.add(dist);
+            carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
             calculateTagCurrentTxPower(sender, r, newConnection);
 /**/        System.out.println("Stop keeping a record of the tagTXPower");
@@ -466,11 +464,11 @@ public class UDGMBS extends UDGM {
 
           double receivedPower = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(distance);
 /**/      System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
-          //receivedPowerLst.add(receivedPower);
+          receivedPowerLst.add(receivedPower);
 
-/**/      //System.out.println("carrierToTagDist: " + carrierToTagDist);
-/**/      //System.out.println("tagToRecvDist: " + tagToRecvDist);
-/**/      //System.out.println("receivedPowerLst: " + receivedPowerLst);
+/**/      System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/      System.out.println("tagToRecvDist: " + tagToRecvDist);
+/**/      System.out.println("rssi: " + receivedPowerLst);
   
           if (distance <= tagTransmissionRange) {
             /* Within transmission range */
@@ -643,7 +641,10 @@ public class UDGMBS extends UDGM {
           
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
-/**/      System.out.println("1.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
+          //receivedPowerLst.add(signalStrength);
+/**/      //System.out.println("receivedPowerLst: " + receivedPowerLst);
+/**/      //System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/      System.out.println("3.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
         } else {
           /* In case the source radio is a carrier generator its destination  
              will be a tag, which does not have receiving capabilities. */
@@ -656,7 +657,7 @@ public class UDGMBS extends UDGM {
 /**/        System.out.printf("maxTxDist = %.2f\n", maxTxDist);
             
             double distFactor = dist/maxTxDist;
-/**/        System.out.printf("distFactor = %.2f\n", distFactor);
+/**/        System.out.printf("4.distFactor = %.2f\n", distFactor);
             signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
 /**/        System.out.println("2.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
           }
@@ -664,7 +665,7 @@ public class UDGMBS extends UDGM {
         
         if (dstRadio.getCurrentSignalStrength() < signalStrength) {
           dstRadio.setCurrentSignalStrength(signalStrength);
-/**/      System.out.println("3.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + dstRadio.getCurrentSignalStrength());          
+/**/      System.out.println("5.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + dstRadio.getCurrentSignalStrength());          
         }
         
         /* In case the tag stops listening the carrier from one connection but
@@ -717,8 +718,8 @@ public class UDGMBS extends UDGM {
           
           /* Signal strength of a CC2420 radio that is receiving from a backscatter tag */
           signalStrength = tagCurrentOutputPowerIndicator + GT + GR + pathLoss(dist);
+/**/      System.out.println("3.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + signalStrength);
 
-/**/      System.out.println("3.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
         } else {
 /**/      System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
 

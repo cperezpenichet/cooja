@@ -49,7 +49,7 @@ public class SkyMote extends MspMote {
 
   public SkyMote(MspMoteType moteType, Simulation sim) {
     super(moteType, sim);
-/**/System.out.println("SkyMote: " + moteType.getIdentifier());
+/**/System.out.println("SkyMote");
   }
 
   protected boolean initEmulator(File fileELF) {

@@ -79,6 +79,8 @@ public class BackscatterTagType extends SkyMoteType {
   public boolean configureAndInit(Container parentContainer, Simulation simulation, boolean visAvailable)
   throws MoteTypeCreationException {
 
+/**/System.out.println("Tag.configureAndInit");    
+    
     /* SPECIAL CASE: Cooja started in applet.
      * Use preconfigured Contiki firmware */
     if (Cooja.isVisualizedInApplet()) {
@@ -97,7 +99,7 @@ public class BackscatterTagType extends SkyMoteType {
     }
 
     /* If visualized, show compile dialog and let user configure */
-    if (visAvailable) {
+    if (visAvailable && !simulation.isQuickSetup()) {
 
       /* Create unique identifier */
       if (getIdentifier() == null) {
@@ -115,6 +117,7 @@ public class BackscatterTagType extends SkyMoteType {
             }
             if (existingMoteType.getIdentifier().equals(getIdentifier())) {
               identifierOK = false;
+/**/          System.out.println("existingMoteType");
               break;
             }
           }
@@ -128,7 +131,7 @@ public class BackscatterTagType extends SkyMoteType {
 
       return MspCompileDialog.showDialog(parentContainer, simulation, this, "sky");
     }
-
+    
     /* Not visualized: Compile Contiki immediately */
     if (getIdentifier() == null) {
       throw new MoteTypeCreationException("No identifier");

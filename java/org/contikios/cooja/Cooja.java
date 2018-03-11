@@ -3374,8 +3374,11 @@ public class Cooja extends Observable {
   }
 
   public Simulation loadSimulationConfig(Element root, boolean quick, Long manualRandomSeed)
+
   throws SimulationCreationException {
     Simulation newSim = null;
+    
+    /**/System.out.println("loadSimulation");
 
     try {
       // Check that config file version is correct

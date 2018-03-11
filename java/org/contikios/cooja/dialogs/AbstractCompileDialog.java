@@ -385,7 +385,8 @@ public abstract class AbstractCompileDialog extends JDialog {
     }.start();
   }
 
-  private void tryRestoreMoteType() { 
+  private void tryRestoreMoteType() {
+/**/System.out.println("tryRestoreMoteType");
     /* Restore old configuration if mote type is already configured */
     boolean restoredDialogState = false;
     if (moteType != null) {
@@ -413,6 +414,7 @@ public abstract class AbstractCompileDialog extends JDialog {
         ((JCheckBox) c).setSelected(false);
       }
       if (moteType.getMoteInterfaceClasses() != null) {
+/**/    System.out.println("Select mote interfaces");        
         for (Class<? extends MoteInterface> intfClass: getAllMoteInterfaces()) {
           addMoteInterface(intfClass, false);
         }
@@ -421,6 +423,7 @@ public abstract class AbstractCompileDialog extends JDialog {
         }
       } else {
         /* Select default mote interfaces */
+/**/    System.out.println("Select default mote interfaces");
         for (Class<? extends MoteInterface> intfClass: getAllMoteInterfaces()) {
           addMoteInterface(intfClass, false);
         }

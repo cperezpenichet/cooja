@@ -96,15 +96,15 @@ public class UDGMBS extends UDGM {
   public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
  
   /* Gain of the transmitting antenna */
-  public final double GT = 3;
+  public final double GT = 0;
   /* Gain of the transmitting antenna */
-  public final double GR = 3;
+  public final double GR = 0;
   /* Wavelength */
   public final double WAVELENGTH = 0.122;
   /* Energy loss */
   public final double ENERGYLOSS = 4.4;
   /* Reflection loss */
-  public final double REFLECTIONLOSS = 13 + ENERGYLOSS;
+  public final double REFLECTIONLOSS = 13.4 + ENERGYLOSS;
   /* Sensitivity threshold for Tmote sky in dBm */
   public final double STH = -86.4;
 

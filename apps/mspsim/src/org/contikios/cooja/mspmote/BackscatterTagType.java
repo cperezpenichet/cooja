@@ -31,8 +31,14 @@
 package org.contikios.cooja.mspmote;
 
 import java.awt.Container;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
 import java.io.File;
+import java.net.URL;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
@@ -184,6 +190,24 @@ public class BackscatterTagType extends SkyMoteType {
       throw new MoteTypeCreationException("Contiki firmware file does not exist: " + getContikiFirmwareFile());
     }
     return true;
+  }
+  
+  public Icon getMoteTypeIcon() {
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    URL imageURL = this.getClass().getClassLoader().getResource("images/tag.jpg");
+    Image image = toolkit.getImage(imageURL);
+    MediaTracker tracker = new MediaTracker(Cooja.getTopParentContainer());
+    tracker.addImage(image, 1);
+    try {
+      tracker.waitForAll();
+    } catch (InterruptedException ex) {
+    }
+    if (image.getHeight(Cooja.getTopParentContainer()) > 0 && image.getWidth(Cooja.getTopParentContainer()) > 0) {
+      image = image.getScaledInstance((200*image.getWidth(Cooja.getTopParentContainer())/image.getHeight(Cooja.getTopParentContainer())), 200, Image.SCALE_DEFAULT);
+      return new ImageIcon(image);
+    }
+
+    return null;
   }
 
   public Class<? extends MoteInterface>[] getAllMoteInterfaceClasses() {

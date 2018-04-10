@@ -120,7 +120,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     this.radioMedium = (UDGMBS) simulation.getRadioMedium();
     
     /* Change the title of the visualizer */
-    getVisualizer().setTitle("Network - UDGMBS");
+    //getVisualizer().setTitle("Network - UDGMBS");
 
     /* Spinner GUI components */
 //    SpinnerNumberModel transmissionModel = new SpinnerNumberModel();
@@ -247,7 +247,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
      */
 
     /* Change the title of the rrFrame of the parent */
-    getRRFrame().setTitle("CC2420 Radio");
+    getRRFrame().setTitle("UDGMBS");
     
     /* Set the rrFrame for the radio */
     rrFrame = new JInternalFrame("Backscatter Tag", false, true);

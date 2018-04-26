@@ -96,9 +96,9 @@ public class UDGMBS extends UDGM {
   public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
  
   /* Gain of the transmitting antenna */
-  public final double GT = 0;
+  public final double GT = 3;
   /* Gain of the transmitting antenna */
-  public final double GR = 0;
+  public final double GR = 3;
   /* Wavelength */
   public final double WAVELENGTH = 0.122;
   /* Energy loss */
@@ -109,8 +109,11 @@ public class UDGMBS extends UDGM {
   public final double STH = -86.4;
 
   ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
+  ArrayList<Double> tagToCarrierDist = new ArrayList<Double>();
   ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
   ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
+  ArrayList<Integer> prr = new ArrayList<Integer>();
+
   
   public UDGMBS(Simulation simulation) {
       super(simulation);
@@ -428,6 +431,14 @@ public class UDGMBS extends UDGM {
 /**/    System.out.printf("PotDest = %d\n", dest.radio.getMote().getID());
 
         Radio recv = dest.radio;
+        
+        /*                               */
+        if (recv.isGeneratingCarrier()) {
+          double DistanceBetweenTagAndCarrier = senderPos.getDistanceTo(recv.getPosition());
+          tagToCarrierDist.add(DistanceBetweenTagAndCarrier);
+/**/      System.out.println("Potenntialrecv: " + recv.getMote().getID());          
+/**/      System.out.println("tagToCarrierDist: " + tagToCarrierDist);
+        }
 
         if(recv.getChannel() >= 0 && !tagTXChannels.contains(recv.getChannel())) {
 /**/      System.out.println("------Checking the validity of the channels------");
@@ -466,13 +477,13 @@ public class UDGMBS extends UDGM {
 /**/      System.out.println("dest: " + recv.getMote().getID() + " - receivedPower: " + receivedPower);
           receivedPowerLst.add(receivedPower);
 
-/**/      System.out.println("carrierToTagDist: " + carrierToTagDist);
-/**/      System.out.println("tagToRecvDist: " + tagToRecvDist);
-/**/      System.out.println("rssi: " + receivedPowerLst);
+/**/      //System.out.println("carrierToTagDist: " + carrierToTagDist);
+/**/      //System.out.println("tagToRecvDist: " + tagToRecvDist);
+/**/      //System.out.println("rssi: " + receivedPowerLst);
   
           if (distance <= tagTransmissionRange) {
             /* Within transmission range */
-/**/          System.out.println("WithinTR");
+/**/        System.out.println("WithinTR");
 
             if (!recv.isRadioOn()) {
 /**/            System.out.println("recv: " + recv.getMote().getID() + " - radio is off");
@@ -508,6 +519,8 @@ public class UDGMBS extends UDGM {
               if(!recv.isBackscatterTag()) {
                 /* Success: radio starts receiving */
                 newConnection.addDestination(recv);
+/**/            prr.add(25);
+
 /**/              System.out.println("recv: " + recv.getMote().getID() + " added as new destination to newConnection " + newConnection.getID());
               } else {
                 /* In case the receiver is a tag */  
@@ -522,7 +535,11 @@ public class UDGMBS extends UDGM {
             newConnection.addInterfered(recv);
 /**/          System.out.println("recv: " + recv.getMote().getID() + " added as interfered to newConnection: " + newConnection.getID());
             recv.interfereAnyReception();
+/**/        prr.add(0);
+          } else {
+/**/        prr.add(0);
           }
+/**/      System.out.println("prr: " + prr);
         }  
       } 
     }

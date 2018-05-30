@@ -230,8 +230,15 @@ public class RadioConnection {
   public Radio[] getInterferedNonDestinations() {
     return onlyInterfered.toArray(new Radio[0]);
   }
-
+  
+  /* To be deleted */
   public String toString() {
+    /* My addition */
+    for (Radio radio: allInterfered){
+      if (radio.isBackscatterTag()) {
+        return id + ": Radio connection: " + source.getMote() + " -> " + radio.getMote();
+      }
+    }
     if (destinationsNonInterfered.size() == 0) {
       return id + ": Radio connection: " + source.getMote() + " -> none";
     }
@@ -242,6 +249,18 @@ public class RadioConnection {
     return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.size() + " motes";
 
   }
+  
+//  public String toString() {
+//    if (destinationsNonInterfered.size() == 0) {
+//      return id + ": Radio connection: " + source.getMote() + " -> none";
+//    }
+//    if (destinationsNonInterfered.size() == 1) {
+//      return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.get(0).getMote();
+//    }
+//
+//    return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.size() + " motes";
+//
+//  }
   
   /* Testing Purposes */
   public int getID() {

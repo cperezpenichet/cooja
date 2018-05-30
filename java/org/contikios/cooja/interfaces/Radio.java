@@ -293,7 +293,7 @@ public abstract class Radio extends MoteInterface {
    *  
    * @param conn
    */
-  public void updateTagTXPowers(RadioConnection conn) {};
+  public void updateTagTXPower(RadioConnection conn) {};
   
   /**
    * Keeps a record of the output power of the tag concerning each time the corresponding
@@ -330,6 +330,16 @@ public abstract class Radio extends MoteInterface {
    * @param channel
    */
   public RadioConnection getConnectionFromMaxOutputPower(int channel) { return null; }
+  
+  
+  public boolean isTXChannelFromCarrierGenerator(int channel) { 
+    return false;
+  }
+
+  
+  
+  
+  
 
   public JPanel getInterfaceVisualizer() {
     JPanel panel = new JPanel(new BorderLayout());

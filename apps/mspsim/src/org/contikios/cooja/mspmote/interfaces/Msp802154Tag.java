@@ -211,7 +211,7 @@ public class Msp802154Tag extends Msp802154Radio {
     isInterfered = false;
   }
   
-  public void updateTagTXPowers(RadioConnection conn) {
+  public void updateTagTXPower(RadioConnection conn) {
 /**/System.out.println("updateTagTXPowers");
 /**/System.out.println("2.lastConnID: " + conn.getID());
 /**/System.out.println("1.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower); 
@@ -292,6 +292,20 @@ public class Msp802154Tag extends Msp802154Radio {
     }
     return null;
     
+  }
+  
+  public boolean isTXChannelFromCarrierGenerator(int channel) {
+    if (tagTXPower.get(channel) !=null) {
+      Enumeration<RadioConnection> conns = tagTXPower.get(channel).keys();
+      while (conns.hasMoreElements()) {
+        RadioConnection activeConn = (RadioConnection)conns.nextElement();
+         if (activeConn.getSource().isGeneratingCarrier()) {
+/**/       System.out.println("Conn: " + activeConn + " has as a source active transmitter " + activeConn.getSource().getMote().getID());         
+           return true;
+         }
+      }
+    }
+    return false;
   }
   
   @Override

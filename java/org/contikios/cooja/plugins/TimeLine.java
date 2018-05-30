@@ -1163,23 +1163,42 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
 
             RadioRXTXEvent ev;
             /* Override events, instead show state */
+//            if (moteRadio.isTransmitting()) {
+//              if (moteRadio.isGeneratingCarrier()) {
+///**/              System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.CARRIER_GENERATED");
+//                  ev = new RadioRXTXEvent(
+//                      simulation.getSimulationTime(), RXTXRadioEvent.CARRIER_GENERATED);
+//              } else if (moteRadio.isBackscatterTag()) { //&& !moteRadio.isListeningCarrier()) {
+//                // In case the tag starts trasmitting without having listened to the carrier first.
+///**/            System.out.println("moteRadio(tag): " + moteRadio.getMote().getID() + " isListeningCarrier: " +  !moteRadio.isListeningCarrier());
+///**/            System.out.println("moteRadio(tag): " + moteRadio.getMote().getID() + " - 1.RXTXRadioEvent.IDLE");
+//                ev = new RadioRXTXEvent(
+//                  simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
+//              } else {
+///**/            System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.TRANSMITTING");
+//                ev = new RadioRXTXEvent(
+//                    simulation.getSimulationTime(), RXTXRadioEvent.TRANSMITTING);
+//              }
+//            }
+            
             if (moteRadio.isTransmitting()) {
               if (moteRadio.isGeneratingCarrier()) {
 /**/              System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.CARRIER_GENERATED");
                   ev = new RadioRXTXEvent(
                       simulation.getSimulationTime(), RXTXRadioEvent.CARRIER_GENERATED);
-              } else if (moteRadio.isBackscatterTag() && !moteRadio.isListeningCarrier()) {
+              } else if (moteRadio.isBackscatterTag()) { //&& !moteRadio.isListeningCarrier()) {
                 // In case the tag starts trasmitting without having listened to the carrier first.
 /**/            System.out.println("moteRadio(tag): " + moteRadio.getMote().getID() + " isListeningCarrier: " +  !moteRadio.isListeningCarrier());
 /**/            System.out.println("moteRadio(tag): " + moteRadio.getMote().getID() + " - 1.RXTXRadioEvent.IDLE");
                 ev = new RadioRXTXEvent(
-                  simulation.getSimulationTime(), RXTXRadioEvent.IDLE);
+                  simulation.getSimulationTime(), RXTXRadioEvent.TRANSMITTING);
               } else {
 /**/            System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - RXTXRadioEvent.TRANSMITTING");
                 ev = new RadioRXTXEvent(
                     simulation.getSimulationTime(), RXTXRadioEvent.TRANSMITTING);
               }
-            } else if (!moteRadio.isRadioOn()) {
+            }         
+            else if (!moteRadio.isRadioOn()) {
 /**/          System.out.println("moteRadio: " + moteRadio.getMote().getID() + " - 2.RXTXRadioEvent.IDLE");
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.IDLE);

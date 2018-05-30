@@ -222,7 +222,8 @@ public class UDGM extends AbstractRadioMedium {
       if (sender.getChannel() >= 0 &&
           recv.getChannel() >= 0 &&
           sender.getChannel() != recv.getChannel()) {
-    	  
+        
+/**/      System.out.println("------Checking the validity of the channels------");
 /**/ 	  System.out.println("Sender - recv: diff channels");
 /**/ 	  System.out.println("Sender: " +  sender.getMote().getID() + " - Ch= " + sender.getChannel());
 /**/ 	  System.out.println("Recv: " +  recv.getMote().getID() + " - Ch= " + recv.getChannel());
@@ -232,7 +233,8 @@ public class UDGM extends AbstractRadioMedium {
            turned on and switched to the right channel. This behavior
            is consistent with the case when receiver is turned off. */
         newConnection.addInterfered(recv);
-
+/**/      System.out.println("-------------------------------------------------");
+/**/      System.out.println();
         continue;
       }
       Position recvPos = recv.getPosition();
@@ -302,7 +304,7 @@ public class UDGM extends AbstractRadioMedium {
         recv.interfereAnyReception();
       }
     }
-
+/**/System.out.println("UDGM.Connection: " + newConnection + " is about to return");        
     return newConnection;
   }
   

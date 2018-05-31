@@ -335,6 +335,10 @@ public abstract class Radio extends MoteInterface {
   public boolean isTXChannelFromCarrierGenerator(int channel) { 
     return false;
   }
+  
+  public int getNumberOfConnectionsFromChannel(int channel) {
+    return 0;
+  }
 
   
   

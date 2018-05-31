@@ -300,13 +300,21 @@ public class Msp802154Tag extends Msp802154Radio {
       while (conns.hasMoreElements()) {
         RadioConnection activeConn = (RadioConnection)conns.nextElement();
          if (activeConn.getSource().isGeneratingCarrier()) {
-/**/       System.out.println("Conn: " + activeConn + " has as a source active transmitter " + activeConn.getSource().getMote().getID());         
+/**/       System.out.println("Conn: " + activeConn + " has as a source carrierGenn " + activeConn.getSource().getMote().getID());         
            return true;
          }
       }
     }
     return false;
   }
+  
+  public int getNumberOfConnectionsFromChannel(int channel) {
+    System.out.println("From channel: " + channel + " - " + 
+                              tagTXPower.get(channel).size() + " connections");
+    return tagTXPower.get(channel).size();
+  }
+  
+  
   
   @Override
   public boolean isRadioOn() {

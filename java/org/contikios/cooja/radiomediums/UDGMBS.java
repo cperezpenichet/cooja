@@ -542,8 +542,8 @@ public class UDGMBS extends UDGM {
             } 
           } else {
             /* 
-             * When a tag starts a new connection and the ongoing connections have only a carrier
-             * generator as a source */
+             * When a tag starts a new connection and the ongoing connections have as a source only a 
+             * carrier generator. */
 /**/        System.out.println("tag " + sender.getMote().getID() + " reacts beacause of carrier generator");
             if (distance <= tagTransmissionRange) {
               /* Within transmission range */
@@ -711,12 +711,12 @@ public class UDGMBS extends UDGM {
          * since it does not have receiving capabilities. */
         if (!dstRadio.isBackscatterTag()) { //|| !dstRadio.isGeneratingCarrier()) {
         
-/**/    System.out.printf("2.dstRadio = %d\n", dstRadio.getMote().getID()) ;        
+/**/      System.out.printf("2.dstRadio = %d\n", dstRadio.getMote().getID()) ;        
   
           double dist = conn.getSource().getPosition().getDistanceTo(dstRadio.getPosition());
-  /**/    System.out.printf("dist = %.2f\n", dist);
+/**/      System.out.printf("dist = %.2f\n", dist);
   
-  /**/    System.out.println("source: " + conn.getSource().getMote().getID());
+/**/      System.out.println("source: " + conn.getSource().getMote().getID());
           
           double signalStrength = 0.0;
   
@@ -728,7 +728,7 @@ public class UDGMBS extends UDGM {
             //receivedPowerLst.add(signalStrength);
   /**/      //System.out.println("receivedPowerLst: " + receivedPowerLst);
   /**/      //System.out.println("carrierToTagDist: " + carrierToTagDist);
-  /**/      System.out.println("3.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
+/**/        System.out.println("3.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
           } else {
   /**/        System.out.println("TRANSMITTING_RANGE: " + TRANSMITTING_RANGE);
               
@@ -759,7 +759,7 @@ public class UDGMBS extends UDGM {
             dstRadio.signalReceptionStart();
           }
         }
-        /* if a dstRadio is already receiving a packet transmitted from a tag and a second because of tag which listens to the carrier radiated by two carrier generators transmitting 
+        /* If a dstRadio is already receiving a packet transmitted from a tag and a second because of tag which listens to the carrier radiated by two carrier generators transmitting 
          * on the same channel at the same time */
         if (conn.getSource().isListeningCarrier() && conn.getSource().getNumberOfConnectionsFromChannel(dstRadio.getChannel()) >= 2) {
 /**/      System.out.println("tag: " + conn.getSource().getMote().getID() + " listens " + conn.getSource().getNumberOfConnectionsFromChannel(dstRadio.getChannel()) 
@@ -772,18 +772,19 @@ public class UDGMBS extends UDGM {
         /* In case two active transmitters or two carrier generators or one active and one carrier
          * exist, the tag that is simultaneously accepting their signal gets interfered */
         
-//        if (conn.getSource().isGeneratingCarrier() && dstRadio.isListeningCarrier()) {
-//          if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
-///**/        System.out.println("tag: " + dstRadio.getMote().getID() + " gets interfered because it listens " 
-//                                 + dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) + " simultaneous carriers on channel " + conn.getSource().getChannel() + 2);
-//            dstRadio.interfereAnyReception();  
-//          }
-//        }
-        if (dstRadio.isBackscatterTag() && dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
+        /* TODO: think about merging these two if statements */
+        if (conn.getSource().isGeneratingCarrier() && dstRadio.isListeningCarrier()) {
+          if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
 /**/        System.out.println("tag: " + dstRadio.getMote().getID() + " gets interfered because it listens " 
                                  + dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) + " simultaneous carriers on channel " + conn.getSource().getChannel() + 2);
             dstRadio.interfereAnyReception();  
+          }
         }
+//        if (dstRadio.isBackscatterTag() && dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
+///**/        System.out.println("tag: " + dstRadio.getMote().getID() + " gets interfered because it listens " 
+//                                 + dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) + " simultaneous carriers on channel " + conn.getSource().getChannel() + 2);
+//            dstRadio.interfereAnyReception();  
+//        }
       }
       /* Clear txChannels HashSet for the next connection */
       txChannels.clear();

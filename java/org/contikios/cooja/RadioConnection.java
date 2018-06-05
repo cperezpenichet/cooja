@@ -245,7 +245,9 @@ public class RadioConnection {
     if (destinationsNonInterfered.size() == 1) {
       return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.get(0).getMote();
     }
-
+    
+//    for(Radio r: destinationsNonInterfered) {
+//    }
     return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.size() + " motes";
 
   }

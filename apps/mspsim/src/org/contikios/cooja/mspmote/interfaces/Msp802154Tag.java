@@ -207,8 +207,23 @@ public class Msp802154Tag extends Msp802154Radio {
    * the tag, tag does not get interfered. 
    */
   public void interfereAnyReception() {
-/**/System.out.println("tag: " + mote.getID() + " does not get interfered");
+/**/System.out.println("tag: " + mote.getID() + " interfereAnyReception");
     isInterfered = false;
+    if (tagTXPower !=null) {
+      Enumeration<Integer> channels = tagTXPower.keys();
+      while (channels.hasMoreElements()) {
+        Integer channel = (Integer)channels.nextElement();
+         if (this.getNumberOfConnectionsFromChannel(channel) >= 2) {
+           isInterfered = true;
+           lastEvent = RadioEvent.RECEPTION_INTERFERED;
+/**/System.out.println("tag: " + mote.getID() + " does get interfered because "
+                + "it listens to the carrier from 2 sources - same ch");
+          setChanged();
+          notifyObservers();
+         }
+      }
+    }
+    
   }
   
   public void updateTagTXPower(RadioConnection conn) {

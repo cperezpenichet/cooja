@@ -769,12 +769,20 @@ public class UDGMBS extends UDGM {
             dstRadio.interfereAnyReception();
           }
         }
-        if (conn.getSource().isGeneratingCarrier() && dstRadio.isListeningCarrier()) {
-          if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
+        /* In case two active transmitters or two carrier generators or one active and one carrier
+         * exist, the tag that is simultaneously accepting their signal gets interfered */
+        
+//        if (conn.getSource().isGeneratingCarrier() && dstRadio.isListeningCarrier()) {
+//          if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
+///**/        System.out.println("tag: " + dstRadio.getMote().getID() + " gets interfered because it listens " 
+//                                 + dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) + " simultaneous carriers on channel " + conn.getSource().getChannel() + 2);
+//            dstRadio.interfereAnyReception();  
+//          }
+//        }
+        if (dstRadio.isBackscatterTag() && dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
 /**/        System.out.println("tag: " + dstRadio.getMote().getID() + " gets interfered because it listens " 
                                  + dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) + " simultaneous carriers on channel " + conn.getSource().getChannel() + 2);
             dstRadio.interfereAnyReception();  
-          }
         }
       }
       /* Clear txChannels HashSet for the next connection */
@@ -875,11 +883,11 @@ public class UDGMBS extends UDGM {
             }
           } else {
             /* Note: The tag cannot be interfered */
-            if (!intfRadio.isBackscatterTag()) { //Can be deleted since the tag has no reception capabilities
+            //if (!intfRadio.isBackscatterTag()) { //Can be deleted since the tag has no reception capabilities
               /*logger.warn("Radio was not interfered: " + intfRadio);*/
   /**/        System.out.printf("9.intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
               intfRadio.interfereAnyReception();
-            }
+            //}
           }
         }
       }

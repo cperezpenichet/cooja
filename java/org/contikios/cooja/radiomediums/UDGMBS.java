@@ -523,7 +523,10 @@ public class UDGMBS extends UDGM {
           double distance = senderPos.getDistanceTo(recvPos);
           //tagToRecvDist.add(distance);
 /**///      System.out.println("TagRecvDistance: " + distance);
+          
+/**/      System.out.println("RecvDistance: " + distance);
 
+          
           /* 
            * When a tag starts a new connection and at least one of the ongoing connections has 
            * an active transmitter as a source put the recv into interfered  */
@@ -737,19 +740,19 @@ public class UDGMBS extends UDGM {
               double distFactor = dist/maxTxDist;
   /**/        System.out.printf("4.distFactor = %.7f\n", distFactor);
               signalStrength = SS_STRONG + distFactor*(SS_WEAK - SS_STRONG);
-  /**/        System.out.println("2.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
+  /**/        System.out.println("5.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + signalStrength);          
           }
           
           if (dstRadio.getCurrentSignalStrength() < signalStrength) {
             dstRadio.setCurrentSignalStrength(signalStrength);
-  /**/      System.out.println("5.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + dstRadio.getCurrentSignalStrength());          
+  /**/      System.out.println("6.dstRadio: " + dstRadio.getMote().getID() + " - signalStrength: " + dstRadio.getCurrentSignalStrength());          
           }
         }
         
         /* In case the tag stops listening the carrier from one connection but
          * it is still listening the carrier from another connection keep it signaled. */
         if (dstRadio.isBackscatterTag() && !dstRadio.isListeningCarrier()) {
-/**/      System.out.println("dstRadio: " + dstRadio.getMote().getID() + " is not listening the carrier...but");
+/**/      System.out.println("7.dstRadio: " + dstRadio.getMote().getID() + " is not listening the carrier...but");
           if (conn.getSource().isGeneratingCarrier()) {
 /**/        System.out.println("conn: " + conn.getID() + " is still active");
 /**/        System.out.println("and its source: " + conn.getSource().getMote().getID() + " isGeneratingCarrier(): " + conn.getSource().isGeneratingCarrier());
@@ -854,11 +857,29 @@ public class UDGMBS extends UDGM {
         }
         
         if (!intfRadio.isInterfered()) {
-          /* Note: The tag cannot be interfered */
-          if (!intfRadio.isBackscatterTag()) { //Can be deleted since the tag has no reception capabilities
-            /*logger.warn("Radio was not interfered: " + intfRadio);*/
-/**/        System.out.printf("intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
-            intfRadio.interfereAnyReception();
+/**/        System.out.printf("8.intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
+          
+          /* Corner case */
+          /* if the tag is already transmitting and the recv is interfered because the appropriate transmitting 
+           * channel does not exist, when an active transmitter starts a new connection make sure that the recv 
+           * gets interfered due to the reflections caused by the signal coming from that transmitter */
+          if(conn.getSource().isBackscatterTag() && conn.getSource().isTransmitting()) {
+            double tagCurrentOutputPowerIndicator = conn.getSource().getTagCurrentOutputPowerMax(intfRadio.getChannel());
+            double tagInterferenceRange = calculateTagInterferenceRange(tagCurrentOutputPowerIndicator);
+/**/        System.out.println("A.tagInterferenceRange: " + tagInterferenceRange);
+            double dist = conn.getSource().getPosition().getDistanceTo(intfRadio.getPosition());
+/**/        System.out.println("A.tagIntfRadioDist: " + dist);
+            if (dist <= tagInterferenceRange) {
+/**/            System.out.println("WithinIR");
+                intfRadio.interfereAnyReception();
+            }
+          } else {
+            /* Note: The tag cannot be interfered */
+            if (!intfRadio.isBackscatterTag()) { //Can be deleted since the tag has no reception capabilities
+              /*logger.warn("Radio was not interfered: " + intfRadio);*/
+  /**/        System.out.printf("9.intfRadio %d was not interfered\n" , intfRadio.getMote().getID());
+              intfRadio.interfereAnyReception();
+            }
           }
         }
       }

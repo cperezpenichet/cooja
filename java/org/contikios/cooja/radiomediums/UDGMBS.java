@@ -94,18 +94,22 @@ public class UDGMBS extends UDGM {
   
   public double SUCCESS_RATIO_TX = 1.0; /* Success ratio of TX. If this fails, no radios receive the packet */
   public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
- 
+  
   /* Gain of the transmitting antenna */
-  public final double GT = 0;
+  public  double GT = 0;
   /* Gain of the transmitting antenna */
-  public final double GR = 0;
+  public  double GR = 0;
   /* Wavelength */
-  public final double WAVELENGTH = 0.122;
+  public  double WAVELENGTH = 0.122;
+  /* Backscatter Coefficiency */
+  /* Derived from the experimental part of the master thesis of George Daglaridis at UNO Group, at Uppsala University */
+  public double BACKSCATTER_COEFFICIENT =  13.4;
   /* Energy loss */
-  public final double ENERGYLOSS = 1.4;
-  /* Reflection loss */
-  public final double REFLECTIONLOSS = 13.4 + ENERGYLOSS;
+  public  double ENERGYLOSS = 1.4;
+  
+  
   /* Sensitivity threshold for Tmote sky in dBm */
+  /* Derived from the experimental part of the master thesis of George Daglaridis at UNO Group, at Uppsala University */
   public final double STH = -86.4;
 
   ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
@@ -233,8 +237,11 @@ public class UDGMBS extends UDGM {
     /* Incident power in dBm */
     double incidentPower = friisEquation(carrierGen, tag);
 /**/System.out.println("incidentPower: " + incidentPower);
+    /* Reflection loss */
+    double reflectionLoss = BACKSCATTER_COEFFICIENT + ENERGYLOSS;
+/**/System.out.println("2.reflectionLoss: " + reflectionLoss);
     /* Current power of the tag in dBm */
-    double tagCurrentTXPower = incidentPower - REFLECTIONLOSS;
+    double tagCurrentTXPower = incidentPower - reflectionLoss;
 /**/System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
 /**/System.out.println(conn);
     tag.putTagTXPower(carrierGen.getChannel() + 2, conn, tagCurrentTXPower);

@@ -103,7 +103,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
   private JInternalFrame rrFrame;
   //private Box ratioRX, ratioTX, rangeTX, rangeINT;
-  private Box ratioRX, ratioTX;
+  private Box ratioRX, ratioTX, backCOEF;
   
   private Hashtable<Integer, Integer> carrierColor = new Hashtable<Integer, Integer>();
 
@@ -145,6 +145,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     successRatioRxModel.setMinimum(new Double(0.0));
     successRatioRxModel.setMaximum(new Double(1.0));
     
+    SpinnerNumberModel backscatterCoefficientModel = new SpinnerNumberModel();
+    backscatterCoefficientModel.setValue(new Double(radioMedium.BACKSCATTER_COEFFICIENT));
+    backscatterCoefficientModel.setStepSize(new Double(0.1)); // 0.1%
+    backscatterCoefficientModel.setMinimum(new Double(0.0));
+//    backscatterCoefficientModel.setMaximum(new Double(1.0));
+    
     JSpinner.NumberEditor editor;
 //    final JSpinner txRangeSpinner = new JSpinner(transmissionModel);
 //    editor = new JSpinner.NumberEditor(txRangeSpinner, "0m");
@@ -158,7 +164,16 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     final JSpinner successRatioRxSpinner = new JSpinner(successRatioRxModel);
     editor = new JSpinner.NumberEditor(successRatioRxSpinner, "0.0%");
     successRatioRxSpinner.setEditor(editor);
+    final JSpinner backscatterCoefficientSpinner = new JSpinner(backscatterCoefficientModel);
+    editor = new JSpinner.NumberEditor(backscatterCoefficientSpinner, "0.0 dB");
+    backscatterCoefficientSpinner.setEditor(editor);
 
+    
+    
+    
+    
+    
+    
 //    ((JSpinner.DefaultEditor) txRangeSpinner.getEditor()).getTextField().setColumns(5);
 //    ((JSpinner.DefaultEditor) interferenceRangeSpinner.getEditor()).getTextField().setColumns(5);
     ((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
@@ -167,7 +182,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //    interferenceRangeSpinner.setToolTipText("Interference range (m)");
     successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
     successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
-
+    backscatterCoefficientSpinner.setToolTipText("Backscatter coefficient (dB)");
+    
+    
 //    txRangeSpinner.addChangeListener(new ChangeListener() {
 //      @Override
 //      public void stateChanged(ChangeEvent e) {
@@ -203,9 +220,23 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         visualizer.repaint();
       }
     });
+    
+    backscatterCoefficientSpinner.addChangeListener(new ChangeListener() {
+      @Override
+      public void stateChanged(ChangeEvent e) {
+        radioMedium.BACKSCATTER_COEFFICIENT = ((SpinnerNumberModel) backscatterCoefficientSpinner.getModel())
+                .getNumber().doubleValue();
+        visualizer.repaint();
+      }
+    });
+    
+    
+    
+    
 
     /* Register menu actions */
     //visualizer.registerSimulationMenuAction(RangeMenuAction.class);
+    visualizer.registerSimulationMenuAction(BackscatterCoefficientMenuAction.class);
     visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
 
     /* UI components */
@@ -230,16 +261,22 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     ratioRX.add(new JLabel("RX ratio:"));
     ratioRX.add(Box.createHorizontalStrut(5));
     ratioRX.add(successRatioRxSpinner);
+    backCOEF = Box.createHorizontalBox();
+    backCOEF.add(new JLabel("Back COEF.:"));
+    backCOEF.add(Box.createHorizontalStrut(5));
+    backCOEF.add(backscatterCoefficientSpinner);
 
 //    rangeTX.setVisible(false);
 //    rangeINT.setVisible(false);
     ratioTX.setVisible(false);
     ratioRX.setVisible(false);
+    backCOEF.setVisible(false);
     
 //    main.add(rangeTX);
 //    main.add(rangeINT);
     main.add(ratioTX);
     main.add(ratioRX);
+    main.add(backCOEF);
     
     /*
      * Now we have a rrFrame for each one of the motes
@@ -247,7 +284,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
      */
 
     /* Change the title of the rrFrame of the parent */
-    getRRFrame().setTitle("UDGMBS");
+    //getRRFrame().setTitle("UDGMBS");
     
     /* Set the rrFrame for the radio */
     rrFrame = new JInternalFrame("Backscatter Tag", false, true);
@@ -261,6 +298,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //        rangeINT.setVisible(false);
         ratioTX.setVisible(false);
         ratioRX.setVisible(false);
+        backCOEF.setVisible(false);
         rrFrame.setVisible(false);
       }
     });
@@ -288,6 +326,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
     /* Unregister menu actions */
     //visualizer.unregisterSimulationMenuAction(RangeMenuAction.class);
+    visualizer.unregisterSimulationMenuAction(BackscatterCoefficientMenuAction.class);
     visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
   }
 
@@ -501,6 +540,31 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           UDGMBSVisualizerSkin vskin = ((UDGMBSVisualizerSkin) skin);
           vskin.ratioTX.setVisible(true);
           vskin.ratioRX.setVisible(true);
+          vskin.updateRatioRangeFrame();
+        }
+      }
+    }
+  };
+  
+  public static class BackscatterCoefficientMenuAction implements SimulationMenuAction {
+
+    @Override
+    public boolean isEnabled(Visualizer visualizer, Simulation simulation) {
+      return true;
+    }
+
+    @Override
+    public String getDescription(Visualizer visualizer, Simulation simulation) {
+      return "Backscatter Coefficient for tag";
+    }
+
+    @Override
+    public void doAction(Visualizer visualizer, Simulation simulation) {
+      VisualizerSkin[] skins = visualizer.getCurrentSkins();
+      for (VisualizerSkin skin : skins) {
+        if (skin instanceof UDGMBSVisualizerSkin) {
+          UDGMBSVisualizerSkin vskin = ((UDGMBSVisualizerSkin) skin);
+          vskin.backCOEF.setVisible(true);
           vskin.updateRatioRangeFrame();
         }
       }

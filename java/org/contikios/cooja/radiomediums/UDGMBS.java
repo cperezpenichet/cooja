@@ -123,39 +123,98 @@ public class UDGMBS extends UDGM {
       super(simulation);
   /**/System.out.println("UDGMBS");
   
-      final Observer positionObserver = new Observer() {
-        public void update(Observable o, Object arg) {
-/**/      System.out.println("UDGMBS_Position_Change");          
-          Mote mote = (Mote) arg;
-          Radio radio = mote.getInterfaces().getRadio();
-          
-          /* Re-calculate the TX range of the tag when the position
-             of the tag or the carrier generator changes. */ 
-          if (radio.isBackscatterTag()) {
-            for (RadioConnection conn: getActiveConnections()) {
-              if (conn.isDestination(radio)) {
-/**/            System.out.println("2.Start keeping a record of the tagTXPower");
-/**/            System.out.println("2.backTag: " + radio.getMote().getID());
-
-                calculateTagCurrentTxPower(conn.getSource(), radio, conn);
-
-/**/            System.out.println("2.Stop keeping a record of the tagTXPower");
-/**/            System.out.println();
+//      final Observer positionObserver = new Observer() {
+//        public void update(Observable o, Object arg) {
+///**/      System.out.println("UDGMBS_Position_Change");          
+//          Mote mote = (Mote) arg;
+//          Radio radio = mote.getInterfaces().getRadio();
+//          
+//          /* Re-calculate the TX range of the tag when the position
+//             of the tag or the carrier generator changes. */ 
+//          if (radio.isBackscatterTag()) {
+//            for (RadioConnection conn: getActiveConnections()) {
+//              if (conn.isDestination(radio)) {
+///**/            System.out.println("2.Start keeping a record of the tagTXPower");
+///**/            System.out.println("2.backTag: " + radio.getMote().getID());
+//
+//                calculateTagCurrentTxPower(conn.getSource(), radio, conn);
+//
+///**/            System.out.println("2.Stop keeping a record of the tagTXPower");
+///**/            System.out.println();
+//              }
+//            }
+//          } else if (radio.isGeneratingCarrier()) {
+//            for (RadioConnection conn: getActiveConnections()) {
+//              if (conn.getSource() == radio) {
+//                for (Radio dest: conn.getAllDestinations()) {
+//                  if (dest.isBackscatterTag()) {
+//                    calculateTagCurrentTxPower(radio, dest, conn);
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      };
+  
+        final Observer positionObserver = new Observer() {
+          public void update(Observable o, Object arg) {
+      /**/      System.out.println("UDGMBS_Position_Change");          
+            Mote mote = (Mote) arg;
+            Radio radio = mote.getInterfaces().getRadio();
+            
+            /* Re-calculate the TX range of the tag when the position
+               of the tag or the carrier generator changes. */ 
+            if (radio.isBackscatterTag()) {
+              for (RadioConnection conn: getActiveConnections()) {
+//                if (conn.isDestination(radio)) {
+      /**/            System.out.println("2.Start keeping a record of the tagTXPower");
+      /**/            System.out.println("2.backTag: " + radio.getMote().getID() + " was moved");
+      
+                  calculateTagCurrentTxPower(conn.getSource(), radio, conn);
+      
+      /**/            System.out.println("2.Stop keeping a record of the tagTXPower");
+      /**/            System.out.println();
+//                }
               }
-            }
-          } else if (radio.isGeneratingCarrier()) {
-            for (RadioConnection conn: getActiveConnections()) {
-              if (conn.getSource() == radio) {
-                for (Radio dest: conn.getAllDestinations()) {
-                  if (dest.isBackscatterTag()) {
-                    calculateTagCurrentTxPower(radio, dest, conn);
+            } else if (radio.isGeneratingCarrier()) {
+              for (RadioConnection conn: getActiveConnections()) {
+                if (conn.getSource() == radio) {
+                  for (Radio destRadio: conn.getAllDestinations()) {
+                    if (destRadio.isBackscatterTag()) {
+/**/                  System.out.println("3.Start keeping a record of the tagTXPower");
+/**/                  System.out.println("3.carrierRadio: " + radio.getMote().getID() + " was moved");
+/**/                  System.out.println("3.backTag: " + destRadio.getMote().getID());
+                      
+                      calculateTagCurrentTxPower(radio, destRadio, conn);
+                      
+/**/                  System.out.println("3.Stop keeping a record of the tagTXPower");
+/**/                  System.out.println();
+                    }
+                  }
+                }
+              }
+            } else {
+              for (RadioConnection conn: getActiveConnections()) {
+                if (conn.getSource() == radio) {
+                  for (Radio intfRadio: conn.getInterfered()) {
+                    if (intfRadio.isBackscatterTag()) {
+/**/                  System.out.println("4.Start keeping a record of the tagTXPower");
+/**/                  System.out.println("4.activeRadio: " + radio.getMote().getID() + " was moved");
+/**/                  System.out.println("4.backTag: " + intfRadio.getMote().getID());
+                      
+                      calculateTagCurrentTxPower(radio, intfRadio, conn);
+                      
+/**/                  System.out.println("4.Stop keeping a record of the tagTXPower");
+/**/                  System.out.println();
+
+                    }
                   }
                 }
               }
             }
           }
-        }
-      };
+        };
   
       /* Re-analyze potential receivers if radios are added/removed. */
       simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {

@@ -378,8 +378,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
             if (!lastConnFromCarrier.getSource().isBackscatterTag()) {
                 int carrierChannel = lastConnFromCarrier.getSource().getChannel();
                 tagTxChannel = carrierChannel+2;
-          /**/          System.out.println("tagTxChannel: " + tagTxChannel);
-          
+/**/            System.out.println("tagTxChannel: " + tagTxChannel);
+                
                 /* Paint the Tx and Int range of the tag */
                 paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
                 break;
@@ -520,8 +520,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           /* Last connection among the active ones that was created by a carrier 
            * generator. */
           RadioConnection lastConnFromCarrier = conns[i-1];
-          if(lastConnFromCarrier.getSource().isGeneratingCarrier()) {
-            if (lastConnFromCarrier.isDestination(selectedRadio)) {
+          if(!lastConnFromCarrier.getSource().isBackscatterTag()) {
               
               int carrierChannel = lastConnFromCarrier.getSource().getChannel();
               int tagTxChannel = carrierChannel+2;
@@ -538,12 +537,19 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
               paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
 
               break;
-            }
           }
         }
       } else if (selectedRadio.isGeneratingCarrier()) {
-        /* Paint the inner part of the carrier generator (selectedRadio) that is currently selected  */
-        paintCarrierColor(selectedMotes, selectedRadio.getMote(), g);
+/**/    System.out.println("selectedRadio: " + selectedRadio.getMote().getID() + "isGeneratingCarrier: " + selectedRadio.isGeneratingCarrier());
+        for (RadioConnection conn: conns) {
+          if (conn.getSource() == selectedRadio) {
+            for (Radio r: conn.getAllDestinations()) {
+/**/          System.out.println("tag: " + r);              
+              /* Paint the inner part of the carrier generator (selectedRadio) that is currently selected  */
+              paintCarrierColor(selectedMotes, selectedRadio.getMote(), r, g);
+            }
+          }
+        }
       } else {
         super.paintAfterMotes(g);
       }
@@ -683,7 +689,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
     double tagCurrentOutputPowerIndicator = 0.0;
     
-    
     for (Mote selectedMote : selectedMotes) {
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
       if (selectedRadio.isBackscatterTag()) {
@@ -691,12 +696,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPowerMax(tagTxChanel);
       } else {
 /**/    System.out.println("selectedRadio: " + selectedRadio.getMote().getID() + " is a  carrier");
-        /* Tag's output power given the specific carrier generator (selectedRadio) */ 
+        /* Tag's output power given the specific active module (active transmitter or carrier generator) */
+        /* In case two active modules operate*/
         tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPower(selectedRadio, tagTxChanel);
       }
     }
-    
-    
+
     
     
     
@@ -910,48 +915,48 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
   } /* showProbability */
 
-  /**
-   * From the given set of motes paint the carrier generator (selectedMote), which is currently
-   * selected.
-   * 
-   * @param selectedMotes
-   * @param selectedMote
-   * @param g
-   */
-  private void paintCarrierColor(Set<Mote> selectedMotes, Mote selectedMote, Graphics g) {
-/**/ System.out.println("paintCarrierColor");    
-    /* Get the position of the carrier generator */
-    Position carrierPos = selectedMote.getInterfaces().getPosition();
-    
-    Point pixelCoordin = visualizer.transformPositionToPixel(carrierPos);
-    int xi = pixelCoordin.x;
-    int yi = pixelCoordin.y;
-    
-    Radio selectedRadio  = selectedMote.getInterfaces().getRadio();
-    int txColor = carrierColor.get(selectedRadio.getChannel()+2);
-    
-    if (selectedMotes.contains(selectedMote)) {
-/**/            System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
-      /* If mote is selected, highlight with red circle
-       and semitransparent gray overlay */
-      g.setColor(new Color(51, 102, 255));
-      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-                   2 * Visualizer.MOTE_RADIUS);
-      g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
-                   2 * Visualizer.MOTE_RADIUS + 2);
-
-      g.setColor(new Color(txColor, true));
-      g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-                 2 * Visualizer.MOTE_RADIUS);
-      
-    } else {
-      g.setColor(Color.BLACK);
-      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-                 2 * Visualizer.MOTE_RADIUS);
-    }
-    
-    
-  } /* paintCarrierColor */
+//  /**
+//   * From the given set of motes paint the carrier generator (selectedMote), which is currently
+//   * selected.
+//   * 
+//   * @param selectedMotes
+//   * @param selectedMote
+//   * @param g
+//   */
+//  private void paintCarrierColor(Set<Mote> selectedMotes, Mote selectedMote, Graphics g) {
+///**/ System.out.println("paintCarrierColor");    
+//    /* Get the position of the carrier generator */
+//    Position carrierPos = selectedMote.getInterfaces().getPosition();
+//    
+//    Point pixelCoordin = visualizer.transformPositionToPixel(carrierPos);
+//    int xi = pixelCoordin.x;
+//    int yi = pixelCoordin.y;
+//    
+//    Radio selectedRadio  = selectedMote.getInterfaces().getRadio();
+//    int txColor = carrierColor.get(selectedRadio.getChannel()+2);
+//    
+//    if (selectedMotes.contains(selectedMote)) {
+///**/            System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
+//      /* If mote is selected, highlight with red circle
+//       and semitransparent gray overlay */
+//      g.setColor(new Color(51, 102, 255));
+//      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
+//                   2 * Visualizer.MOTE_RADIUS);
+//      g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
+//                   2 * Visualizer.MOTE_RADIUS + 2);
+//
+//      g.setColor(new Color(txColor, true));
+//      g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
+//                 2 * Visualizer.MOTE_RADIUS);
+//      
+//    } else {
+//      g.setColor(Color.BLACK);
+//      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
+//                 2 * Visualizer.MOTE_RADIUS);
+//    }
+//    
+//    
+//  } /* paintCarrierColor */
   
   /**
    * From the given set of motes paint the carrier generator (radio), whose carrier the selectedMote
@@ -963,17 +968,37 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
    * @param g
    */
   private void paintCarrierColor(Set<Mote> selectedMotes, Mote selectedMote, Radio radio, Graphics g) {
-    /* Get the position of the carrier generator */
-    Position carrierPos = radio.getPosition();
     
-    Point pixelCoordin = visualizer.transformPositionToPixel(carrierPos);
+    Radio selectedRadio  = selectedMote.getInterfaces().getRadio();
+//    int txColor = carrierColor.get(radio.getChannel()+2);
+/**/System.out.println("paintCarrierColor - selectedRadio is a tag: " + selectedRadio.isBackscatterTag());
+    
+    Radio tag = null;
+    Radio paintedRadio = null;
+    
+    if (selectedRadio.isBackscatterTag()) {
+      tag = selectedRadio;
+      paintedRadio = radio;
+    } else {
+      tag = radio;
+      paintedRadio = selectedRadio;
+    }
+    
+/**/System.out.println("radio " + radio.getMote().getID() + " is pressed");
+/**/System.out.println("paintedRadio " + paintedRadio.getMote().getID());    
+    
+    
+    /* Get the position of the carrier generator */
+    Position activeRadioPos = paintedRadio.getPosition();
+    
+    Point pixelCoordin = visualizer.transformPositionToPixel(activeRadioPos);
     int xi = pixelCoordin.x;
     int yi = pixelCoordin.y;
-    
-    int txColor = carrierColor.get(radio.getChannel()+2);
-    
+
+
     if (selectedMotes.contains(selectedMote)) {
-/**/            System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
+      
+/**/  System.out.println("UDGMBS.getSelectedMotes().contains(mote)");        
       /* If mote is selected, highlight with red circle
        and semitransparent gray overlay */
       g.setColor(new Color(51, 102, 255));
@@ -982,10 +1007,22 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
                    2 * Visualizer.MOTE_RADIUS + 2);
 
-      g.setColor(new Color(txColor, true));
-      g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-                 2 * Visualizer.MOTE_RADIUS);
-      
+      if (!tag.isTXChannelFromCarrierGenerator(paintedRadio.getChannel()+2) || 
+                tag.getNumberOfConnectionsFromChannel(paintedRadio.getChannel()+2) >= 2) {
+        
+/**/    System.out.println("Either you have an active transmiter or two simultaneous connections having as sources active modules");
+        g.setColor(new Color(128, 128, 128, 128));
+        g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
+                   2 * Visualizer.MOTE_RADIUS);
+        
+      } else {
+/**/    System.out.println("corresponding radio is a carrier generator: " + paintedRadio.isGeneratingCarrier());
+        
+        int txColor = carrierColor.get(paintedRadio.getChannel()+2);
+        g.setColor(new Color(txColor, true));
+        g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
+                   2 * Visualizer.MOTE_RADIUS);
+      }
     } else {
       g.setColor(Color.BLACK);
       g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,

@@ -44,7 +44,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-
+import org.omg.CORBA.INTF_REPOS;
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
 import org.contikios.cooja.RadioConnection;
@@ -968,11 +968,12 @@ public class UDGMBS extends UDGM {
   private void removeFromActiveConnections(Radio radio) {
 /**/System.out.println("UDGMBS.removeFromActiveConnections");
     /* 
-     * When a carrier generator is removed from an ongoing connection
-     * every tag that was receiving its carrier updates the corresponding
-     * entry in its Hashtable and stops any current backscatter transmission .
+     * When an active module (transmitter or carrier generator) is removed 
+     * from an ongoing connection every tag that was receiving its signal or
+     * its carrier respectively, updates the corresponding entry in its Hashtable
+     * and stops any current signal reflection.
      */
-    if (radio.isGeneratingCarrier()) {
+//    if (!radio.isBackscatterTag()) {
       for (RadioConnection conn : getActiveConnections()) {
         if (conn.getSource() == radio) {
           for (Radio dstRadio : conn.getAllDestinations()) {
@@ -1001,6 +1002,8 @@ public class UDGMBS extends UDGM {
           }
           
           for (Radio intRadio : conn.getInterferedNonDestinations()) {
+            /* A connection having as source an active transmitter considers the tag as an interfered radio */ 
+            intRadio.updateTagTXPower(conn);
             if (intRadio.isInterfered()) {
 /**/          System.out.println("UDGMBS.intfRadio: " + intRadio.getMote().getID() + " signalReceptionEnd");
               intRadio.signalReceptionEnd();
@@ -1010,7 +1013,7 @@ public class UDGMBS extends UDGM {
           getActiveConnectionsArrayList().remove(conn);
         }
       }
-    }
+//    }
 
   } /* removeFromActiveConnections */
   

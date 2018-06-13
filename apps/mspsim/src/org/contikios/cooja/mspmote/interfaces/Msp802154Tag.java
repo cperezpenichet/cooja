@@ -310,23 +310,35 @@ public class Msp802154Tag extends Msp802154Radio {
   }
   
   public boolean isTXChannelFromCarrierGenerator(int channel) {
+    /**/System.out.println("2.isTXChannelFromCarrierGenerator");
     if (tagTXPower.get(channel) !=null) {
+/**/  System.out.println("3.isTXChannelFromCarrierGenerator");
+      
       Enumeration<RadioConnection> conns = tagTXPower.get(channel).keys();
       while (conns.hasMoreElements()) {
         RadioConnection activeConn = (RadioConnection)conns.nextElement();
-         if (activeConn.getSource().isGeneratingCarrier()) {
-/**/       System.out.println("Conn: " + activeConn + " has as a source carrierGenn " + activeConn.getSource().getMote().getID());         
+         if (!activeConn.getSource().isGeneratingCarrier()) {
+/**/       System.out.println("Conn: " + activeConn + " has as a source activeTrans " + activeConn.getSource().getMote().getID());         
            return true;
          }
       }
     }
+    /**/System.out.println("4.isTXChannelFromCarrierGenerator");
     return false;
   }
   
   public int getNumberOfConnectionsFromChannel(int channel) {
-    System.out.println("From channel: " + channel + " - " + 
-                              tagTXPower.get(channel).size() + " connections");
+    
+    if (!tagTXPower.containsKey(channel)) {
+      /**/System.out.println("HERE.NOcontainsKey");
+      return 0;
+    }
+    
+/**/System.out.println("From channel: " + channel + " - " + 
+            tagTXPower.get(channel).size() + " connections");
+
     return tagTXPower.get(channel).size();
+    
   }
   
   

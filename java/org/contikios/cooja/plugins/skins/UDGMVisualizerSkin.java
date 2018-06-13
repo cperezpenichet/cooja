@@ -389,8 +389,6 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
           continue;
         }
         
-        
-        
 /**/    System.out.println("UDGM.m: " + m.getID());      
      
         double prob

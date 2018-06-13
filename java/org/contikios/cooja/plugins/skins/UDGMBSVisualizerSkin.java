@@ -382,12 +382,17 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
                 
                 /* Paint the Tx and Int range of the tag */
                 paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
+                showProbability(selectedMotes, g, tagTxChannel);
                 break;
               }
           }
-          //TODO: Consider to move this call to within the if statement above
-          showProbability(selectedMotes, g, tagTxChannel);
+          //TODO: Consider to move this call within the if statement above
+//          showProbability(selectedMotes, g, tagTxChannel);
+//          showProbability(selectedMotes, g);
+          
 
+          
+          
 //        int tagTxChannel = 0;
 //        if (conns.length >= 1) {
 //          RadioConnection lastConnFromCarrier = conns[conns.length-1];
@@ -783,38 +788,44 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     }
 /**/System.out.println("2.carrierColor: " + carrierColor);    
     
-
-    Graphics2D g2d = (Graphics2D) g;
-/**/System.out.println("1.UDGMBS.Graphics2D");
-
-/**/System.out.println("tagTxChanel: " + tagTxChanel);
-
-    g2d.setColor(Color.WHITE);
-    g2d.fill(intRangeArea); // fill the circle with color
-
-    if (!radio.isTXChannelFromCarrierGenerator(tagTxChanel) || 
-                      radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
-      
-/**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
-          
-      g2d.setColor(COLOR_INT);
+//    if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
+    
+      Graphics2D g2d = (Graphics2D) g;
+  /**/System.out.println("1.UDGMBS.Graphics2D");
+  
+  /**/System.out.println("tagTxChanel: " + tagTxChanel);
+  
+      g2d.setColor(Color.WHITE);
       g2d.fill(intRangeArea); // fill the circle with color
-      g.setColor(Color.GRAY);
-      g2d.draw(intRangeMaxArea);
-    } else {
-      
-      g2d.setColor(COLOR_INT);
-      g2d.fill(intRangeArea); // fill the circle with color
-      g.setColor(Color.GRAY);
-      g2d.draw(intRangeMaxArea); 
+    if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
+      /**/System.out.println("AT LEAST ONE CONNECTION");
+      if (radio.isTXChannelFromCarrierGenerator(tagTxChanel) || 
+                        radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
         
-      g.setColor(new Color(txColor, true));
-      g2d.fill(trxRangeArea);
-      g.setColor(Color.GRAY);
-      g2d.draw(trxRangeMaxArea); // draw the circle
+  /**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
+            
+        g2d.setColor(COLOR_INT);
+        g2d.fill(intRangeArea); // fill the circle with color
+        g.setColor(Color.GRAY);
+        g2d.draw(intRangeMaxArea);
+      } else {
+  /**/  System.out.println("TX AND INT RANGE ARE PAINTED");
+  
+        g2d.setColor(COLOR_INT);
+        g2d.fill(intRangeArea); // fill the circle with color
+        g.setColor(Color.GRAY);
+        g2d.draw(intRangeMaxArea); 
+          
+        g.setColor(new Color(txColor, true));
+        g2d.fill(trxRangeArea);
+        g.setColor(Color.GRAY);
+        g2d.draw(trxRangeMaxArea); // draw the circle
+      }
     }
+    /**/System.out.println("NO DRAWING");
     
   } /* paintTxAndIxRanges */
+  
   
   /**
    * Show the probability beneath each tag of the Set selectedMotes for the given
@@ -824,6 +835,16 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
    * @param g
    * @param channel
    */
+  
+  /* Alternative function for showing the probability of the nodes placed within 
+   * the transmission range of a tag. It is based on the calculation of the  
+   * tagCurrentOutputPowerIndicator, which, in turn, is based on the current max 
+   * output power of the tag, indexed by the appropriate backscatter channel. 
+   * According to the way the power was indexed, this method was mainly used  
+   * because the probability of an active radio was not shown. Therefore, it was
+   * in the beginning but rejected afterwards, because it was not taking into account
+   * the variable SUCCESS_RATIO_RX in the calculation of the local variable prob. */
+  
   private void showProbability(Set<Mote> selectedMotes, Graphics g, int channel) {
 /**/System.out.println("1.showProbability");    
     
@@ -984,7 +1005,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       paintedRadio = selectedRadio;
     }
     
-/**/System.out.println("radio " + radio.getMote().getID() + " is pressed");
+/**/System.out.println("tag " + tag.getMote().getID() + " is pressed");
 /**/System.out.println("paintedRadio " + paintedRadio.getMote().getID());    
     
     
@@ -1007,7 +1028,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
                    2 * Visualizer.MOTE_RADIUS + 2);
 
-      if (!tag.isTXChannelFromCarrierGenerator(paintedRadio.getChannel()+2) || 
+      if (tag.isTXChannelFromCarrierGenerator(paintedRadio.getChannel()+2) || 
                 tag.getNumberOfConnectionsFromChannel(paintedRadio.getChannel()+2) >= 2) {
         
 /**/    System.out.println("Either you have an active transmiter or two simultaneous connections having as sources active modules");

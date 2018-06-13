@@ -317,7 +317,7 @@ public class Msp802154Tag extends Msp802154Radio {
       Enumeration<RadioConnection> conns = tagTXPower.get(channel).keys();
       while (conns.hasMoreElements()) {
         RadioConnection activeConn = (RadioConnection)conns.nextElement();
-         if (!activeConn.getSource().isGeneratingCarrier()) {
+         if (activeConn.getSource().isGeneratingCarrier()) {
 /**/       System.out.println("Conn: " + activeConn + " has as a source activeTrans " + activeConn.getSource().getMote().getID());         
            return true;
          }

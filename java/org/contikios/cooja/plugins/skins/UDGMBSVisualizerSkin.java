@@ -525,8 +525,17 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           /* Last connection among the active ones that was created by a carrier 
            * generator. */
           RadioConnection lastConnFromCarrier = conns[i-1];
-          if(!lastConnFromCarrier.getSource().isBackscatterTag()) {
+//          if(!lastConnFromCarrier.getSource().isBackscatterTag()) {
               
+          if(lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) { 
+            
+            /**/System.out.println("lastConnFromCarrier.getSource(): " 
+                                     + lastConnFromCarrier.getSource().getMote().getID());
+            
+            /**/ System.out.println("carrierChannel: " 
+                                     + lastConnFromCarrier.getSource().getChannel());
+          
+          
               int carrierChannel = lastConnFromCarrier.getSource().getChannel();
               int tagTxChannel = carrierChannel+2;
               
@@ -539,8 +548,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
               /* Paint the inner part of the carrier generator (connFromMaxPower.getSource()), whose carrier 
                * the selectedMote is listening to, with the same color as the color of the TX range of the 
                * selectedMote (tag). */
-              paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
-
+              if (connFromMaxPower != null) {
+                paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
+              }
               break;
           }
         }

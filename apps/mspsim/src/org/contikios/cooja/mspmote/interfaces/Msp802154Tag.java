@@ -216,7 +216,7 @@ public class Msp802154Tag extends Msp802154Radio {
          if (this.getNumberOfConnectionsFromChannel(channel) >= 2) {
            isInterfered = true;
            lastEvent = RadioEvent.RECEPTION_INTERFERED;
-/**/System.out.println("tag: " + mote.getID() + " does get interfered because "
+/**/       System.out.println("tag: " + mote.getID() + " does get interfered because "
                 + "it listens to the carrier from 2 sources - same ch");
           setChanged();
           notifyObservers();
@@ -245,7 +245,7 @@ public class Msp802154Tag extends Msp802154Radio {
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower) {
 /**/System.out.println("putTagTXPower");
 
-    if (tagTXPower.containsKey(channel)) {
+    if (channel >= 0 && tagTXPower.containsKey(channel)) {
       tagTXPower.get(channel).put(conn, tagCurrentTXPower);
     } else {
       Hashtable<RadioConnection, Double> txPower = new Hashtable<RadioConnection, Double>();
@@ -259,7 +259,8 @@ public class Msp802154Tag extends Msp802154Radio {
   public double getTagCurrentOutputPower(Radio radio, int channel) {
 /**/System.out.println("getTagCurrentOutputPower");
 /**/System.out.println("3.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
-    if (!tagTXPower.isEmpty()) {
+//    if (!tagTXPower.isEmpty()) {
+    if (channel >= 0 && tagTXPower.containsKey(channel)) {
       Enumeration<RadioConnection> conns = tagTXPower.get(channel).keys();
       while (conns.hasMoreElements()) {
          RadioConnection conn = (RadioConnection)conns.nextElement();
@@ -277,17 +278,15 @@ public class Msp802154Tag extends Msp802154Radio {
   public double getTagCurrentOutputPowerMax(int channel) {
 /**/System.out.println("getTagCurrentOutputPowerMax");
 /**/System.out.println("4.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
-    if (!tagTXPower.isEmpty()) {
-      if (tagTXPower.get(channel) !=null) {
+    if (channel >= 0 && tagTXPower.containsKey(channel)) {
 /**/    System.out.println(tagTXPower.get(channel).values());
-/**/    System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values(), null));
-       /* In case there are more than one carrier generators with the same channel 
-        * return the max output power of those that were produced by them */
-        return Collections.max(tagTXPower.get(channel).values(), null);
-      } else {
+/**/    System.out.println("maxTXPower: " + Collections.max(tagTXPower.get(channel).values()));
+     /* In case there are more than one carrier generators with the same channel 
+      * return the max output power of those that were produced by them */
+      return Collections.max(tagTXPower.get(channel).values());
+    } else {
 /**/    System.out.println("tagTXPower.get(" + channel + ")" + " == null");
 /**/    System.out.println(channel == -1 ? "tag channel is: " + channel : "channel: " + channel);
-      }
     }
     /* When there is no entry in the Hashtable 
      * return something really small */
@@ -295,14 +294,18 @@ public class Msp802154Tag extends Msp802154Radio {
   }
   
   public RadioConnection getConnectionFromMaxOutputPower(int channel) {
-    double maxPower = this.getTagCurrentOutputPowerMax(channel);
-    Enumeration<RadioConnection> carrierConns = tagTXPower.get(channel).keys();
-    while (carrierConns.hasMoreElements()) {
-      RadioConnection carrierConn = (RadioConnection)carrierConns.nextElement();
-/**/   System.out.println("1.carrierConn: " + carrierConn);
-      if (tagTXPower.get(channel).get(carrierConn) == maxPower) {
-/**/    System.out.println("2.carrierConn: " + carrierConn);
-        return carrierConn;
+    if (channel >= 0 && tagTXPower.containsKey(channel)) {
+      /**/System.out.println("HERE1");
+      double maxPower = this.getTagCurrentOutputPowerMax(channel);
+      /**/System.out.println("HERE2");
+      Enumeration<RadioConnection> carrierConns = tagTXPower.get(channel).keys();
+      while (carrierConns.hasMoreElements()) {
+        RadioConnection carrierConn = (RadioConnection)carrierConns.nextElement();
+  /**/   System.out.println("1.carrierConn: " + carrierConn);
+        if (tagTXPower.get(channel).get(carrierConn) == maxPower) {
+  /**/    System.out.println("2.carrierConn: " + carrierConn);
+          return carrierConn;
+        }
       }
     }
     return null;
@@ -311,7 +314,7 @@ public class Msp802154Tag extends Msp802154Radio {
   
   public boolean isTXChannelFromCarrierGenerator(int channel) {
     /**/System.out.println("2.isTXChannelFromCarrierGenerator");
-    if (tagTXPower.get(channel) !=null) {
+    if (channel >= 0 && tagTXPower.containsKey(channel)) {
 /**/  System.out.println("3.isTXChannelFromCarrierGenerator");
       
       Enumeration<RadioConnection> conns = tagTXPower.get(channel).keys();

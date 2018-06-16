@@ -231,10 +231,12 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/System.out.println("2.lastConnID: " + conn.getID());
 /**/System.out.println("1.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower); 
     //if(tagTXPower.get(conn.getSource().getChannel()+2).containsKey(conn)) {
-    if (tagTXPower.get(conn.getSource().getChannel()+2) != null) {
-      tagTXPower.get(conn.getSource().getChannel()+2).remove(conn);
-      if (tagTXPower.get(conn.getSource().getChannel()+2).isEmpty()) {
-        tagTXPower.remove(conn.getSource().getChannel()+2);
+    int tagTXChannel = conn.getSource().getChannel()+2;
+    if (tagTXPower.get(tagTXChannel) != null) {
+      tagTXPower.get(tagTXChannel).remove(conn);
+      if (tagTXPower.get(tagTXChannel).isEmpty()) {
+        /**/System.out.println("isEmpty");
+        tagTXPower.remove(tagTXChannel);
       }
     } else { //remove it in the end
 /**/  System.out.println("No connection was inserted");

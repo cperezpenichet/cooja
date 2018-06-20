@@ -110,7 +110,7 @@ The COOJA Simulator
       <jvmarg value="-Xnoagent"/>
       <jvmarg value="-Xrunjdwp:transport=dt_socket,address=5556,server=y,suspend=y"/>	
       <!-- - - - - - - - - - - - - - - - - - - - - - - -->
-    	<sysproperty key="user.language" value="en"/>
+      <sysproperty key="user.language" value="en"/>
       <arg line="${args}"/>
       <env key="LD_LIBRARY_PATH" value="."/>
       <classpath>

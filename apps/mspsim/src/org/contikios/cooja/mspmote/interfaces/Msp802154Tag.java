@@ -214,10 +214,11 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/System.out.println("tag: " + mote.getID() + " interfereAnyReception");
     isInterfered = false;
 /**/System.out.println("1a.lock.owner()" + lock.owner());
-/**/System.out.println("1.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("1b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("1c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     lock.lock();
-/**/System.out.println("1b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("1.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("1d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("1e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     try {
       if (tagTXPower !=null) {
         Enumeration<Integer> channels = tagTXPower.keys();
@@ -235,6 +236,10 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     } finally {
       lock.unlock();
+/**/  System.out.println("isInterfered: " + isInterfered);      
+/**/  System.out.println("1f.lock.owner()" + lock.owner());
+/**/  System.out.println("1g.lock.isLocked(): " + lock.isLocked());
+
     }
         
   }
@@ -247,10 +252,12 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/System.out.println("1.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower); 
         //if(tagTXPower.get(conn.getSource().getChannel()+2).containsKey(conn)) {
 /**/System.out.println("2a.lock.owner()" + lock.owner());
-/**/System.out.println("2.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("2b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("2c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+
     lock.lock();
-/**/System.out.println("2b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("2.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("2d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("2e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     try {
       int tagTXChannel = conn.getSource().getChannel()+2;
       if (tagTXPower.get(tagTXChannel) != null) {
@@ -263,6 +270,8 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     } finally {
       lock.unlock();
+/**/  System.out.println("2f.lock.owner()" + lock.owner());
+/**/  System.out.println("2g.lock.isLocked(): " + lock.isLocked());
     }
 /**/System.out.println("2.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
   }
@@ -270,10 +279,12 @@ public class Msp802154Tag extends Msp802154Radio {
   public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower) {
 /**/System.out.println("putTagTXPower");
 /**/System.out.println("3a.lock.owner()" + lock.owner());
-/**/System.out.println("3.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("3b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("3c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+
     lock.lock();
-/**/System.out.println("3b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("3.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("3d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("3e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     try {
       if (channel >= 0 && tagTXPower.containsKey(channel)) {
         tagTXPower.get(channel).put(conn, tagCurrentTXPower);
@@ -284,6 +295,8 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     } finally {
       lock.unlock();
+/**/  System.out.println("3f.lock.owner()" + lock.owner());
+/**/  System.out.println("3g.lock.isLocked(): " + lock.isLocked());
     }
 /**/System.out.println("1.tagTXPower: " + tagTXPower);
   }
@@ -292,10 +305,12 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/System.out.println("getTagCurrentOutputPower");
 /**/System.out.println("3.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
 /**/System.out.println("4a.lock.owner()" + lock.owner());
-/**/System.out.println("4.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("4b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("4c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+
     lock.lock();
-/**/System.out.println("4b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("4.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("4d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("4e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     /* When there is no entry in the Hashtable 
      * return something really small */
     double power = Double.NEGATIVE_INFINITY;
@@ -312,6 +327,8 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     } finally {
       lock.unlock();
+/**/  System.out.println("4f.lock.owner()" + lock.owner());
+/**/  System.out.println("4g.lock.isLocked(): " + lock.isLocked());
     }
     
     return power;
@@ -321,12 +338,12 @@ public class Msp802154Tag extends Msp802154Radio {
   public double getTagCurrentOutputPowerMax(int channel) {
 /**/System.out.println("1.getTagCurrentOutputPowerMax");
 /**/System.out.println("4.tag: " + this.getMote().getID() + " tagTXPower: " + tagTXPower);
-/**/System.out.println("lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());      
 /**/System.out.println("5a.lock.owner()" + lock.owner());
-/**/System.out.println("5.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("5b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("5c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     lock.lock();
-/**/System.out.println("5b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("5.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("5d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("5e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
       
     double maxValue = 0.0;
     try {
@@ -344,8 +361,8 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     } finally {
       lock.unlock();
-/**/  System.out.println("5c.lock.owner()" + lock.owner());
-/**/  System.out.println("5d.lock.isLocked(): " + lock.isLocked());
+/**/  System.out.println("5f.lock.owner()" + lock.owner());
+/**/  System.out.println("5g.lock.isLocked(): " + lock.isLocked());
     }
 
     return maxValue;
@@ -355,10 +372,11 @@ public class Msp802154Tag extends Msp802154Radio {
   public RadioConnection getConnectionFromMaxOutputPower(int channel) {
 /**/System.out.println("getConnectionFromMaxOutputPower");
 /**/System.out.println("6a.lock.owner()" + lock.owner());
-/**/System.out.println("6.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("6b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("6c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     lock.lock();
-/**/System.out.println("6b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("6.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("6d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("6e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     
     RadioConnection activeConn = null;
     try {
@@ -366,8 +384,8 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/    System.out.println("3a.getTagCurrentOutputPowerMax");
         double maxPower = this.getTagCurrentOutputPowerMax(channel);
 /**/    System.out.println("3.maxPower: " + maxPower);
-/**/    System.out.println("6c.lock.owner()" + lock.owner());
-/**/    System.out.println("6d.lock.isLocked(): " + lock.isLocked());
+/**/    System.out.println("6f.lock.owner()" + lock.owner());
+/**/    System.out.println("6g.lock.isLocked(): " + lock.isLocked());
 
 /**/    System.out.println("3b.getTagCurrentOutputPowerMax");
         Enumeration<RadioConnection> carrierConns = tagTXPower.get(channel).keys();
@@ -382,8 +400,8 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     } finally {
       lock.unlock();
-/**/  System.out.println("6e.lock.owner()" + lock.owner());
-/**/  System.out.println("6f.lock.isLocked(): " + lock.isLocked());
+/**/  System.out.println("6h.lock.owner()" + lock.owner());
+/**/  System.out.println("6i.lock.isLocked(): " + lock.isLocked());
       
     }
     
@@ -393,11 +411,12 @@ public class Msp802154Tag extends Msp802154Radio {
   
   public boolean isTXChannelFromCarrierGenerator(int channel) {
 /**/System.out.println("2.isTXChannelFromCarrierGenerator");
-/**/System.out.println("1a.lock.owner()" + lock.owner());
-/**/System.out.println("1.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("7a.lock.owner()" + lock.owner());
+/**/System.out.println("7b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("7c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     lock.lock();
-/**/System.out.println("1b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("7d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("7e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     boolean isTXChannelFromCarrierGenerator = false;
     try {
       if (channel >= 0 && tagTXPower.containsKey(channel)) {
@@ -405,37 +424,46 @@ public class Msp802154Tag extends Msp802154Radio {
        Enumeration<RadioConnection> conns = tagTXPower.get(channel).keys();
         while (conns.hasMoreElements()) {
           RadioConnection activeConn = (RadioConnection)conns.nextElement();
-          if (activeConn.getSource().isGeneratingCarrier()) {
+          if (!activeConn.getSource().isGeneratingCarrier()) {
 /**/       System.out.println("Conn: " + activeConn + " has as a source activeTrans " + activeConn.getSource().getMote().getID());         
            isTXChannelFromCarrierGenerator = true;
+           break;
           }
         }
       }
     } finally {
       lock.unlock();
+/**/  System.out.println("7f.lock.owner()" + lock.owner());
+/**/  System.out.println("7g.lock.isLocked(): " + lock.isLocked());
     }
-    /**/System.out.println("4.isTXChannelFromCarrierGenerator");
+    /**/System.out.println("4.isTXChannelFromCarrierGenerator: " + isTXChannelFromCarrierGenerator);
     return isTXChannelFromCarrierGenerator;
   }
   
   
   public int getNumberOfConnectionsFromChannel(int channel) {
-/**/System.out.println("1a.lock.owner()" + lock.owner());
-/**/System.out.println("1.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("getNumberOfConnectionsFromChannel");
+/**/System.out.println("8a.lock.owner()" + lock.owner());
+/**/System.out.println("8b.lock.isLocked(): " + lock.isLocked());
+/**/System.out.println("8c.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+
     lock.lock();
-/**/System.out.println("1b.lock.owner()" + lock.owner() + " - " + lock.hashCode());
-/**/System.out.println("lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+/**/System.out.println("8d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
+/**/System.out.println("8e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
     int size = 0;
     try {
-      if (channel >=0 && !tagTXPower.containsKey(channel)) {
-/**/    System.out.println("HERE.NOcontainsKey");
-        size = 0;
-      } else {
+      if (channel >=0 && tagTXPower.containsKey(channel)) {
 /**/    System.out.println("From channel: " + channel + " - " + tagTXPower.get(channel).size() + " connections");
         size = tagTXPower.get(channel).size();
+      } else {
+/**/    System.out.println("HERE.NOcontainsKey");
+//        size = 0;
       }
     } finally {
-          lock.unlock();
+      lock.unlock();
+/**/  System.out.println("8f.lock.owner()" + lock.owner());
+/**/  System.out.println("8g.lock.isLocked(): " + lock.isLocked());
+      
     }
     
     return size;

@@ -374,8 +374,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 /**/        System.out.println("lenght of conns: " + conns.length);
 /**/        System.out.println("i: " + i);
             RadioConnection lastConnFromCarrier = conns[i-1];
-/**/        System.out.println("lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID());
-            if (!lastConnFromCarrier.getSource().isBackscatterTag()) {
+/**/        System.out.println("lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID());  
+            if (lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) { 
                 int carrierChannel = lastConnFromCarrier.getSource().getChannel();
                 tagTxChannel = carrierChannel+2;
 /**/            System.out.println("tagTxChannel: " + tagTxChannel);
@@ -549,9 +549,11 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
                * the selectedMote is listening to, with the same color as the color of the TX range of the 
                * selectedMote (tag). */
               if (connFromMaxPower != null) {
+/**/            System.out.println("2.connFromMaxPower: " + connFromMaxPower.getID());
                 paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
+                break;
               }
-              break;
+//              break;?
           }
         }
       } else if (selectedRadio.isGeneratingCarrier()) {
@@ -798,7 +800,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     }
 /**/System.out.println("2.carrierColor: " + carrierColor);    
     
-//    if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
+    if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
     
       Graphics2D g2d = (Graphics2D) g;
   /**/System.out.println("1.UDGMBS.Graphics2D");
@@ -808,11 +810,11 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       g2d.setColor(Color.WHITE);
       g2d.fill(intRangeArea); // fill the circle with color
     //if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
-      ///**/System.out.println("AT LEAST ONE CONNECTION");
-      if (!radio.isTXChannelFromCarrierGenerator(tagTxChanel) || 
+/**/System.out.println("AT LEAST ONE CONNECTION");
+      if (radio.isTXChannelFromCarrierGenerator(tagTxChanel) ||
                         radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
         
-  /**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
+/**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
             
         g2d.setColor(COLOR_INT);
         g2d.fill(intRangeArea); // fill the circle with color
@@ -831,8 +833,10 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         g.setColor(Color.GRAY);
         g2d.draw(trxRangeMaxArea); // draw the circle
       }
-    //}
-    /**/System.out.println("NO DRAWING");
+    } else {
+      /**/System.out.println("NO DRAWING");
+    }
+    
     
   } /* paintTxAndIxRanges */
   
@@ -1038,7 +1042,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
                    2 * Visualizer.MOTE_RADIUS + 2);
 
-      if (!tag.isTXChannelFromCarrierGenerator(paintedRadio.getChannel()+2) || 
+      if (tag.isTXChannelFromCarrierGenerator(paintedRadio.getChannel()+2) || 
                 tag.getNumberOfConnectionsFromChannel(paintedRadio.getChannel()+2) >= 2) {
         
 /**/    System.out.println("Either you have an active transmiter or two simultaneous connections having as sources active modules");

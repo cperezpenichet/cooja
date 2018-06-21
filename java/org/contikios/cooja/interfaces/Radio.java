@@ -332,12 +332,16 @@ public abstract class Radio extends MoteInterface {
   public RadioConnection getConnectionFromMaxOutputPower(int channel) { return null; }
   
   
-  public boolean isTXChannelFromCarrierGenerator(int channel) { 
+  public boolean isTXChannelFromActiveTransmitter(int channel) { 
     return false;
   }
   
   public int getNumberOfConnectionsFromChannel(int channel) {
     return 0;
+  }
+  
+  public boolean isTagTXPowersEmpty() {
+    return false;
   }
 
   

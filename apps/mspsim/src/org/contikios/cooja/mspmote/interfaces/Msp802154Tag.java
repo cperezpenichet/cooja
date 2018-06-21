@@ -409,7 +409,7 @@ public class Msp802154Tag extends Msp802154Radio {
   }
   
   
-  public boolean isTXChannelFromCarrierGenerator(int channel) {
+  public boolean isTXChannelFromActiveTransmitter(int channel) {
 /**/System.out.println("2.isTXChannelFromCarrierGenerator");
 /**/System.out.println("7a.lock.owner()" + lock.owner());
 /**/System.out.println("7b.lock.isLocked(): " + lock.isLocked());
@@ -469,6 +469,17 @@ public class Msp802154Tag extends Msp802154Radio {
     return size;
         
   }
+  
+  public boolean isTagTXPowersEmpty() {
+    /**/System.out.println("isTagTXPowersEmpty");
+    if (tagTXPower.isEmpty()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  
   
    
   @Override

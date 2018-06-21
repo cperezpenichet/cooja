@@ -802,40 +802,41 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
     if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
     
-      Graphics2D g2d = (Graphics2D) g;
-  /**/System.out.println("1.UDGMBS.Graphics2D");
-  
-  /**/System.out.println("tagTxChanel: " + tagTxChanel);
-  
-      g2d.setColor(Color.WHITE);
-      g2d.fill(intRangeArea); // fill the circle with color
-    //if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
-/**/System.out.println("AT LEAST ONE CONNECTION");
-      if (radio.isTXChannelFromCarrierGenerator(tagTxChanel) ||
-                        radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
-        
-/**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
-            
-        g2d.setColor(COLOR_INT);
+        Graphics2D g2d = (Graphics2D) g;
+    /**/System.out.println("1.UDGMBS.Graphics2D");
+    
+    /**/System.out.println("tagTxChanel: " + tagTxChanel);
+    
+        g2d.setColor(Color.WHITE);
         g2d.fill(intRangeArea); // fill the circle with color
-        g.setColor(Color.GRAY);
-        g2d.draw(intRangeMaxArea);
-      } else {
-  /**/  System.out.println("TX AND INT RANGE ARE PAINTED");
-  
-        g2d.setColor(COLOR_INT);
-        g2d.fill(intRangeArea); // fill the circle with color
-        g.setColor(Color.GRAY);
-        g2d.draw(intRangeMaxArea); 
+      if (!radio.isTagTXPowersEmpty()) {
+  /**/System.out.println("AT LEAST ONE CONNECTION");
+        if (radio.isTXChannelFromActiveTransmitter(tagTxChanel) ||
+                          radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
           
-        g.setColor(new Color(txColor, true));
-        g2d.fill(trxRangeArea);
-        g.setColor(Color.GRAY);
-        g2d.draw(trxRangeMaxArea); // draw the circle
-      }
+  /**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
+              
+          g2d.setColor(COLOR_INT);
+          g2d.fill(intRangeArea); // fill the circle with color
+          g.setColor(Color.GRAY);
+          g2d.draw(intRangeMaxArea);
+        } else {
+    /**/  System.out.println("TX AND INT RANGE ARE PAINTED");
+    
+          g2d.setColor(COLOR_INT);
+          g2d.fill(intRangeArea); // fill the circle with color
+          g.setColor(Color.GRAY);
+          g2d.draw(intRangeMaxArea); 
+            
+          g.setColor(new Color(txColor, true));
+          g2d.fill(trxRangeArea);
+          g.setColor(Color.GRAY);
+          g2d.draw(trxRangeMaxArea); // draw the circle
+        }
+      } 
     } else {
-      /**/System.out.println("NO DRAWING");
-    }
+        /**/System.out.println("NO DRAWING");
+      }
     
     
   } /* paintTxAndIxRanges */
@@ -1042,7 +1043,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
                    2 * Visualizer.MOTE_RADIUS + 2);
 
-      if (tag.isTXChannelFromCarrierGenerator(paintedRadio.getChannel()+2) || 
+      if (tag.isTXChannelFromActiveTransmitter(paintedRadio.getChannel()+2) || 
                 tag.getNumberOfConnectionsFromChannel(paintedRadio.getChannel()+2) >= 2) {
         
 /**/    System.out.println("Either you have an active transmiter or two simultaneous connections having as sources active modules");

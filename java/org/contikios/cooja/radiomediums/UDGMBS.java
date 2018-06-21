@@ -591,12 +591,14 @@ public class UDGMBS extends UDGM {
 /**///      System.out.println("TagRecvDistance: " + distance);
           
 /**/      System.out.println("RecvDistance: " + distance);
+        
+          if (sender.getNumberOfConnectionsFromChannel(recv.getChannel()) != 0) {
 
           
           /* 
            * When a tag starts a new connection and at least one of the ongoing connections has 
            * an active transmitter as a source put the recv into interfered  */
-          if (sender.isTXChannelFromCarrierGenerator(recv.getChannel()) || 
+          if (sender.isTXChannelFromActiveTransmitter(recv.getChannel()) || 
                             sender.getNumberOfConnectionsFromChannel(recv.getChannel()) >= 2) {
 /**/        System.out.println("tag " + sender.getMote().getID() + " reacts beacause of an active transmitter");
             if (distance <= tagInterferenceRange) {
@@ -665,6 +667,7 @@ public class UDGMBS extends UDGM {
               recv.interfereAnyReception();
             }
           }
+         }
         }  
       } 
     }

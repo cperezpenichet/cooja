@@ -368,23 +368,50 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         /* Search among the active connections only for the last one that was created by 
          * a carrier generator and paint the Tx and Int ranges of the selectedRadio (tag)
          * that is listening to its carrier. */
-
-          int tagTxChannel = 0;
+          
+//          int tagTxChannel = 0;
           for(int i=conns.length; i>0; i--) {
 /**/        System.out.println("lenght of conns: " + conns.length);
 /**/        System.out.println("i: " + i);
             RadioConnection lastConnFromCarrier = conns[i-1];
-/**/        System.out.println("lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID());  
-            if (lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) { 
-                int carrierChannel = lastConnFromCarrier.getSource().getChannel();
-                tagTxChannel = carrierChannel+2;
-/**/            System.out.println("tagTxChannel: " + tagTxChannel);
-                
+/**/        System.out.println("1.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID());
+            int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
+/**/        System.out.println("1.tagTxChannel: " + tagTxChannel);
+            if (lastConnFromCarrier.getSource().isGeneratingCarrier()) {
+              if (lastConnFromCarrier.isDestination(selectedRadio)) {
+/**/            System.out.println("1.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + "is an carrier generator");              
+
                 /* Paint the Tx and Int range of the tag */
                 paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
                 showProbability(selectedMotes, g, tagTxChannel);
                 break;
+              } 
+            } else {
+              if (lastConnFromCarrier.isInterfered(selectedRadio)) {
+/**/          System.out.println("1.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + " is an active transmittter");              
+                if (selectedRadio.isTransmitting()) {
+/**/              System.out.println("1.tag: " + selectedRadio.getMote().getID() + "is transmitting");                  
+                  
+                  /* Paint the Tx and Int range of the tag */
+                  paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
+                  showProbability(selectedMotes, g, tagTxChannel);
+                  break;
+                }
               }
+            }
+
+
+//              if (lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) {
+//              
+//                int carrierChannel = lastConnFromCarrier.getSource().getChannel();
+//                tagTxChannel = carrierChannel+2;
+///**/            System.out.println("tagTxChannel: " + tagTxChannel);
+//                
+//                /* Paint the Tx and Int range of the tag */
+//                paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
+//                showProbability(selectedMotes, g, tagTxChannel);
+//                break;
+//              }
           }
           //TODO: Consider to move this call within the if statement above
 //          showProbability(selectedMotes, g, tagTxChannel);
@@ -512,7 +539,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       RadioConnection[] conns = radioMedium.getActiveConnections();
       
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
-    
+      
       if (selectedRadio.isBackscatterTag()) {
 /**/    System.out.println("selectedTAGMoteID: " + selectedMote.getID());
         /* Search among the active connections only for the last one that was created by 
@@ -525,37 +552,85 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           /* Last connection among the active ones that was created by a carrier 
            * generator. */
           RadioConnection lastConnFromCarrier = conns[i-1];
-//          if(!lastConnFromCarrier.getSource().isBackscatterTag()) {
-              
-          if(lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) { 
-            
-            /**/System.out.println("lastConnFromCarrier.getSource(): " 
-                                     + lastConnFromCarrier.getSource().getMote().getID());
-            
-            /**/ System.out.println("carrierChannel: " 
-                                     + lastConnFromCarrier.getSource().getChannel());
-          
-          
-              int carrierChannel = lastConnFromCarrier.getSource().getChannel();
-              int tagTxChannel = carrierChannel+2;
-              
+/**/      System.out.println("2.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID());
+          int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
+/**/      System.out.println("2.tagTxChannel: " + tagTxChannel);
+          RadioConnection connFromMaxPower = null;
+          if (lastConnFromCarrier.getSource().isGeneratingCarrier()) {
+            if (lastConnFromCarrier.isDestination(selectedRadio)) {
+/**/          System.out.println("2.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + "is an carrier generator");
+
               /* Gives the connection responsible for the tag's maximum output power, in case the carrier 
                * generators of more than one connections have the same channel */
-              RadioConnection connFromMaxPower = selectedRadio.getConnectionFromMaxOutputPower(tagTxChannel);
-              
-/**/          System.out.println("carrierSource: " +  connFromMaxPower.getSource().getMote().getID() + " is responsible for the max output power");
+              connFromMaxPower = selectedRadio.getConnectionFromMaxOutputPower(tagTxChannel);
+/**/          System.out.println("2.carrierSource: " +  connFromMaxPower.getSource().getMote().getID() + " is responsible for the max output power");
+            } 
+          } else {
+            if (lastConnFromCarrier.isInterfered(selectedRadio)) {
+/**/          System.out.println("2.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + " is an active transmittter");              
+              if (selectedRadio.isTransmitting()) {
+/**/              System.out.println("1.tag: " + selectedRadio.getMote().getID() + "is transmitting");                  
 
-              /* Paint the inner part of the carrier generator (connFromMaxPower.getSource()), whose carrier 
-               * the selectedMote is listening to, with the same color as the color of the TX range of the 
-               * selectedMote (tag). */
-              if (connFromMaxPower != null) {
-/**/            System.out.println("2.connFromMaxPower: " + connFromMaxPower.getID());
-                paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
-                break;
+                /* Gives the connection responsible for the tag's maximum output power, in case the carrier 
+                 * generators of more than one connections have the same channel */
+                connFromMaxPower = selectedRadio.getConnectionFromMaxOutputPower(tagTxChannel);
+/**/            System.out.println("2.carrierSource: " +  connFromMaxPower.getSource().getMote().getID() + " is responsible for the max output power");
               }
-//              break;?
+            }
+          }
+          
+          /* Paint the inner part of the carrier generator (connFromMaxPower.getSource()), whose carrier 
+           * the selectedMote is listening to, with the same color as the color of the TX range of the 
+           * selectedMote (tag). */
+          if (connFromMaxPower != null) {
+  /**/      System.out.println("2.connFromMaxPower: " + connFromMaxPower.getID());
+            paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
+            break;
           }
         }
+        
+        
+        
+//        if (paintCorrespondingSource) {
+//          
+//        }
+//
+//          
+//          
+//          
+//          
+//          
+//          
+//          
+//          
+//          if(lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) { 
+//            
+//            /**/System.out.println("lastConnFromCarrier.getSource(): " 
+//                                     + lastConnFromCarrier.getSource().getMote().getID());
+//            
+//            /**/ System.out.println("carrierChannel: " 
+//                                     + lastConnFromCarrier.getSource().getChannel());
+//          
+//          
+//              int carrierChannel = lastConnFromCarrier.getSource().getChannel();
+//              int tagTxChannel = carrierChannel+2;
+//              
+//              
+//              RadioConnection connFromMaxPower = selectedRadio.getConnectionFromMaxOutputPower(tagTxChannel);
+//              
+///**/          System.out.println("carrierSource: " +  connFromMaxPower.getSource().getMote().getID() + " is responsible for the max output power");
+//
+//              /* Paint the inner part of the carrier generator (connFromMaxPower.getSource()), whose carrier 
+//               * the selectedMote is listening to, with the same color as the color of the TX range of the 
+//               * selectedMote (tag). */
+//              if (connFromMaxPower != null) {
+///**/            System.out.println("2.connFromMaxPower: " + connFromMaxPower.getID());
+//                paintCarrierColor(selectedMotes, selectedMote, connFromMaxPower.getSource(), g);
+//                break;
+//              }
+////              break;?
+//          }
+//        }
       } else if (selectedRadio.isGeneratingCarrier()) {
 /**/    System.out.println("selectedRadio: " + selectedRadio.getMote().getID() + "isGeneratingCarrier: " + selectedRadio.isGeneratingCarrier());
         for (RadioConnection conn: conns) {
@@ -809,7 +884,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
         g2d.setColor(Color.WHITE);
         g2d.fill(intRangeArea); // fill the circle with color
-      if (!radio.isTagTXPowersEmpty()) {
+//      if (!radio.isTagTXPowersEmpty()) {
   /**/System.out.println("AT LEAST ONE CONNECTION");
         if (radio.isTXChannelFromActiveTransmitter(tagTxChanel) ||
                           radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
@@ -833,10 +908,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           g.setColor(Color.GRAY);
           g2d.draw(trxRangeMaxArea); // draw the circle
         }
-      } 
     } else {
-        /**/System.out.println("NO DRAWING");
-      }
+/**/  System.out.println("NO DRAWING");
+    }
     
     
   } /* paintTxAndIxRanges */
@@ -1030,7 +1104,6 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     Point pixelCoordin = visualizer.transformPositionToPixel(activeRadioPos);
     int xi = pixelCoordin.x;
     int yi = pixelCoordin.y;
-
 
     if (selectedMotes.contains(selectedMote)) {
       

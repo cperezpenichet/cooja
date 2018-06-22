@@ -77,6 +77,8 @@ public class Msp802154Tag extends Msp802154Radio {
   
   //ReentrantLock lock = new ReentrantLock();
   private MyReentrantLock lock = new MyReentrantLock();
+  
+//  volatile boolean isTXChannelFromCarrierGenerator = false;
 
   public Msp802154Tag(Mote m) {
     super(m);
@@ -417,6 +419,7 @@ public class Msp802154Tag extends Msp802154Radio {
     lock.lock();
 /**/System.out.println("7d.lock.owner()" + lock.owner() + " - " + lock.hashCode());
 /**/System.out.println("7e.lock.isHeldByCurrentThread: " + lock.isHeldByCurrentThread());
+//    volatile boolean isTXChannelFromCarrierGenerator = false;
     boolean isTXChannelFromCarrierGenerator = false;
     try {
       if (channel >= 0 && tagTXPower.containsKey(channel)) {

@@ -884,7 +884,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
         g2d.setColor(Color.WHITE);
         g2d.fill(intRangeArea); // fill the circle with color
-//      if (!radio.isTagTXPowersEmpty()) {
+      if (!radio.isTagTXPowersEmpty()) {
   /**/System.out.println("AT LEAST ONE CONNECTION");
         if (radio.isTXChannelFromActiveTransmitter(tagTxChanel) ||
                           radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
@@ -911,7 +911,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     } else {
 /**/  System.out.println("NO DRAWING");
     }
-    
+  }
     
   } /* paintTxAndIxRanges */
   

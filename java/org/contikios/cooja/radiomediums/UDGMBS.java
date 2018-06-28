@@ -97,7 +97,7 @@ public class UDGMBS extends UDGM {
   
   /* Gain of the transmitting antenna */
   public  double GT = 0;
-  /* Gain of the transmitting antenna */
+  /* Gain of the receiving antenna */
   public  double GR = 0;
   /* Wavelength */
   public  double WAVELENGTH = 0.122;

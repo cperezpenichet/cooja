@@ -724,9 +724,10 @@ public class UDGMBS extends UDGM {
       if (ratio > 1.0) {
         return 0.0;
       }
-/**/System.out.println("UDGMBS.SUCCESS_RATIO_RX: " + SUCCESS_RATIO_RX);
+/**/  System.out.println("UDGMBS.SUCCESS_RATIO_RX: " + SUCCESS_RATIO_RX);
 
       rxSuccessProbability = 1.0 - ratio*(1.0-SUCCESS_RATIO_RX);
+/**/  System.out.println("UDGMBS.rxSuccessProbability: " + rxSuccessProbability);
     }
     return rxSuccessProbability;
         

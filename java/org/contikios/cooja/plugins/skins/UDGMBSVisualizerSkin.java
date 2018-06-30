@@ -370,34 +370,40 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
          * that is listening to its carrier. */
           
 //          int tagTxChannel = 0;
+          boolean paintRanges = false;
           for(int i=conns.length; i>0; i--) {
 /**/        System.out.println("lenght of conns: " + conns.length);
 /**/        System.out.println("i: " + i);
             RadioConnection lastConnFromCarrier = conns[i-1];
 /**/        System.out.println("1.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID());
-            int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
-/**/        System.out.println("1.tagTxChannel: " + tagTxChannel);
+//            int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
+///**/        System.out.println("1.tagTxChannel: " + tagTxChannel);
             if (lastConnFromCarrier.getSource().isGeneratingCarrier()) {
               if (lastConnFromCarrier.isDestination(selectedRadio)) {
 /**/            System.out.println("1.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + "is an carrier generator");              
-
-                /* Paint the Tx and Int range of the tag */
-                paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
-                showProbability(selectedMotes, g, tagTxChannel);
-                break;
+                paintRanges = true;
+/**/            System.out.println("1.paintRanges: " + paintRanges);
               } 
             } else {
               if (lastConnFromCarrier.isInterfered(selectedRadio)) {
 /**/          System.out.println("1.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + " is an active transmittter");              
                 if (selectedRadio.isTransmitting()) {
-/**/              System.out.println("1.tag: " + selectedRadio.getMote().getID() + "is transmitting");                  
-                  
-                  /* Paint the Tx and Int range of the tag */
-                  paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
-                  showProbability(selectedMotes, g, tagTxChannel);
-                  break;
+/**/              System.out.println("1.tag: " + selectedRadio.getMote().getID() + "is transmitting");
+                  paintRanges = true;
+/**/              System.out.println("1.paintRanges: " + paintRanges);
                 }
               }
+            }
+            
+            if (paintRanges) {
+/**/          System.out.println("1.paintRanges--");
+              int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
+/**/          System.out.println("1.tagTxChannel: " + tagTxChannel);
+              
+              /* Paint the Tx and Int range of the tag */
+              paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
+              showProbability(selectedMotes, g, tagTxChannel);
+              break;
             }
 
 
@@ -472,8 +478,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
             for (Radio r : conn.getAllDestinations()) {
               if (conn.getDestinationDelay(r) == 0) {
 /**/            System.out.println("tx range of tag " + r.getMote().getID() + " is drawn because of carrier " + conn.getSource().getMote().getID());
-                int carrierChannel = conn.getSource().getChannel();
-                int tagTxChannel = carrierChannel+2;
+//                int carrierChannel = conn.getSource().getChannel();
+                int tagTxChannel = conn.getSource().getChannel()+2;
 /**/            System.out.println("tagTxChannel: " + tagTxChannel);
       
                 /* Paint the TX and INT range of each tag */
@@ -493,12 +499,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
         for (RadioConnection conn: conns) {
           if (conn.getSource() == selectedRadio) {
-/**/        System.out.println("selectedCarrierGenID: " + selectedMote.getID());
+/**/        System.out.println("selectedActiveID: " + selectedMote.getID());
             for (Radio r : conn.getInterferedNonDestinations()) {
-              if (r.isBackscatterTag()) {
+              if (r.isBackscatterTag() && r.isTransmitting()) {
 /**/            System.out.println("tx range of tag " + r.getMote().getID() + " is drawn because of active " + conn.getSource().getMote().getID());
-                int carrierChannel = conn.getSource().getChannel();
-                int tagTxChannel = carrierChannel+2;
+//                int carrierChannel = conn.getSource().getChannel();
+                int tagTxChannel = conn.getSource().getChannel()+2;
 /**/            System.out.println("tagTxChannel: " + tagTxChannel);
 
                 /* Paint the TX and INT range of each tag */
@@ -569,7 +575,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
             if (lastConnFromCarrier.isInterfered(selectedRadio)) {
 /**/          System.out.println("2.lastConnFromCarrier.getSource: " + lastConnFromCarrier.getSource().getMote().getID() + " is an active transmittter");              
               if (selectedRadio.isTransmitting()) {
-/**/              System.out.println("1.tag: " + selectedRadio.getMote().getID() + "is transmitting");                  
+/**/              System.out.println("2.tag: " + selectedRadio.getMote().getID() + "is transmitting");                  
 
                 /* Gives the connection responsible for the tag's maximum output power, in case the carrier 
                  * generators of more than one connections have the same channel */
@@ -882,22 +888,24 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
     /**/System.out.println("tagTxChanel: " + tagTxChanel);
     
-        g2d.setColor(Color.WHITE);
-        g2d.fill(intRangeArea); // fill the circle with color
+//        g2d.setColor(Color.WHITE);
+//        g2d.fill(intRangeArea); // fill the circle with color
       if (!radio.isTagTXPowersEmpty()) {
   /**/System.out.println("AT LEAST ONE CONNECTION");
         if (radio.isTXChannelFromActiveTransmitter(tagTxChanel) ||
                           radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
           
   /**/  System.out.println("ONLY THE INT RANGE IS PAINTED");
-              
+          g2d.setColor(Color.WHITE);
+          g2d.fill(intRangeArea); // fill the circle with color    
           g2d.setColor(COLOR_INT);
           g2d.fill(intRangeArea); // fill the circle with color
           g.setColor(Color.GRAY);
           g2d.draw(intRangeMaxArea);
         } else {
     /**/  System.out.println("TX AND INT RANGE ARE PAINTED");
-    
+          g2d.setColor(Color.WHITE);
+          g2d.fill(intRangeArea); // fill the circle with color
           g2d.setColor(COLOR_INT);
           g2d.fill(intRangeArea); // fill the circle with color
           g.setColor(Color.GRAY);

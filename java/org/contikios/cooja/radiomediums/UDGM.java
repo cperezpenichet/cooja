@@ -315,6 +315,7 @@ public class UDGM extends AbstractRadioMedium {
   
   public double getTxSuccessProbability(Radio source) {
 /**/System.out.println("UDGM.getTxSuccessProbability");
+/**/System.out.println("UDGM.SUCCESS_RATIO_TX: " + SUCCESS_RATIO_TX);
     return SUCCESS_RATIO_TX;
   }
   
@@ -354,7 +355,9 @@ public class UDGM extends AbstractRadioMedium {
     
 /**/System.out.println("UDGM.SUCCESS_RATIO_RX: " + SUCCESS_RATIO_RX);
 
-    
+    double ret = 1.0 - ratio*(1.0-SUCCESS_RATIO_RX);
+/**/System.out.println("UDGM.ret: " + ret);
+
     return 1.0 - ratio*(1.0-SUCCESS_RATIO_RX);
   }
 

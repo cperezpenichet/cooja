@@ -57,37 +57,6 @@ import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.skins.UDGMBSVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 
-
-
-/**
- * The Unit Disk Graph Radio Medium abstracts radio transmission range as circles.
- * 
- * It uses two different range parameters: one for transmissions, and one for
- * interfering with other radios and transmissions.
- * 
- * Both radio ranges grow with the radio output power indicator.
- * The range parameters are multiplied with [output power]/[maximum output power].
- * For example, if the transmission range is 100m, the current power indicator 
- * is 50, and the maximum output power indicator is 100, then the resulting transmission 
- * range becomes 50m.
- * 
- * For radio transmissions within range, two different success ratios are used [0.0-1.0]:
- * one for successful transmissions, and one for successful receptions.
- * If the transmission fails, no radio will hear the transmission.
- * If one of receptions fail, only that receiving radio will not receive the transmission,
- * but will be interfered throughout the entire radio connection.  
- * 
- * The received radio packet signal strength grows inversely with the distance to the
- * transmitter.
- *
- * @see #SS_STRONG
- * @see #SS_WEAK
- * @see #SS_NOTHING
- *
- * @see DirectedGraphMedium
- * @see UDGMVisualizerSkin
- * @author Fredrik Osterlind
- */
 @ClassDescription("Unit Disk Graph Medium for Backscater Communication (UDGMBS): Distance Loss")
 public class UDGMBS extends UDGM {
   private static Logger logger = Logger.getLogger(UDGMBS.class);
@@ -101,13 +70,11 @@ public class UDGMBS extends UDGM {
   public  double GR = 0;
   /* Wavelength */
   public  double WAVELENGTH = 0.122;
-  /* Backscatter Coefficiency */
+  /* Backscatter Coefficient */
   /* Derived from the experimental part of the master thesis of George Daglaridis at UNO Group, at Uppsala University */
   public double BACKSCATTER_COEFFICIENT =  13.4;
   /* Energy loss */
-  public  double ENERGYLOSS = 1.4;
-  
-  
+  public  double ENERGYLOSS = 1.4;  
   /* Sensitivity threshold for Tmote sky in dBm */
   /* Derived from the experimental part of the master thesis of George Daglaridis at UNO Group, at Uppsala University */
   public final double STH = -86.4;
@@ -120,83 +87,53 @@ public class UDGMBS extends UDGM {
 
   
   public UDGMBS(Simulation simulation) {
-      super(simulation);
-  /**/System.out.println("UDGMBS");
+    super(simulation);
+/**/System.out.println("UDGMBS");
   
-//      final Observer positionObserver = new Observer() {
-//        public void update(Observable o, Object arg) {
-///**/      System.out.println("UDGMBS_Position_Change");          
-//          Mote mote = (Mote) arg;
-//          Radio radio = mote.getInterfaces().getRadio();
-//          
-//          /* Re-calculate the TX range of the tag when the position
-//             of the tag or the carrier generator changes. */ 
-//          if (radio.isBackscatterTag()) {
-//            for (RadioConnection conn: getActiveConnections()) {
-//              if (conn.isDestination(radio)) {
-///**/            System.out.println("2.Start keeping a record of the tagTXPower");
-///**/            System.out.println("2.backTag: " + radio.getMote().getID());
-//
-//                calculateTagCurrentTxPower(conn.getSource(), radio, conn);
-//
-///**/            System.out.println("2.Stop keeping a record of the tagTXPower");
-///**/            System.out.println();
-//              }
-//            }
-//          } else if (radio.isGeneratingCarrier()) {
-//            for (RadioConnection conn: getActiveConnections()) {
-//              if (conn.getSource() == radio) {
-//                for (Radio dest: conn.getAllDestinations()) {
-//                  if (dest.isBackscatterTag()) {
-//                    calculateTagCurrentTxPower(radio, dest, conn);
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-//      };
-  
-        final Observer positionObserver = new Observer() {
-          public void update(Observable o, Object arg) {
-      /**/      System.out.println("UDGMBS_Position_Change");          
-            Mote mote = (Mote) arg;
-            Radio radio = mote.getInterfaces().getRadio();
-            
-            /* Re-calculate the TX range of the tag when the position
-               of the tag or the carrier generator changes. */ 
-            if (radio.isBackscatterTag()) {
-              for (RadioConnection conn: getActiveConnections()) {
+    final Observer positionObserver = new Observer() {
+      public void update(Observable o, Object arg) {
+/**/    System.out.println("UDGMBS_Position_Change");          
+        Mote mote = (Mote) arg;
+        Radio radio = mote.getInterfaces().getRadio();
+          
+       /* Re-calculate the TX range of the tag when the position
+          of the tag or the active node (active transmitter or 
+          carrier generator) changes. */ 
+       if (radio.isBackscatterTag()) {
+         for (RadioConnection conn: getActiveConnections()) {
 //                if (conn.isDestination(radio)) {
-      /**/            System.out.println("2.Start keeping a record of the tagTXPower");
-      /**/            System.out.println("2.backTag: " + radio.getMote().getID() + " was moved");
-      
+    /**/            System.out.println("2.Start keeping a record of the tagTXPower");
+    /**/            System.out.println("2.backTag: " + radio.getMote().getID() + " was moved");
+    /**/                  System.out.println("2a.conn.getSource(): " + conn.getSource().getMote().getID());
+                /* Calculating the tag's output power does not involve 
+                 * the tag as a source of a connection which in fact would 
+                 * add an unwanted entry in the tag's hashtable. */
+                if (!conn.getSource().isBackscatterTag()) {
+/**/                  System.out.println("2b.conn.getSource(): " + conn.getSource().getMote().getID());
                   calculateTagCurrentTxPower(conn.getSource(), radio, conn);
-      
-      /**/            System.out.println("2.Stop keeping a record of the tagTXPower");
-      /**/            System.out.println();
+                }
+    
+    /**/            System.out.println("2.Stop keeping a record of the tagTXPower");
+    /**/            System.out.println();
 //                }
-              }
-            } else if (radio.isGeneratingCarrier()) {
-              for (RadioConnection conn: getActiveConnections()) {
-                if (conn.getSource() == radio) {
+            }
+          } else {
+            for (RadioConnection conn: getActiveConnections()) {
+              if (conn.getSource() == radio) {
+                if (conn.getSource().isGeneratingCarrier()) {
                   for (Radio destRadio: conn.getAllDestinations()) {
                     if (destRadio.isBackscatterTag()) {
-/**/                  System.out.println("3.Start keeping a record of the tagTXPower");
-/**/                  System.out.println("3.carrierRadio: " + radio.getMote().getID() + " was moved");
-/**/                  System.out.println("3.backTag: " + destRadio.getMote().getID());
-                      
+/**/                    System.out.println("3.Start keeping a record of the tagTXPower");
+/**/                    System.out.println("3.carrierRadio: " + radio.getMote().getID() + " was moved");
+/**/                    System.out.println("3.backTag: " + destRadio.getMote().getID());
+                    
                       calculateTagCurrentTxPower(radio, destRadio, conn);
-                      
-/**/                  System.out.println("3.Stop keeping a record of the tagTXPower");
-/**/                  System.out.println();
+                    
+/**/                    System.out.println("3.Stop keeping a record of the tagTXPower");
+/**/                    System.out.println();
                     }
                   }
-                }
-              }
-            } else {
-              for (RadioConnection conn: getActiveConnections()) {
-                if (conn.getSource() == radio) {
+                } else {
                   for (Radio intfRadio: conn.getInterfered()) {
                     if (intfRadio.isBackscatterTag()) {
 /**/                  System.out.println("4.Start keeping a record of the tagTXPower");
@@ -207,36 +144,36 @@ public class UDGMBS extends UDGM {
                       
 /**/                  System.out.println("4.Stop keeping a record of the tagTXPower");
 /**/                  System.out.println();
-
                     }
                   }
                 }
               }
             }
-          }
-        };
-  
-      /* Re-analyze potential receivers if radios are added/removed. */
-      simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
-        public void moteWasAdded(Mote mote) {
-    /**/    System.out.println("moteWasAdded from UDGM");        
-          mote.getInterfaces().getPosition().addObserver(positionObserver);
+          } 
         }
-        public void moteWasRemoved(Mote mote) {
-    /**/    System.out.println("moteWasRemoved from UDGM");        
-          mote.getInterfaces().getPosition().deleteObserver(positionObserver);
-        }
-      });
-      for (Mote mote: simulation.getMotes()) {
+      };
+
+    /* Re-analyze potential receivers if radios are added/removed. */
+    simulation.getEventCentral().addMoteCountListener(new MoteCountListener() {
+      public void moteWasAdded(Mote mote) {
+/**/    System.out.println("moteWasAdded from UDGMBS");        
         mote.getInterfaces().getPosition().addObserver(positionObserver);
       }
-      
-      /* Remove the UDGMVisualizerSkin since visualization 
-       * is being handled by UDGMBSVisualizerSkin */
-      super.removed();
+      public void moteWasRemoved(Mote mote) {
+/**/    System.out.println("moteWasRemoved from UDGMBS");        
+        mote.getInterfaces().getPosition().deleteObserver(positionObserver);
+      }
+    });
+    for (Mote mote: simulation.getMotes()) {
+      mote.getInterfaces().getPosition().addObserver(positionObserver);
+    }
+    
+    /* Remove the UDGMVisualizerSkin since visualization 
+     * is being handled by UDGMBSVisualizerSkin */
+    super.removed();
 
-      /* Register visualizer skin */
-      Visualizer.registerVisualizerSkin(UDGMBSVisualizerSkin.class);
+    /* Register visualizer skin */
+    Visualizer.registerVisualizerSkin(UDGMBSVisualizerSkin.class);
       
   }
   
@@ -281,20 +218,21 @@ public class UDGMBS extends UDGM {
   
   /**
    * Calculate the transmission power of the tag for the given connection, conn, 
-   * and the given source of that connection, carrierGen.
+   * and the given source of that connection, activeRadio (active transmitter or 
+   * a carrier generator).
    * 
    * @param carrierGen
    * @param tag
    * @param conn
    */
-  public void calculateTagCurrentTxPower(Radio carrierGen,  Radio tag, RadioConnection conn) {
+  public void calculateTagCurrentTxPower(Radio activeRadio,  Radio tag, RadioConnection conn) {
     /* Calculate the output power of the tag subtracting the REFLECTION LOSS of the 
     target (backscatter tag) from the incident power that reaches it. Keep a record 
     of that output power indexing it by the appropriate backscatter transmission  
-    channel derived by the carrier generator from which that incident power came. */
+    channel derived by the activeRadio from which that incident power came. */
     
     /* Incident power in dBm */
-    double incidentPower = friisEquation(carrierGen, tag);
+    double incidentPower = friisEquation(activeRadio, tag);
 /**/System.out.println("incidentPower: " + incidentPower);
     /* Reflection loss */
     double reflectionLoss = BACKSCATTER_COEFFICIENT + ENERGYLOSS;
@@ -303,14 +241,26 @@ public class UDGMBS extends UDGM {
     double tagCurrentTXPower = incidentPower - reflectionLoss;
 /**/System.out.println("tagCurrentTXPower: " + tagCurrentTXPower);
 /**/System.out.println(conn);
-    tag.putTagTXPower(carrierGen.getChannel() + 2, conn, tagCurrentTXPower);
+    tag.putTagTXPower(activeRadio.getChannel() + 2, conn, tagCurrentTXPower);
   } 
   
+  /**
+   * Calculate tag's transmission range: dynamically grows with tag's output power
+   * 
+   * @param tagCurrentOutputPowerIndicator
+   * @return tag's transmission range
+   */
   public double calculateTagTransmissionRange(double tagCurrentOutputPowerIndicator) {
     
     return Math.pow(10,((GT + GR + tagCurrentOutputPowerIndicator - STH + 20*(Math.log10(WAVELENGTH / (4*Math.PI)))) / 20));
   }
   
+  /**
+   * Calculate tag's interference range: dynamically grows with tag's output power
+   * 
+   * @param tagCurrentOutputPowerIndicator
+   * @return tag's interference range
+   */
   public double calculateTagInterferenceRange(double tagCurrentOutputPowerIndicator) {
     
     return Math.pow(10,((GT + GR + tagCurrentOutputPowerIndicator - (STH - 3) + 20*(Math.log10(WAVELENGTH / (4*Math.PI)))) / 20));
@@ -318,9 +268,9 @@ public class UDGMBS extends UDGM {
   
   /**
    * Returns a hashset with the appropriate TX channels of each 
-   * tag considering only the ongoing connections created by a
-   * carrier generator whose carrier the tag is currently listening
-   * to.
+   * tag considering only the ongoing connections created by an 
+   * active radio (transmitter or carrier generator) whose signal 
+   * the tag is currently listening to.
    * 
    * @param sender
    */
@@ -329,26 +279,20 @@ public class UDGMBS extends UDGM {
     HashSet<Integer> txChannels = new HashSet<Integer>();
       
     /* 
-     * Every tag that is listening to a carrier is interfered by the  
-     * connection whose source generated that carrier.
-     *  
-     * Hence, check every active connection generated by a carrier generator
+     * Check every active connection generated by an active radio.
      */
     if (sender.isBackscatterTag()) {         
       for (RadioConnection conn : getActiveConnections()) {
 /**/    System.out.println("A.conn: " + conn.getID() + " with sender: " + conn.getSource().getMote().getID());                              
-              
-        /* ... and also check to which connection the tag belongs. Then take the  
-           channel of the source (carrier generator) of that connection, move 
-           it two channels apart (+2) and store that channel to a set. */  
-        //if (conn.isDestination(sender)) {
+        /* ...Then take the channel of the source of that connection, move 
+           it two channels apart (+2) and store the new channel to a set. Moving 
+           the source's channel by 2 corresponds to a frequency offset of 10 MHz.  */  
 /**/      System.out.println("tag: " + sender.getMote().getID() + " belongs to conn: " + conn.getID());
           if (conn.getSource().getChannel() > 0) {
 /**/        System.out.println("carier.g: " +  conn.getSource().getMote().getID() + " of conn: " + conn.getID() +  " - Ch= " + conn.getSource().getChannel());                    
             txChannels.add(conn.getSource().getChannel() + 2);
 /**/        System.out.println("Ch= " +  (conn.getSource().getChannel() + 2) + " is stored in txChannels");                  
           }    
-        //} 
       }
     } else {
       /* Store the channel of the sender which is responsible for an active transmission */
@@ -362,53 +306,11 @@ public class UDGMBS extends UDGM {
     return txChannels;
   }
   
-  
-//  public HashSet<Integer> getTXChannels(Radio sender) {
-//    /* Store the channels for an active or backscatter transmission */
-//    HashSet<Integer> txChannels = new HashSet<Integer>();
-//      
-//    /* 
-//     * Every tag that is listening to a carrier is interfered by the  
-//     * connection whose source generated that carrier.
-//     *  
-//     * Hence, check every active connection generated by a carrier generator
-//     */
-//    if(sender.isBackscatterTag()) {         
-//      for (RadioConnection conn : getActiveConnections()) {
-///**/    System.out.println("A.conn: " + conn.getID() + " with sender: " + conn.getSource().getMote().getID());                              
-//              
-//        /* ... and also check to which connection the tag belongs. Then take the  
-//           channel of the source (carrier generator) of that connection, move 
-//           it two channels apart (+2) and store that channel to a set. */  
-//        if (conn.isDestination(sender)) {
-///**/      System.out.println("tag: " + sender.getMote().getID() + " belongs to conn: " + conn.getID());                
-//          if (conn.getSource().isGeneratingCarrier()) { // TODO It might be interesting to reflect active transmissions as interference too
-//            if (conn.getSource().getChannel() >=0) {
-///**/          System.out.println("carier.g: " +  conn.getSource().getMote().getID() + " of conn: " + conn.getID() +  " - Ch= " + conn.getSource().getChannel());                    
-//              txChannels.add(conn.getSource().getChannel() + 2);
-///**/          System.out.println("Ch= " +  (conn.getSource().getChannel() + 2) + " is stored in txChannels");                  
-//            }    
-//          }
-//        } 
-//      }
-//    } else {
-//      /* Store the channel of the sender which is responsible for an active transmission */
-///**/  System.out.println(sender.isGeneratingCarrier() ? "sender: " + sender.getMote().getID() + " is a carrier gen" 
-//                         : "sender: " + sender.getMote().getID() + " is a cc2420 radio");
-//      if (sender.getChannel() >= 0) {
-//        txChannels.add(sender.getChannel());
-///**/    System.out.println("Ch= " +  sender.getChannel() + " is stored in txChannels");               
-//      }
-//    }
-//    return txChannels;
-//  }
-
-  
   /*
    * Currently the tag does not have any receiving capabilities.
    * Hence, the tag is not affected by interferences, which is 
-   * a case we took care during the implementation of the following 
-   * method. 
+   * a case that was taken into account during the implementation
+   * of the following method. 
    */
   public RadioConnection createConnections(Radio sender) {
     RadioConnection newConnection;
@@ -418,9 +320,9 @@ public class UDGMBS extends UDGM {
     
     if (!sender.isBackscatterTag()) {
       /* 
-       * For an active transmission started by an active sender which may 
-       * generate a carrier or not use the already implemented super() method  
-       * for creating the new connection.
+       * For a transmission started by an active radio acting either as  
+       * an active transmitter or a carrier generator, the already implemented
+       * parent method for creating the new connection is used.
        */  
       newConnection = super.createConnections(sender);
 
@@ -478,7 +380,7 @@ public class UDGMBS extends UDGM {
           }
         }
       } else {
-        /* In case the sender transmits a packet and the tag is within its TX
+        /* In case the sender is an active transmitter and the tag is within its TX
          * range the tag is removed from the destinations and added to the interfered. */
 /**/    System.out.println("sender:" + sender.getMote().getID() + " is an active sender");      
         for (Radio r: newConnection.getAllDestinations()) {
@@ -507,10 +409,7 @@ public class UDGMBS extends UDGM {
       }
 /**/  System.out.println("UDGMBS.getInterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
     } else {
-      /* 
-       * For an active connection created by a tag which is listening
-       * the carrier create a new connection using the following procedure.
-       */   
+      /* The tag starts a new connection. */   
       newConnection = new RadioConnection(sender);
       
       /* Fail radio transmission randomly - no radios will hear this transmission */
@@ -576,11 +475,12 @@ public class UDGMBS extends UDGM {
           double tagCurrentOutputPowerIndicator = sender.getTagCurrentOutputPowerMax(recv.getChannel());
 /**/      System.out.println("tagCurrentOutputPowerIndicator: " + tagCurrentOutputPowerIndicator);
           
-          /* Calculate ranges: grows with radio output power */
+          /* Tag's transmission range */
           double tagTransmissionRange = calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
           
 /**/      System.out.println("tagTransmissionRange: " + tagTransmissionRange);
-
+          
+          /* Tag's interference range */
           double tagInterferenceRange = calculateTagInterferenceRange(tagCurrentOutputPowerIndicator);
           
 /**/      System.out.println("tagInterferenceRange: " + tagInterferenceRange);
@@ -597,7 +497,8 @@ public class UDGMBS extends UDGM {
           
           /* 
            * When a tag starts a new connection and at least one of the ongoing connections has 
-           * an active transmitter as a source put the recv into interfered  */
+           * an active transmitter as a source treat the receiver as an interfered radio.
+           */
           if (sender.isTXChannelFromActiveTransmitter(recv.getChannel()) || 
                             sender.getNumberOfConnectionsFromChannel(recv.getChannel()) >= 2) {
 /**/        System.out.println("tag " + sender.getMote().getID() + " reacts beacause of an active transmitter");
@@ -675,6 +576,22 @@ public class UDGMBS extends UDGM {
     return newConnection;
     
   } /* createConnections */
+  
+  @Override
+  public double getTxSuccessProbability(Radio source) {
+    /**/System.out.println("UDGMBS.getTxSuccessProbability");
+//    /**/System.out.println("UDGMBS.SUCCESS_RATIO_TX: " + SUCCESS_RATIO_TX);
+    double txSuccessProbability = 0.0;
+    if(!source.isBackscatterTag()) {
+      txSuccessProbability = super.getTxSuccessProbability(source);
+    } else {
+      txSuccessProbability = SUCCESS_RATIO_TX;
+    }
+/**/System.out.println("UDGMBS.SUCCESS_RATIO_TX: " + txSuccessProbability);
+
+    return txSuccessProbability;
+    
+  }
  
   @Override
   public double getRxSuccessProbability(Radio source, Radio dest) {
@@ -690,20 +607,17 @@ public class UDGMBS extends UDGM {
       double distanceSquared = Math.pow(distance,2.0);
 /**/  System.out.println("UDGMBs.distanceSquared: " + distanceSquared);
       
-//      double tagCurrentOutputPowerIndicator = 0.0;
-//      
-///**/  System.out.println("dest: " + dest.getMote().getID() + "isGeneratingCarrier: " + dest.isGeneratingCarrier());
-//
-//      if(dest.isGeneratingCarrier()) {
+      double tagCurrentOutputPowerIndicator = 0.0;
+//      if (dest.isGeneratingCarrier()) {
+        /* Usually the appropriate transmitting channel for a tag is already saved when the rx success probability is 
+         * calculated for an active transmitter acting as the destination radio. This if statement might look a little bit anorthodox,
+         * but it is needed in cases where the destination radio is a carrier generator, which in reality can't be, since this method
+         * is also used for the appearance of the probability percentage of these dest radio which are within the source's TX range. */
 //        tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPowerMax(dest.getChannel()+2);
 //      } else {
-//        tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPowerMax(dest.getChannel());
+        /* Regular active radio acting as a destination radio */
+        tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPowerMax(dest.getChannel());
 //      }
-      
-      double tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPowerMax(dest.getChannel());
-
-      
-      
       
 /**/  System.out.println();
 /**/  System.out.println("UDGMBS.Power Indicator");
@@ -843,8 +757,8 @@ public class UDGMBS extends UDGM {
             dstRadio.signalReceptionStart();
           }
         }
-        /* If a dstRadio is already receiving a packet transmitted from a tag and a second because of tag which listens to the carrier radiated by two carrier generators transmitting 
-         * on the same channel at the same time */
+        /* If a dstRadio is already receiving a packet transmitted from a tag and a second because of tag which listens to 
+         * the carrier radiated by two carrier generators transmitting on the same channel at the same time */
         if (conn.getSource().isListeningCarrier() && conn.getSource().getNumberOfConnectionsFromChannel(dstRadio.getChannel()) >= 2) {
 /**/      System.out.println("tag: " + conn.getSource().getMote().getID() + " listens " + conn.getSource().getNumberOfConnectionsFromChannel(dstRadio.getChannel()) 
                               + " simultaneous carriers on the same channel");
@@ -856,7 +770,6 @@ public class UDGMBS extends UDGM {
         /* In case two active transmitters or two carrier generators or one active and one carrier
          * exist, the tag that is simultaneously accepting their signal gets interfered */
         
-        /* TODO: think about merging these two if statements */
         if (conn.getSource().isGeneratingCarrier() && dstRadio.isListeningCarrier()) {
           if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
 /**/        System.out.println("tag: " + dstRadio.getMote().getID() + " gets interfered because it listens " 
@@ -935,6 +848,7 @@ public class UDGMBS extends UDGM {
           }
           
           if (distFactor < 1) { 
+/**/        System.out.println("4a.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + intfRadio.getCurrentSignalStrength());
             if (intfRadio.getCurrentSignalStrength() < signalStrength) {
               intfRadio.setCurrentSignalStrength(signalStrength);
   /**/        System.out.println("5.intfRadio: " + intfRadio.getMote().getID() + " - signalStrength: " + intfRadio.getCurrentSignalStrength());          

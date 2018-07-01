@@ -300,7 +300,7 @@ public class Msp802154Tag extends Msp802154Radio {
 /**/  System.out.println("3f.lock.owner()" + lock.owner());
 /**/  System.out.println("3g.lock.isLocked(): " + lock.isLocked());
     }
-/**/System.out.println("1.tagTXPower: " + tagTXPower);
+/**/System.out.println("1. tag: " + this.getMote().getID() + " - tagTXPower: " + tagTXPower);
   }
   
   public double getTagCurrentOutputPower(Radio radio, int channel) {

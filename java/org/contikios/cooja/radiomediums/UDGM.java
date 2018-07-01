@@ -310,7 +310,9 @@ public class UDGM extends AbstractRadioMedium {
   
   public double getSuccessProbability(Radio source, Radio dest) {
 /**/System.out.println("UDGM.getSuccessProbability");
-  	return getTxSuccessProbability(source) * getRxSuccessProbability(source, dest);
+    double probability = getTxSuccessProbability(source) * getRxSuccessProbability(source, dest);
+/**/System.out.println("probability: " + probability);  	
+    return probability; 
   }
   
   public double getTxSuccessProbability(Radio source) {

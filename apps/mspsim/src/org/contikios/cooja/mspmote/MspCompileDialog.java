@@ -72,11 +72,9 @@ public class MspCompileDialog extends AbstractCompileDialog {
   }
 
   public Class<? extends MoteInterface>[] getAllMoteInterfaces() {
-/**/System.out.println("MspCompile.getAllMoteInterfaceClasses");      
 	  return ((MspMoteType)moteType).getAllMoteInterfaceClasses();
   }
   public Class<? extends MoteInterface>[] getDefaultMoteInterfaces() {
-/**/System.out.println("MspCompile.getDefaultMoteInterfaceClasses");      
 	  return ((MspMoteType)moteType).getDefaultMoteInterfaceClasses();
   }
 

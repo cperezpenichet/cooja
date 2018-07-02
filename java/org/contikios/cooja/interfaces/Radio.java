@@ -248,7 +248,7 @@ public abstract class Radio extends MoteInterface {
    */
   public abstract Mote getMote();
   
-  /* Concerning the backscattering communication */
+  /* Concerning the backscatter communication */
   
   /**
    * Signal that the carrier listening just begun. This method should normally be 
@@ -273,7 +273,6 @@ public abstract class Radio extends MoteInterface {
    * @return True if radio is generating a carrier.
    */
   public boolean isGeneratingCarrier() {
-/**/  System.out.println("No this isGeneratingCarrier");
     return false;
   }
   
@@ -331,24 +330,30 @@ public abstract class Radio extends MoteInterface {
    */
   public RadioConnection getConnectionFromMaxOutputPower(int channel) { return null; }
   
+  /**
+   * Returns true if there is at least one active transmitter who serves as a source in one 
+   * of the ongoing connections that correspond to the entry in the tag's hashtable indexed by
+   * the given channel. 
+   * 
+   * @param channel
+   */
+  public boolean isTXChannelFromActiveTransmitter(int channel) { return false; }
   
-  public boolean isTXChannelFromActiveTransmitter(int channel) { 
-    return false;
-  }
+  /**
+   * Returns the number of connections that correspond to the entry in the tag's hashtable indexed
+   * by the given channel. 
+   * 
+   * @param channel
+   */
+  public int getNumberOfConnectionsFromChannel(int channel) { return 0; }
   
-  public int getNumberOfConnectionsFromChannel(int channel) {
-    return 0;
-  }
-  
-  public boolean isTagTXPowersEmpty() {
-    return false;
-  }
+  /**
+   * Returns true if the tag's hashtable is empty.
+   * @return
+   */
+  public boolean isTagTXPowersEmpty() { return false; }
 
   
-  
-  
-  
-
   public JPanel getInterfaceVisualizer() {
     JPanel panel = new JPanel(new BorderLayout());
     Box box = Box.createVerticalBox();

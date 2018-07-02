@@ -232,9 +232,6 @@ public abstract class MspMoteType implements MoteType {
   public boolean setConfigXML(Simulation simulation,
       Collection<Element> configXML, boolean visAvailable)
       throws MoteTypeCreationException {
-    
-    /**/  System.out.println("setConfigXML");
-
 
     ArrayList<Class<? extends MoteInterface>> intfClassList = new ArrayList<Class<? extends MoteInterface>>();
     for (Element element : configXML) {
@@ -309,7 +306,6 @@ public abstract class MspMoteType implements MoteType {
 
     if (intfClasses.length == 0) {
       /* Backwards compatibility: No interfaces specified */
-/**/  System.out.println("No interfaces specified");
       logger.warn("Old simulation config detected: no mote interfaces specified, assuming all.");
       intfClasses = getAllMoteInterfaceClasses();
     }

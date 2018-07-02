@@ -113,7 +113,6 @@ public class DGRMConfigurator extends VisPlugin {
     /* Listen for graph updates */
     radioMedium.addRadioTransmissionObserver(radioMediumObserver = new Observer() {
       public void update(Observable obs, Object obj) {
-/**/    System.out.println("DGRMConfigurator.RadioTransmissionObserver");
         model.fireTableDataChanged();
       }
     });

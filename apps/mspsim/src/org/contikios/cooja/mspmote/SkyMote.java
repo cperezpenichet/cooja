@@ -49,12 +49,10 @@ public class SkyMote extends MspMote {
 
   public SkyMote(MspMoteType moteType, Simulation sim) {
     super(moteType, sim);
-/**/System.out.println("SkyMote");
   }
 
   protected boolean initEmulator(File fileELF) {
     try {
-/**/  System.out.println("SkyMote.initEmulator");
       skyNode = new SkyNode();
       registry = skyNode.getRegistry();
       skyNode.setFlash(new CoojaM25P80(skyNode.getCPU()));

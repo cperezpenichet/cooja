@@ -357,7 +357,6 @@ public class Cooja extends Observable {
    * @param desktop Desktop pane
    */
   public Cooja(JDesktopPane desktop) {
-/**/System.out.println("Cooja");
     cooja = this;
     mySimulation = null;
     myDesktopPane = desktop;
@@ -2645,7 +2644,6 @@ public class Cooja extends Observable {
    * Add new mote to current simulation
    */
   public void doAddMotes(MoteType moteType) {
-/**/System.out.println("doAddMotes");
     if (mySimulation != null) {
       mySimulation.stopSimulation();
 
@@ -2936,7 +2934,6 @@ public class Cooja extends Observable {
 
   private class GUIEventHandler implements ActionListener {
     public void actionPerformed(ActionEvent e) {
-/**/  System.out.println("GUIEventHandler");
       if (e.getActionCommand().equals("create mote type")) {
         cooja.doCreateMoteType((Class<? extends MoteType>) ((JMenuItem) e
             .getSource()).getClientProperty("class"));
@@ -2993,25 +2990,19 @@ public class Cooja extends Observable {
 
     if (callingObject != null) {
       try {
-/**/    //System.out.println("callingObject: " + callingObject.getClass().getClassLoader().getClass());        
         return callingObject.getClass().getClassLoader().loadClass(className).asSubclass(classType);
       } catch (ClassNotFoundException e) {
       } catch (UnsupportedClassVersionError e) {
       }
     }
-/**///System.out.println("2.callingObject");
     try {
-/**///System.out.println("3.callingObject");      
       return Class.forName(className).asSubclass(classType);
     } catch (ClassNotFoundException e) {
     } catch (UnsupportedClassVersionError e) {
     }
-/**/  //  System.out.println("4.callingObject");
     if (!isVisualizedInApplet()) {
       try {      
-/**/    //System.out.println("5.callingObject");
         if (projectDirClassLoader != null) {
-/**/      //System.out.println("6.callingObject");          
           return projectDirClassLoader.loadClass(className).asSubclass(
               classType);
         }
@@ -3377,8 +3368,6 @@ public class Cooja extends Observable {
 
   throws SimulationCreationException {
     Simulation newSim = null;
-    
-    /**/System.out.println("loadSimulation");
 
     try {
       // Check that config file version is correct

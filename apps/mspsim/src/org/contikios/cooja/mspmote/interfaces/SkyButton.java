@@ -44,7 +44,6 @@ public class SkyButton extends Button {
 
   public SkyButton(Mote mote) {
     super(mote);
-/**/System.out.println("SkyButton");
     skyMote = (SkyMote) mote;
   }
 
@@ -60,15 +59,6 @@ public class SkyButton extends Button {
 
   @Override
   public boolean isPressed() {
-    if(skyMote.skyNode == null) {
-        System.out.println("1.skyMote.skyNode: " + skyMote.skyNode);
-        System.out.println("1.skyMote.getClass: " + skyMote.getClass());
-        System.out.println("1.skyNode.getClass: " + skyMote.skyNode.getClass());
-    } else {
-        System.out.println("2.skyMote.getClass: " + skyMote.getClass());
-        System.out.println("2.skyNode.getClass: " + skyMote.skyNode.getClass());
-        System.out.println("2.skyMote.skyNode: " + skyMote.skyNode);
-    }
     return skyMote.skyNode.getButton().isPressed();
   }
 

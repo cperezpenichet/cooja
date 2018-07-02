@@ -58,30 +58,21 @@ public class IDVisualizerSkin implements VisualizerSkin {
   private Visualizer visualizer = null;
 
   public void setActive(Simulation simulation, Visualizer vis) {
-/**/System.out.println("IDVisualizerSkin.setActive");
-    
     this.simulation = simulation;
     this.visualizer = vis;
   }
 
   public void setInactive() {
-/**/System.out.println("IDVisualizerSkin.setInactive");
-    
   }
 
   public Color[] getColorOf(Mote mote) {
-/**/System.out.println("IDVisualizerSkin.getColorOf");
-
     return null;
   }
 
   public void paintBeforeMotes(Graphics g) {
-/**/System.out.println("IDVisualizerSkin.paintBeforeMotes");
-
   }
 
   public void paintAfterMotes(Graphics g) {
-/**/System.out.println("IDVisualizerSkin.paintAfterMotes");
 
     FontMetrics fm = g.getFontMetrics();
     g.setColor(Color.BLACK);

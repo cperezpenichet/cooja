@@ -80,7 +80,6 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
     public void update(Observable obs, Object obj) {
       RadioConnection last = radioMedium.getLastConnection();
       if (last != null && historyList.size() < MAX_HISTORY_SIZE) {
-/**/    System.out.println("TrafficVisualizerSkin.RadioTransmissionObserver");
         synchronized(historyList) {
           historyList.add(new RadioConnectionArrow(last));
           visualizer.repaint(500);
@@ -120,8 +119,6 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setActive(final Simulation simulation, Visualizer vis) {
-/**/System.out.println("TrafficVisualizerSkin.setActive");
-    
     this.radioMedium = (AbstractRadioMedium) simulation.getRadioMedium();
     this.simulation = simulation;
     this.visualizer = vis;
@@ -143,8 +140,6 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setInactive() {
-/**/System.out.println("TrafficVisualizerSkin.setInactive");
-    
     this.active = false;
     if (simulation == null) {
       /* Skin was never activated */
@@ -157,7 +152,6 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
 
   @Override
   public Color[] getColorOf(Mote mote) {
-/**/System.out.println("TrafficVisualizerSkin.getColorOf");
     return null;
   }
 
@@ -193,7 +187,6 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void paintBeforeMotes(Graphics g) {
-/**/ System.out.println("TrafficVisualizerSkin.paintBeforeMotes");    
     synchronized (historyList) {
       for (RadioConnectionArrow connArrow : historyList) {
         float colorHistoryIndex = 1.0f - connArrow.getAge();
@@ -218,8 +211,6 @@ public class TrafficVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void paintAfterMotes(Graphics g) {
-    /**/ System.out.println("TrafficVisualizerSkin.paintAfterMotes");    
-    
   }
 
   @Override

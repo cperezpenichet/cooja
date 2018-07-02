@@ -249,13 +249,10 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     this.gui = gui;
     this.simulation = simulation;
     
-/**/System.out.println("VISUALIZER");
-
     /* Register external visualizers */
     String[] skins = gui.getProjectConfig().getStringArrayValue(Visualizer.class, "SKINS");
 
     for (String skinClass : skins) {
-/**/ System.out.println("skinClass: " + skinClass);      
       Class<? extends VisualizerSkin> skin = gui.tryLoadClass(this, VisualizerSkin.class, skinClass);
       if (registerVisualizerSkin(skin)) {
         logger.info("Registered external visualizer: " + skinClass);
@@ -345,12 +342,10 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
 
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (VisualizerSkin skin : currentSkins) {
-/**/      System.out.println("1.VisualizerSkin: " + skin.getClass().getName());          
           skin.paintBeforeMotes(g);
         }
         paintMotes(g);
         for (VisualizerSkin skin : currentSkins) {
-/**/      System.out.println("2.VisualizerSkin: " + skin.getClass().getName());          
           skin.paintAfterMotes(g);
         }
         selection.drawSelection(g);
@@ -437,7 +432,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
           return;
         }
 
-/**/    System.out.println("addMoteHighlightObserver".toUpperCase());
         final Timer timer = new Timer(100, null);
         final Mote mote = (Mote) obj;
         timer.addActionListener(new ActionListener() {
@@ -695,7 +689,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void generateAndActivateSkin(Class<? extends VisualizerSkin> skinClass) {
-/**/System.out.println("currentSkins.size: " + currentSkins.size());
     for (VisualizerSkin skin : currentSkins) {
       if (skinClass == skin.getClass()) {
         logger.warn("Selected visualizer already active: " + skinClass);
@@ -704,7 +697,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     }
 
     if (!isSkinCompatible(skinClass)) {
-/**/   System.out.println("isSkinCompatible: ");
       /*logger.warn("Skin is not compatible with current simulation: " + skinClass);*/
       return;
     }
@@ -724,7 +716,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
 
   @Override
   public void startPlugin() {
-/**/System.out.println("startPlugin");    
     super.startPlugin();
     if (loadedConfig) {
       return;
@@ -736,8 +727,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       if (skin.isEmpty()) {
         continue;
       }
-      
-/**/  System.out.println("Visualizer.skin: " + skin);
 
       Class<? extends VisualizerSkin> skinClass
               = simulation.getCooja().tryLoadClass(this, VisualizerSkin.class, skin);
@@ -791,14 +780,11 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       return false;
     }
     visualizerSkins.add(skin);
-/**/System.out.println("skin: " + skin);    
-/**/System.out.println("1.visualizerSkins.SIZE(): " + visualizerSkins.size());    
     return true;
   }
 
   public static void unregisterVisualizerSkin(Class<? extends VisualizerSkin> skin) {
     visualizerSkins.remove(skin);
-/**/System.out.println("2.visualizerSkins.SIZE(): " + visualizerSkins.size());    
     
   }
 
@@ -966,32 +952,26 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       return false;
     }
     
-/**/System.out.println("simulation.getRadioMedium().getClass(): " + simulation.getRadioMedium().getClass());
-    
     /* Check if skin depends on any particular radio medium */
     boolean showMenuItem = true;
     if (skinClass.getAnnotation(SupportedArguments.class) != null) {
       showMenuItem = false;
       Class<? extends RadioMedium>[] radioMediums = skinClass.getAnnotation(SupportedArguments.class).radioMediums();
       for (Class<? extends Object> o : radioMediums) {
-/**/    System.out.println("o.getClass(): " + o);        
         if (o.isAssignableFrom(simulation.getRadioMedium().getClass())) {
           /* Custom solution */
           if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMBS.class) {
             break;
           }
           showMenuItem = true;
-/**/      System.out.println("1.showMenuItem: " + showMenuItem);          
           break;
         }
       }
     }
-/**/System.out.println("2.showMenuItem: " + showMenuItem);    
     return showMenuItem;
   }
 
   private void handleMousePress(MouseEvent mouseEvent) {
-/**/System.out.println("handleMousePress");
     int x = mouseEvent.getX();
     int y = mouseEvent.getY();
 
@@ -1042,12 +1022,10 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   Map<Mote, double[]> moveStartPositions = new HashMap<>();
 
   private void handleMouseDrag(MouseEvent e, boolean stop) {
-/**///System.out.println("handleMouseDrag");    
     Position currPos = transformPixelToPosition(e.getPoint());
 
     switch (mouseActionState) {
       case DEFAULT_PRESS:
-/**/    System.out.println("MouseDrag.DEFAULT_PRESS");        
         if (cursorMote == null) {
           mouseActionState = MotesActionState.PANNING;
         }
@@ -1065,7 +1043,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
         }
         break;
       case MOVING:
-/**/    System.out.println("MouseDrag.MOVING");        
         canvas.setCursor(MOVE_CURSOR);
         for (Mote moveMote : selectedMotes) {
           moveMote.getInterfaces().getPosition().setCoordinates(
@@ -1079,11 +1056,9 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
         }
         break;
       case PAN_PRESS:
-/**/    System.out.println("MouseDrag.PAN_PRESS");        
         mouseActionState = MotesActionState.PANNING;
         break;
       case PANNING:
-/**/    System.out.println("MouseDrag.PANNING");        
         /* The current mouse position should correspond to where panning started */
         viewportTransform.translate(
                 currPos.getXCoordinate() - pressedPos.getXCoordinate(),
@@ -1092,12 +1067,10 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
         repaint();
         break;
       case SELECT_PRESS:
-/**/    System.out.println("MouseDrag.SELECT_PRESS");        
         mouseActionState = MotesActionState.SELECTING;
         selection.setEnabled(true);
         break;
       case SELECTING:
-/**/    System.out.println("MouseDrag.SELECTING");        
         int pressedX = transformToPixelX(pressedPos.getXCoordinate());
         int pressedY = transformToPixelY(pressedPos.getYCoordinate());
         int currX = transformToPixelX(currPos.getXCoordinate());
@@ -1117,7 +1090,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void handleMouseRelease(MouseEvent mouseEvent) {
-/**/System.out.println("handleMouseRelease");
 
     switch (mouseActionState) {
       case PAN_PRESS:
@@ -1166,7 +1138,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   private void beginMoveRequest(Mote selectedMote, boolean withTiming, boolean confirm) {
-/**/System.out.println("beginMoveRequest");    
     if (withTiming) {
       moveStartTime = System.currentTimeMillis();
     }
@@ -1282,7 +1253,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
   }
 
   public void paintMotes(Graphics g) {
-/**/System.out.println("VISUALIZER.paintMotes");    
     Mote[] allMotes = simulation.getMotes();
 
     /* Paint mote relations */
@@ -1347,7 +1317,6 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       }
 
       if (getSelectedMotes().contains(mote)) {
-/**/    System.out.println("getSelectedMotes().contains(mote)");        
         /* If mote is selected, highlight with red circle
          and semitransparent gray overlay */
         g.setColor(new Color(51, 102, 255));

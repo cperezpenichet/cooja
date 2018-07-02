@@ -1671,7 +1671,6 @@ public class AreaViewer extends VisPlugin {
   private Observer radioMediumSettingsObserver = new Observer() {
     public void update(Observable obs, Object obj) {
       // Clear selected radio (if any selected) and radio medium coverage
-/**/  System.out.println("AreaViewer.addRadioMediumObserver");
       selectedRadio = null;
       channelImage = null;
       trackModeButton.setEnabled(false);
@@ -1685,7 +1684,6 @@ public class AreaViewer extends VisPlugin {
    */
   private Observer radioMediumActivityObserver = new Observer() {
     public void update(Observable obs, Object obj) {
-/**/System.out.println("AreaViwer.RadioTransmissionObserver");
         
       // Just remove any selected radio (it may have been removed)
       canvas.repaint();

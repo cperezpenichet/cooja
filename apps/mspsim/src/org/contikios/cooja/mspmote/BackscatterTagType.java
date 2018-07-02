@@ -78,15 +78,12 @@ public class BackscatterTagType extends SkyMoteType {
   private static Logger logger = Logger.getLogger(BackscatterTagType.class);
 
   protected MspMote createMote(Simulation simulation) {
-/**/System.out.println("BackscatterTagType - createMote");      
     return new BackscatterTag(this, simulation);
   }
 
   public boolean configureAndInit(Container parentContainer, Simulation simulation, boolean visAvailable)
   throws MoteTypeCreationException {
 
-/**/System.out.println("Tag.configureAndInit");    
-    
     /* SPECIAL CASE: Cooja started in applet.
      * Use preconfigured Contiki firmware */
     if (Cooja.isVisualizedInApplet()) {
@@ -123,7 +120,6 @@ public class BackscatterTagType extends SkyMoteType {
             }
             if (existingMoteType.getIdentifier().equals(getIdentifier())) {
               identifierOK = false;
-/**/          System.out.println("existingMoteType");
               break;
             }
           }
@@ -211,7 +207,6 @@ public class BackscatterTagType extends SkyMoteType {
   }
 
   public Class<? extends MoteInterface>[] getAllMoteInterfaceClasses() {
-/**/System.out.println("BackscatterTag.getMoteInterfaceClasses");      
     return new Class[] {
         Position.class,
         RimeAddress.class,

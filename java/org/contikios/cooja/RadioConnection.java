@@ -172,9 +172,7 @@ public class RadioConnection {
     }
 
     allInterfered.add(radio);
-/**///System.out.println("1.destinationsNonInterfered: " +  destinationsNonInterfered.size());    
     destinationsNonInterfered.remove(radio);
-/**///System.out.println("2.destinationsNonInterfered: " +  destinationsNonInterfered.size());    
     if (!isDestination(radio)) {
       onlyInterfered.add(radio);
     }
@@ -231,42 +229,21 @@ public class RadioConnection {
     return onlyInterfered.toArray(new Radio[0]);
   }
   
-  /* To be deleted */
   public String toString() {
-    /* My addition */
-    for (Radio radio: allInterfered){
-      if (radio.isBackscatterTag()) {
-        return id + ": Radio connection: " + source.getMote() + " -> " + radio.getMote();
-      }
-    }
     if (destinationsNonInterfered.size() == 0) {
       return id + ": Radio connection: " + source.getMote() + " -> none";
     }
     if (destinationsNonInterfered.size() == 1) {
       return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.get(0).getMote();
     }
-    
-//    for(Radio r: destinationsNonInterfered) {
-//    }
+
     return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.size() + " motes";
 
   }
   
-//  public String toString() {
-//    if (destinationsNonInterfered.size() == 0) {
-//      return id + ": Radio connection: " + source.getMote() + " -> none";
-//    }
-//    if (destinationsNonInterfered.size() == 1) {
-//      return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.get(0).getMote();
-//    }
-//
-//    return id + ": Radio connection: " + source.getMote() + " -> " + destinationsNonInterfered.size() + " motes";
-//
+//  /* Testing Purposes */
+//  public int getID() {
+//	  return id;
 //  }
-  
-  /* Testing Purposes */
-  public int getID() {
-	  return id;
-  }
 
 }

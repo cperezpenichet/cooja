@@ -87,8 +87,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	
 	private Simulation simulation = null;
 	
-	//protected int txChannel;
-	
 	/* Book-keeping */
 	public int COUNTER_TX = 0;
 	public int COUNTER_RX = 0;
@@ -108,7 +106,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	 * @param simulation Simulation
 	 */
 	public AbstractRadioMedium(Simulation simulation) {
-/**/   System.out.println("AbstractRadioMedium");
 		this.simulation = simulation;
 	}
 	
@@ -116,7 +113,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	 * @return All registered radios
 	 */
 	public Radio[] getRegisteredRadios() {
-	    System.out.println("getRegisteredRadios");
 		return registeredRadios.toArray(new Radio[0]);
 	}
 	
@@ -202,7 +198,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	 * @param radio Radio
 	 */
 	private void removeFromActiveConnections(Radio radio) {
-/**/System.out.println("Abstract.removeFromActiveConnections");
 		/* This radio must not be a connection source */
 		RadioConnection connection = getActiveConnectionFrom(radio);
 		if (connection != null) {
@@ -239,14 +234,9 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				logger.fatal("Radio event dispatched by non-radio object");
 				return;
 			}
-			
-/**/  System.out.println("ARM.radioEventsObserver");
-			
 			Radio radio = (Radio) obs;
 			
 			final Radio.RadioEvent event = radio.getLastEvent();
-			
-/**/  System.out.println("ARM.radio: " + radio.getMote().getID() + " - event= " + event);
 			
 			switch (event) {
 				case RECEPTION_STARTED:
@@ -270,8 +260,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_STARTED: {
-/**/		  System.out.println("ARM.radio= " + radio.getMote().getID() + " - TRANSMISSION_STARTED");
-
 					/* Create new radio connection */
 					if (radio.isReceiving()) {
 						/*
@@ -279,7 +267,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						 * receiving! Ok, but it won't receive the packet
 						 */
 						radio.interfereAnyReception();
-/**/        System.out.println("sender: " + radio.getMote().getID() + "tries to transmitt but it is already receiving");						
 						for (RadioConnection conn : activeConnections) {
 							if (conn.isDestination(radio)) {
 								conn.addInterfered(radio);
@@ -289,25 +276,16 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					
 					RadioConnection newConnection = createConnections(radio);
 					activeConnections.add(newConnection);
-					
-/**/			System.out.println("ARM.ActiveConnections: " + activeConnections.size());
-/**/			System.out.println(radio.isGeneratingCarrier() ? "ARM.newConnectionFromCarrierID: " + newConnection.getID() :
-              radio.isBackscatterTag() ? "ARM.newConnectionFromTagID: " + newConnection.getID() : "ARM.newConnectionFromSenderID: " + newConnection.getID());
-/**/			System.out.println("ARM.AllDestinations: " + newConnection.getAllDestinations().length);
-/**/      System.out.println("ARM.InterferedNonDestinations: " + newConnection.getInterferedNonDestinations().length);
 
 					for (Radio r : newConnection.getAllDestinations()) {
 						if (newConnection.getDestinationDelay(r) == 0) {
-/**/			    System.out.println("ARM.r: " + r.getMote().getID() + " signalReceptionStart");
               r.signalReceptionStart();
 
 						} else {
-						  System.out.println("ARM.EXPERIMENTAL_TRANSMISSION_STARTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = r;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-/**/						  System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionStart");
                   delayedRadio.signalReceptionStart();
 								}
 							};
@@ -325,7 +303,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case TRANSMISSION_FINISHED: {
-/**/			System.out.println("ARM.radio= " + radio.getMote().getID() + " - TRANSMISSION_FINISHED");
 					/* Remove radio connection */
 
 					/* Connection */
@@ -334,24 +311,18 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						logger.fatal("No radio connection found");
 						return;
 					}
-					
-/**/      System.out.println("\nActiveConnections: " + getActiveConnections().length);
-/**/      System.out.println("conn: " + connection.getID() + " stops"); 
 
 					activeConnections.remove(connection);
 					lastConnection = connection;
 					COUNTER_TX++;
 					for (Radio dstRadio : connection.getAllDestinations()) {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
-/**/						System.out.println("ARM.dstRadio: " + dstRadio.getMote().getID() + " signalReceptionEnd");
-                            dstRadio.signalReceptionEnd();
+              dstRadio.signalReceptionEnd();
 						} else {
-/**/						System.out.println("EXPERIMENTAL_TRANSMISSION_FINISHED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-/**/						  System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " signalReceptionEnd");
                   delayedRadio.signalReceptionEnd();
 								}
 							};
@@ -363,23 +334,20 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					COUNTER_INTERFERED += connection.getInterfered().length;
 					for (Radio intRadio : connection.getInterferedNonDestinations()) {
 					  if (intRadio.isInterfered()) {
-/**/				  System.out.println("ARM.intfRadio: " + intRadio.getMote().getID() + " signalReceptionEnd");
               intRadio.signalReceptionEnd();
 					  }
 					}
 					
 					/* Update signal strengths */
 					updateSignalStrengths();
-					System.out.println("ARM.connection: " + lastConnection.getID() + " is about to finish");
 					
 					/* Notify observers */
 					radioTransmissionObservable.setChangedAndNotify();
-/**/				System.out.println("ARM.connection: " + lastConnection.getID() + " finished");
 				}
 				break;
 				case CUSTOM_DATA_TRANSMITTED: {
-/**/                System.out.println("ARM.radio= " + radio.getMote().getID() + " - CUSTOM_DATA_TRANSMITTED");		
-					/* Connection */
+
+				  /* Connection */
 					RadioConnection connection = getActiveConnectionFrom(radio);
 					if (connection == null) {
 						logger.fatal("No radio connection found");
@@ -394,30 +362,21 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					}
 					
 					for (Radio dstRadio : connection.getAllDestinations()) {
-/**///                    System.out.println("dstRadio instanceof CustomDataRadio: " + (dstRadio instanceof CustomDataRadio));
-/**///                    System.out.println("dstRadio.canReceiveFrom(radio): " + (((CustomDataRadio) dstRadio).canReceiveFrom((CustomDataRadio)radio)) );
-/**///                    System.out.println("dstRadio.getClass(): " + ((CustomDataRadio)dstRadio).getClass());
-/**///                    System.out.println("radio.getClass(): " + ((CustomDataRadio)radio).getClass());
-
 						if (!(dstRadio instanceof CustomDataRadio) || 
 						    !((CustomDataRadio) dstRadio).canReceiveFrom((CustomDataRadio)radio)) {
 							/* Radios communicate via radio packets */
-/**/     				    System.out.println("ARM.Radios communicate via radio packets");
 							continue;
 						}
 
 						 
 						if (connection.getDestinationDelay(dstRadio) == 0) {
-/**/                        System.out.println("ARM.(CustomDataRadio)dstRadio: " + dstRadio.getMote().getID() + " receiveCustomData");
 							((CustomDataRadio) dstRadio).receiveCustomData(data);
 						} else {
-/**/						System.out.println("ARM.EXPERIMENTAL_CUSTOM_DATA_TRANSMITTED");							
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final CustomDataRadio delayedRadio = (CustomDataRadio) dstRadio;
 							final Object delayedData = data;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-/**/                                System.out.println("ARM.(CustomDataRadio)delayedRadio: " + ((Radio)delayedRadio).getMote().getID() + " receiveCustomData");								    
 									delayedRadio.receiveCustomData(delayedData);
 								}
 							};
@@ -430,7 +389,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case PACKET_TRANSMITTED: {
-/**/                System.out.println("ARM.radio= " + radio.getMote().getID() + " - PACKET_TRANSMITTED");				    
 					/* Connection */
 					RadioConnection connection = getActiveConnectionFrom(radio);
 					if (connection == null) {
@@ -451,7 +409,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					      (dstRadio instanceof CustomDataRadio) && 
 					      ((CustomDataRadio) dstRadio).canReceiveFrom((CustomDataRadio)radio)) {
 					    /* Radios instead communicate via custom data objects */
-/**/                    System.out.println("ARM.Radios instead communicate via custom data objects");                  
 					    continue;
 					  }
 
@@ -459,16 +416,13 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						/* Forward radio packet */
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							dstRadio.setReceivedPacket(packet);
-/**/                        System.out.println("ARM.dstRadio: " + dstRadio.getMote().getID() + " setReceivedPacket");
 						} else {
-/**/						System.out.println("EXPERIMENTAL_PACKET_TRANSMITTED");
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							final RadioPacket delayedPacket = packet;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
 									delayedRadio.setReceivedPacket(delayedPacket);
-/**/                                System.out.println("ARM.delayedRadio: " + delayedRadio.getMote().getID() + " setReceivedPacket");
 								}
 							};
 							simulation.scheduleEvent(delayedEvent,
@@ -498,7 +452,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 			return;
 		}
 		
-/**/    System.out.println("ARM.registerRadioInterface");		
 		registeredRadios.add(radio);
 		radio.addObserver(radioEventsObserver);
 		radioMediumObservable.setChangedAndNotify();
@@ -508,13 +461,10 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	}
 	
 	public void unregisterRadioInterface(Radio radio, Simulation sim) {
-/**/	  System.out.println("Abstract.unregisterRadioInterface");
 		if (!registeredRadios.contains(radio)) {
 			logger.warn("No radio to unregister: " + radio);
 			return;
 		}
-		
-/**/System.out.println("ARM.unregisterRadioInterface");
 		
 		radio.deleteObserver(radioEventsObserver);
 		registeredRadios.remove(radio);

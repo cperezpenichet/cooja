@@ -318,7 +318,6 @@ public class PowerTracker extends VisPlugin {
       this.simulation = mote.getSimulation();
       this.mote = mote;
       this.radio = mote.getInterfaces().getRadio();
-/**/  System.out.println("2.isRadioOn()");
       radioWasOn = radio.isRadioOn();
       if (radio.isTransmitting()) {
         lastRadioState = RadioState.TRANSMITTING;
@@ -338,7 +337,6 @@ public class PowerTracker extends VisPlugin {
       update();
     }
     public void update() {
-/**/  System.out.println("3.isRadioOn()");
       long now = simulation.getSimulationTime();
 
       accumulateDuration(now - lastUpdateTime);

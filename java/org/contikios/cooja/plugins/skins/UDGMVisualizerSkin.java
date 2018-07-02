@@ -99,11 +99,8 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
   private JInternalFrame rrFrame;
   private Box ratioRX, ratioTX, rangeTX, rangeINT;
   
-  
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
-/**/System.out.println("UDGM.setActive");
-
     if (!(simulation.getRadioMedium() instanceof UDGM)) {
       logger.fatal("Cannot activate UDGM skin for unknown radio medium: " + simulation.getRadioMedium());
       return;
@@ -251,7 +248,6 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public void setInactive() {
-/**/System.out.println("UDGM.setInactive");      
     if (simulation == null) {
       /* Skin was never activated */
       return;
@@ -267,13 +263,11 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
   @Override
   public Color[] getColorOf(Mote mote) {
-/**/System.out.println("UDGM.getColorOf");         
     return null;
   }
 
   @Override
   public void paintBeforeMotes(Graphics g) {
-/**/System.out.println("UDGM.paintBeforeMotes");         
       
     Set<Mote> selectedMotes = visualizer.getSelectedMotes();
     if (simulation == null || selectedMotes == null) {
@@ -284,16 +278,12 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
     Area intRangeMaxArea = new Area();
     Area trxRangeArea = new Area();
     Area trxRangeMaxArea = new Area();
-    
-/**/System.out.println("UDGM.paintBeforeMotesSTART");
 
     for (Mote selectedMote : selectedMotes) {
       if (selectedMote.getInterfaces().getRadio() == null) {
         continue;
       }
       
-/**/  System.out.println("selectedRadioMoteID: " + selectedMote.getID());        
-
 
       /* Paint transmission and interference range for selected mote */
       Position motePos = selectedMote.getInterfaces().getPosition();
@@ -308,9 +298,6 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
               = radioMedium.INTERFERENCE_RANGE
               * ((double) selectedRadio.getCurrentOutputPowerIndicator()
               / (double) selectedRadio.getOutputPowerIndicatorMax());
-      
-      /**/System.out.println("radioMedium.TRANSMITTING_RANGE: " + radioMedium.TRANSMITTING_RANGE);
-      
       double moteTransmissionRange
               = radioMedium.TRANSMITTING_RANGE
               * ((double) selectedRadio.getCurrentOutputPowerIndicator()
@@ -364,7 +351,7 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
     }   
     Graphics2D g2d = (Graphics2D) g;
-/**/System.out.println("UDGM.Graphics2D");
+    
     g2d.setColor(COLOR_INT);
     g2d.fill(intRangeArea);
     g.setColor(Color.GRAY);
@@ -380,8 +367,6 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
 
     /* Print transmission success probabilities only if single mote is selected */
     if (selectedMotes.size() == 1) {
-/**/    System.out.println("UDGM.selectedMotes.size(): " + selectedMotes.size());      
-      
       Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
       for (Mote m : simulation.getMotes()) {
@@ -389,14 +374,8 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
           continue;
         }
         
-/**/    System.out.println("UDGM.m: " + m.getID());      
-     
         double prob
                 = ((UDGM) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, m.getInterfaces().getRadio());
-       
-/**/    System.out.println("UDGM.PROB: " + prob);
-
-        
         if (prob == 0.0d) {
           continue;
         }
@@ -407,13 +386,11 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
         g.drawString(msg, pixel.x - msgWidth / 2, pixel.y + 2 * Visualizer.MOTE_RADIUS + 3);
       }
     }
-/**/System.out.println("UDGM.paintBeforeMotesSTOP");
 
   }
 
   @Override
   public void paintAfterMotes(Graphics g) {
-/**/System.out.println("UDGM.paintAfterMotes");         
   }
 
   public static class RangeMenuAction implements SimulationMenuAction {
@@ -469,8 +446,6 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
   };
 
   private void updateRatioRangeFrame() {
-/**/System.out.println("UDGM.updateRatioRangeFrame");         
-      
     if (rrFrame.getDesktopPane() == null) {
       visualizer.getDesktopPane().add(rrFrame);
     }
@@ -500,9 +475,9 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
     return visualizer;
   }
   
-  /* New addition */
-  public JInternalFrame getRRFrame() {
-    return rrFrame;
-  }
+//  /* New addition */
+//  public JInternalFrame getRRFrame() {
+//    return rrFrame;
+//  }
   
 }

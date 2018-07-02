@@ -94,7 +94,6 @@ public class BaseRSSIconf extends VisPlugin {
 		changeObserver = new Observer() {
 			public void update(Observable obs, Object obj) {
 				logger.debug("Changed");
-/**/            System.out.println("BaseRSSIconf.addRadioMediumObserver");
 				model.fireTableDataChanged();
 				
 			}

@@ -49,12 +49,10 @@ public class BackscatterTag extends SkyMote {
 
   public BackscatterTag(MspMoteType moteType, Simulation sim) {
     super(moteType, sim);
-/**/System.out.println("BackscatterTag: " + moteType.getIdentifier());
   }
 
   protected boolean initEmulator(File fileELF) {
     try {
-/**/  System.out.println("1.BackscatterTag.initEmulatorskyNode");
       skyNode = new BackscatterTagNode();
       super.skyNode = skyNode;
       registry = skyNode.getRegistry();
@@ -81,4 +79,5 @@ public class BackscatterTag extends SkyMote {
       return "Tag " + getID();
     }
 
+  
 } /* BackscatterTag */

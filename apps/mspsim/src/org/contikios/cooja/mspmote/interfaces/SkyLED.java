@@ -64,7 +64,6 @@ public class SkyLED extends LED {
   private static final Color RED = new Color(255, 0, 0);
 
   public SkyLED(Mote mote) {
-/**/System.out.println("SkyLED");      
     mspMote = (SkyMote) mote;
 
     IOUnit unit = mspMote.getCPU().getIOUnit("Port 5");

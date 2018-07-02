@@ -57,12 +57,40 @@ import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.skins.UDGMBSVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 
+/**
+ * The enhancement of COOJA in order to support realistic simulations of backscatter radio links
+ * is based on the master thesis of George Daglaridis that was carried out with the help of his supervisor
+ * Carlos Perez Penichet, at UNO Group, Uppsala University. The goal of this thesis was to experimentally 
+ * investigate what affects the quality of backscatter radio links and model all the phenomena retrieved 
+ * form these experiments so as to augment COOJA to support backscatter devices. For additional information 
+ * you can address here: .
+ * 
+ * 
+ * The Unit Disk Graph Radio Medium for Backscatter Communication abstracts radio 
+ * transmission range as circles.
+ * 
+ * It uses two different range parameters: one for transmissions, and one for
+ * interfering with other radios and transmissions.
+ * 
+ * When a connection has as as source an active radio acting either as active transmitter
+ * or carrier generator, both radio ranges grow with the radio output power indicator as 
+ * it was in the original UDGM (parent class). What changes here is the the way that these
+ * ranges are calculated concerning a connection that has a backscatter tag as a source.
+ * The tag's output power changes dynamically based on the energy loss that the tag
+ * experiences due to the distance between the tag and the active radio.  
+ *
+ * This class is an extension of the UDGM class written by Fredrik Osterlind.0
+ *
+ * @author George Daglaridis
+ * @author Carlos Perez Penichet
+ */
+
 @ClassDescription("Unit Disk Graph Medium for Backscater Communication (UDGMBS): Distance Loss")
 public class UDGMBS extends UDGM {
   private static Logger logger = Logger.getLogger(UDGMBS.class);
   
-  public double SUCCESS_RATIO_TX = 1.0; /* Success ratio of TX. If this fails, no radios receive the packet */
-  public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
+  //public double SUCCESS_RATIO_TX = 1.0; /* Success ratio of TX. If this fails, no radios receive the packet */
+  //public double SUCCESS_RATIO_RX = 1.0; /* Success ratio of RX. If this fails, the single affected receiver does not receive the packet */
   
   /* Gain of the transmitting antenna */
   public  double GT = 0;
@@ -352,7 +380,7 @@ public class UDGMBS extends UDGM {
 /**/        System.out.println("1.Start keeping a record of the tagTXPower");
 /**/        System.out.println("backTag: " + r.getMote().getID());
             double dist = sender.getPosition().getDistanceTo(r.getPosition());
-            carrierToTagDist.add(dist);
+//            carrierToTagDist.add(dist);
 /**/        System.out.println("dist: " + dist);
 
             calculateTagCurrentTxPower(sender, r, newConnection);

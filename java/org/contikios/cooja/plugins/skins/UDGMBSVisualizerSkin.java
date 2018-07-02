@@ -75,18 +75,21 @@ import org.contikios.cooja.radiomediums.UDGM;
 import org.contikios.cooja.radiomediums.UDGMBS;
 
 /**
- * Visualizer skin for configuring the Unit Disk Graph radio medium for backscaterring communication (UDGMBS).
+ * Visualizer skin for configuring the Unit Disk Graph radio medium for backscatter communication (UDGMBS).
  *
  * Allows a user to change the collective TX/interference ranges, and the TX/RX
  * success ratio.
  *
  * To also see radio traffic, this skin can be combined with {@link
  * TrafficVisualizerSkin}.
+ * 
+ * This class is an extension of the UDGMVisualizerSkin class written by Fredrik Osterlind
+ * and Enrico Joerns.
  *
  * @see TrafficVisualizerSkin
  * @see UDGMBS
- * @author Fredrik Osterlind
- * @author Enrico Joerns
+ * @author George Daglaridis
+ * @author Carlos Perez Penichet 
  */
 @ClassDescription("Radio environment (UDGMBS)")
 @SupportedArguments(radioMediums = {UDGMBS.class})
@@ -103,7 +106,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
   private JInternalFrame rrFrame;
   //private Box ratioRX, ratioTX, rangeTX, rangeINT;
-  private Box ratioRX, ratioTX, backCOEF;
+  private Box backCOEF;
   
   private Hashtable<Integer, Integer> carrierColor = new Hashtable<Integer, Integer>();
 
@@ -133,17 +136,17 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //    interferenceModel.setStepSize(new Double(1.0)); // 1m
 //    interferenceModel.setMinimum(new Double(0.0));
     
-    SpinnerNumberModel successRatioTxModel = new SpinnerNumberModel();
-    successRatioTxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_TX));
-    successRatioTxModel.setStepSize(new Double(0.001)); // 0.1%
-    successRatioTxModel.setMinimum(new Double(0.0));
-    successRatioTxModel.setMaximum(new Double(1.0));
-
-    SpinnerNumberModel successRatioRxModel = new SpinnerNumberModel();
-    successRatioRxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_RX));
-    successRatioRxModel.setStepSize(new Double(0.001)); // 0.1%
-    successRatioRxModel.setMinimum(new Double(0.0));
-    successRatioRxModel.setMaximum(new Double(1.0));
+//    SpinnerNumberModel successRatioTxModel = new SpinnerNumberModel();
+//    successRatioTxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_TX));
+//    successRatioTxModel.setStepSize(new Double(0.001)); // 0.1%
+//    successRatioTxModel.setMinimum(new Double(0.0));
+//    successRatioTxModel.setMaximum(new Double(1.0));
+//
+//    SpinnerNumberModel successRatioRxModel = new SpinnerNumberModel();
+//    successRatioRxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_RX));
+//    successRatioRxModel.setStepSize(new Double(0.001)); // 0.1%
+//    successRatioRxModel.setMinimum(new Double(0.0));
+//    successRatioRxModel.setMaximum(new Double(1.0));
     
     SpinnerNumberModel backscatterCoefficientModel = new SpinnerNumberModel();
     backscatterCoefficientModel.setValue(new Double(radioMedium.BACKSCATTER_COEFFICIENT));
@@ -158,14 +161,14 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //    final JSpinner interferenceRangeSpinner = new JSpinner(interferenceModel);
 //    editor = new JSpinner.NumberEditor(interferenceRangeSpinner, "0m");
 //    interferenceRangeSpinner.setEditor(editor);
-    final JSpinner successRatioTxSpinner = new JSpinner(successRatioTxModel);
-    editor = new JSpinner.NumberEditor(successRatioTxSpinner, "0.0%");
-    successRatioTxSpinner.setEditor(editor);
-    final JSpinner successRatioRxSpinner = new JSpinner(successRatioRxModel);
-    editor = new JSpinner.NumberEditor(successRatioRxSpinner, "0.0%");
-    successRatioRxSpinner.setEditor(editor);
+//    final JSpinner successRatioTxSpinner = new JSpinner(successRatioTxModel);
+//    editor = new JSpinner.NumberEditor(successRatioTxSpinner, "0.0%");
+//    successRatioTxSpinner.setEditor(editor);
+//    final JSpinner successRatioRxSpinner = new JSpinner(successRatioRxModel);
+//    editor = new JSpinner.NumberEditor(successRatioRxSpinner, "0.0%");
+//    successRatioRxSpinner.setEditor(editor);
     final JSpinner backscatterCoefficientSpinner = new JSpinner(backscatterCoefficientModel);
-    editor = new JSpinner.NumberEditor(backscatterCoefficientSpinner, "0.0 dB");
+    editor = new JSpinner.NumberEditor(backscatterCoefficientSpinner, "0.0 dBm");
     backscatterCoefficientSpinner.setEditor(editor);
 
     
@@ -176,13 +179,13 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     
 //    ((JSpinner.DefaultEditor) txRangeSpinner.getEditor()).getTextField().setColumns(5);
 //    ((JSpinner.DefaultEditor) interferenceRangeSpinner.getEditor()).getTextField().setColumns(5);
-    ((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
-    ((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
+//    ((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
+//    ((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
 //    txRangeSpinner.setToolTipText("Transmitting range (m)");
 //    interferenceRangeSpinner.setToolTipText("Interference range (m)");
-    successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
-    successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
-    backscatterCoefficientSpinner.setToolTipText("Backscatter coefficient (dB)");
+//    successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
+//    successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
+    backscatterCoefficientSpinner.setToolTipText("Backscatter coefficient (dBm)");
     
     
 //    txRangeSpinner.addChangeListener(new ChangeListener() {
@@ -203,23 +206,23 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //      }
 //    });
     
-    successRatioTxSpinner.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        radioMedium.SUCCESS_RATIO_TX = ((SpinnerNumberModel) successRatioTxSpinner.getModel())
-                .getNumber().doubleValue();
-        visualizer.repaint();
-      }
-    });
-
-    successRatioRxSpinner.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        radioMedium.SUCCESS_RATIO_RX = ((SpinnerNumberModel) successRatioRxSpinner.getModel())
-                .getNumber().doubleValue();
-        visualizer.repaint();
-      }
-    });
+//    successRatioTxSpinner.addChangeListener(new ChangeListener() {
+//      @Override
+//      public void stateChanged(ChangeEvent e) {
+//        radioMedium.SUCCESS_RATIO_TX = ((SpinnerNumberModel) successRatioTxSpinner.getModel())
+//                .getNumber().doubleValue();
+//        visualizer.repaint();
+//      }
+//    });
+//
+//    successRatioRxSpinner.addChangeListener(new ChangeListener() {
+//      @Override
+//      public void stateChanged(ChangeEvent e) {
+//        radioMedium.SUCCESS_RATIO_RX = ((SpinnerNumberModel) successRatioRxSpinner.getModel())
+//                .getNumber().doubleValue();
+//        visualizer.repaint();
+//      }
+//    });
     
     backscatterCoefficientSpinner.addChangeListener(new ChangeListener() {
       @Override
@@ -237,7 +240,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     /* Register menu actions */
     //visualizer.registerSimulationMenuAction(RangeMenuAction.class);
     visualizer.registerSimulationMenuAction(BackscatterCoefficientMenuAction.class);
-    visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
+//    visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
 
     /* UI components */
     JPanel main = new JPanel();
@@ -253,14 +256,14 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //    rangeINT.add(Box.createHorizontalStrut(5));
 //    rangeINT.add(interferenceRangeSpinner);
 //    
-    ratioTX = Box.createHorizontalBox();
-    ratioTX.add(new JLabel("TX ratio:"));
-    ratioTX.add(Box.createHorizontalStrut(5));
-    ratioTX.add(successRatioTxSpinner);
-    ratioRX = Box.createHorizontalBox();
-    ratioRX.add(new JLabel("RX ratio:"));
-    ratioRX.add(Box.createHorizontalStrut(5));
-    ratioRX.add(successRatioRxSpinner);
+//    ratioTX = Box.createHorizontalBox();
+//    ratioTX.add(new JLabel("TX ratio:"));
+//    ratioTX.add(Box.createHorizontalStrut(5));
+//    ratioTX.add(successRatioTxSpinner);
+//    ratioRX = Box.createHorizontalBox();
+//    ratioRX.add(new JLabel("RX ratio:"));
+//    ratioRX.add(Box.createHorizontalStrut(5));
+//    ratioRX.add(successRatioRxSpinner);
     backCOEF = Box.createHorizontalBox();
     backCOEF.add(new JLabel("Back COEF.:"));
     backCOEF.add(Box.createHorizontalStrut(5));
@@ -268,14 +271,14 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 
 //    rangeTX.setVisible(false);
 //    rangeINT.setVisible(false);
-    ratioTX.setVisible(false);
-    ratioRX.setVisible(false);
+//    ratioTX.setVisible(false);
+//    ratioRX.setVisible(false);
     backCOEF.setVisible(false);
     
 //    main.add(rangeTX);
 //    main.add(rangeINT);
-    main.add(ratioTX);
-    main.add(ratioRX);
+//    main.add(ratioTX);
+//    main.add(ratioRX);
     main.add(backCOEF);
     
     /*
@@ -296,8 +299,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
         super.internalFrameClosed(ife);
 //        rangeTX.setVisible(false);
 //        rangeINT.setVisible(false);
-        ratioTX.setVisible(false);
-        ratioRX.setVisible(false);
+//        ratioTX.setVisible(false);
+//        ratioRX.setVisible(false);
         backCOEF.setVisible(false);
         rrFrame.setVisible(false);
       }
@@ -327,7 +330,7 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     /* Unregister menu actions */
     //visualizer.unregisterSimulationMenuAction(RangeMenuAction.class);
     visualizer.unregisterSimulationMenuAction(BackscatterCoefficientMenuAction.class);
-    visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
+//    visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
   }
 
   @Override
@@ -641,31 +644,31 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
 //    }
 //  };
 
-  public static class SuccessRatioMenuAction implements SimulationMenuAction {
-
-    @Override
-    public boolean isEnabled(Visualizer visualizer, Simulation simulation) {
-      return true;
-    }
-
-    @Override
-    public String getDescription(Visualizer visualizer, Simulation simulation) {
-      return "Change TX/RX success ratio for tag";
-    }
-
-    @Override
-    public void doAction(Visualizer visualizer, Simulation simulation) {
-      VisualizerSkin[] skins = visualizer.getCurrentSkins();
-      for (VisualizerSkin skin : skins) {
-        if (skin instanceof UDGMBSVisualizerSkin) {
-          UDGMBSVisualizerSkin vskin = ((UDGMBSVisualizerSkin) skin);
-          vskin.ratioTX.setVisible(true);
-          vskin.ratioRX.setVisible(true);
-          vskin.updateRatioRangeFrame();
-        }
-      }
-    }
-  };
+//  public static class SuccessRatioMenuAction implements SimulationMenuAction {
+//
+//    @Override
+//    public boolean isEnabled(Visualizer visualizer, Simulation simulation) {
+//      return true;
+//    }
+//
+//    @Override
+//    public String getDescription(Visualizer visualizer, Simulation simulation) {
+//      return "Change TX/RX success ratio for tag";
+//    }
+//
+//    @Override
+//    public void doAction(Visualizer visualizer, Simulation simulation) {
+//      VisualizerSkin[] skins = visualizer.getCurrentSkins();
+//      for (VisualizerSkin skin : skins) {
+//        if (skin instanceof UDGMBSVisualizerSkin) {
+//          UDGMBSVisualizerSkin vskin = ((UDGMBSVisualizerSkin) skin);
+//          vskin.ratioTX.setVisible(true);
+//          vskin.ratioRX.setVisible(true);
+//          vskin.updateRatioRangeFrame();
+//        }
+//      }
+//    }
+//  };
   
   public static class BackscatterCoefficientMenuAction implements SimulationMenuAction {
 

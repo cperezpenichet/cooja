@@ -79,11 +79,11 @@ public class UDGMBS extends UDGM {
   /* Derived from the experimental part of the master thesis of George Daglaridis at UNO Group, at Uppsala University */
   public final double STH = -86.4;
 
-  ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
-  ArrayList<Double> tagToCarrierDist = new ArrayList<Double>();
-  ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
-  ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
-  ArrayList<Integer> prr = new ArrayList<Integer>();
+//  ArrayList<Double> carrierToTagDist = new ArrayList<Double>();
+//  ArrayList<Double> tagToCarrierDist = new ArrayList<Double>();
+//  ArrayList<Double> tagToRecvDist = new ArrayList<Double>();
+//  ArrayList<Double> receivedPowerLst = new ArrayList<Double>();
+//  ArrayList<Integer> prr = new ArrayList<Integer>();
 
   
   public UDGMBS(Simulation simulation) {

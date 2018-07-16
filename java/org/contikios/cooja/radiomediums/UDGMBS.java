@@ -206,14 +206,7 @@ public class UDGMBS extends UDGM {
   }
 
   public double getTransmissionPower(Radio radio) {
-    double transmitttedPower = 0.0;
-    /* Transform power level into output power in dBm */
-    for (int i = 0; i < radio.CC2420OutputPower.length; i++) {
-      if((double) radio.getCurrentOutputPowerIndicator() == i) {
-        transmitttedPower = radio.CC2420OutputPower[i];
-      }
-    }
-    return transmitttedPower;
+    return radio.CC2420OutputPower[radio.getCurrentOutputPowerIndicator()];
   }
 
 

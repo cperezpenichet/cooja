@@ -371,35 +371,30 @@ public class UDGMBS extends UDGM {
         for (Radio r: newConnection.getAllDestinations()) {
           if (r.isBackscatterTag() && r.isListeningCarrier()) {
 
-            HashSet<Integer> tagRadioChannels = new HashSet<Integer>();
+            RadioConnection carrier_connection = r.getConnectionFromMaxOutputPower(sender.getChannel());
+            if (carrier_connection == null) {
+              continue; // There is no carrier generator in the appropriate channel for this sender so we skip this tag.
+            }
 
-            tagRadioChannels = getRadioChannels(r);
-
-            for(int k : tagRadioChannels){
-              if (k==sender.getChannel()){
-                //since channel+2 is added to the hashset we compare above
-                double B = -64.91;//A and B are negative
-                double A = -1.025;
-                Radio carrierGenerator = getCarrierSource(r, k);
-                double incidentPowerOfTag_CG= friisEquation(carrierGenerator,r);
-                //TODO: get the carrier generator using the channel
-                double CarrierGeneratorPower = getTransmissionPower(carrierGenerator);
-                double Sensitivity_Threshold = A*incidentPowerOfTag_CG + B;
-                double incidentPowerOfTag_Sender= friisEquation(sender,r);
-                //Sensitivity_Threshold is greater than, but here we compare negative values and therefore sign is lessthan
-                if (Sensitivity_Threshold < incidentPowerOfTag_Sender){
-                  //do nothing, automatically added to destination
-                  System.out.println("-----can receive ----");
-                }
-                else if((Sensitivity_Threshold - incidentPowerOfTag_Sender) >3){
-                  newConnection.removeDestination(r);
-                }
-                else {
-                  newConnection.removeDestination(r);
-                  newConnection.addInterfered(r);
-                  System.out.println("-----cannot receive ----");
-                }
-              }
+            double B = -64.91;//A and B are negative
+            double A = -1.025;
+            Radio carrierGenerator = carrier_connection.getSource();
+            double incidentPowerOfTag_CG= friisEquation(carrierGenerator,r);
+            double Sensitivity_Threshold = A*incidentPowerOfTag_CG + B;
+            double incidentPowerOfTag_Sender= friisEquation(sender,r);
+            //Sensitivity_Threshold is greater than, but here we compare negative values and therefore sign is lessthan
+            if (incidentPowerOfTag_CG > Sensitivity_Threshold){
+              //do nothing, automatically added to destination
+              System.out.println("-----can receive ----");
+            }
+            else if(incidentPowerOfTag_Sender > (Sensitivity_Threshold - 3)) {
+              newConnection.removeDestination(r);
+              System.out.println("-----Interfered -----");
+            }
+            else {
+              newConnection.removeDestination(r);
+              newConnection.addInterfered(r);
+              System.out.println("-----cannot receive ----");
             }
           }
           else{

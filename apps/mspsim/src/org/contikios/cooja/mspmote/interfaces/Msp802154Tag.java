@@ -48,6 +48,7 @@ import org.contikios.cooja.interfaces.CustomDataRadio;
 import org.contikios.cooja.RadioConnection;
 
 import org.contikios.cooja.interfaces.Radio.RadioEvent;
+import org.contikios.cooja.mspmote.MspMoteTimeEvent;
 import org.contikios.cooja.radiomediums.AbstractRadioMedium;
 import org.contikios.cooja.radiomediums.UDGMBS;
 
@@ -382,6 +383,28 @@ public class Msp802154Tag extends Msp802154Radio {
 		  return true;
 	  }
     return false;
+  }
+  
+  public void receiveCustomData(Object data) {
+	    if (!(data instanceof Byte)) {
+	      logger.fatal("Bad custom data: " + data);
+	      return;
+	    }
+	    lastIncomingByte = (Byte) data;
+
+	    final byte inputByte;
+	    if (isInterfered()) {
+	      inputByte = (byte)0xFF;
+	    } else {
+	      inputByte = lastIncomingByte;
+	    }
+	    mote.getSimulation().scheduleEvent(new MspMoteTimeEvent(mote, 0) {
+	      public void execute(long t) {
+	        super.execute(t);
+	        radio.receivedByte(inputByte);
+	        mote.requestImmediateWakeup();
+	      }
+	    }, mote.getSimulation().getSimulationTime());
   }
   
 //  /* Found on the internet in case the owner (thread) of the lock

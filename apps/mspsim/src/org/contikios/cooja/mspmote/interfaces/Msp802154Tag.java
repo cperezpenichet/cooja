@@ -44,6 +44,7 @@ import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
 import org.contikios.cooja.RadioPacket;
 import org.contikios.cooja.interfaces.Radio;
+import org.contikios.cooja.interfaces.CustomDataRadio;
 import org.contikios.cooja.RadioConnection;
 
 import org.contikios.cooja.interfaces.Radio.RadioEvent;
@@ -67,7 +68,7 @@ import org.contikios.cooja.RadioConnection;
 public class Msp802154Tag extends Msp802154Radio {
   private static Logger logger = Logger.getLogger(Msp802154Tag.class);
   
-  private final BackscatterTXRadio tag;
+  private final BackscatterTXRadio radio;
 
   private boolean isListeningCarrier = false;
   
@@ -80,13 +81,13 @@ public class Msp802154Tag extends Msp802154Radio {
 
   public Msp802154Tag(Mote m) {
     super(m);
-    this.tag = this.mote.getCPU().getChip(BackscatterTXRadio.class);
+    this.radio = this.mote.getCPU().getChip(BackscatterTXRadio.class);
     
-    if (tag == null) {
+    if (radio == null) {
         throw new IllegalStateException("Mote is not equipped with a tag");
     }
     
-    tag.addRFListener(new RFListener() {
+    radio.addRFListener(new RFListener() {
       int len = 0;
       int expMpduLen = 0;
       byte[] buffer = new byte[127 + 6];
@@ -373,6 +374,14 @@ public class Msp802154Tag extends Msp802154Radio {
   public boolean isRadioOn() {
     return true;
     
+  }
+  
+  
+  public boolean canReceiveFrom(CustomDataRadio radio) {
+	  if (radio.getClass() == Msp802154Radio.class) {
+		  return true;
+	  }
+    return false;
   }
   
 //  /* Found on the internet in case the owner (thread) of the lock

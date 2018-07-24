@@ -1144,6 +1144,8 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
               radioEv == RadioEvent.RECEPTION_STARTED ||
               radioEv == RadioEvent.RECEPTION_INTERFERED ||
               radioEv == RadioEvent.RECEPTION_FINISHED ||
+    		  radioEv == RadioEvent.CARRIER_STARTED ||
+			  radioEv == RadioEvent.CARRIER_STOPPED ||
           	  radioEv == RadioEvent.CARRIER_LISTENING_STARTED ||
           	  radioEv == RadioEvent.CARRIER_LISTENING_STOPPED) {
         	  
@@ -1164,12 +1166,12 @@ public class TimeLine extends VisPlugin implements HasQuickHelp {
             } else if (moteRadio.isInterfered()) {
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.INTERFERED);
+            } else if (moteRadio.isReceiving()) {
+                ev = new RadioRXTXEvent(
+                    simulation.getSimulationTime(), RXTXRadioEvent.RECEIVING);
             } else if (moteRadio.isListeningCarrier()) {
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.LISTENING_CARRIER);
-            } else if (moteRadio.isReceiving()) {
-              ev = new RadioRXTXEvent(
-                  simulation.getSimulationTime(), RXTXRadioEvent.RECEIVING);
             } else {
               ev = new RadioRXTXEvent(
                   simulation.getSimulationTime(), RXTXRadioEvent.IDLE);

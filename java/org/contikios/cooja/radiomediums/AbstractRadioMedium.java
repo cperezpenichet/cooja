@@ -243,7 +243,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				case RECEPTION_INTERFERED:
 				case RECEPTION_FINISHED:
 				case CARRIER_LISTENING_STARTED:
-        case CARRIER_LISTENING_STOPPED:  
+				case CARRIER_LISTENING_STOPPED:  
 					break;
 
 				case UNKNOWN:
@@ -259,6 +259,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					updateSignalStrengths();
 				}
 				break;
+				case CARRIER_STARTED:
 				case TRANSMISSION_STARTED: {
 					/* Create new radio connection */
 					if (radio.isReceiving()) {
@@ -279,14 +280,17 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 
 					for (Radio r : newConnection.getAllDestinations()) {
 						if (newConnection.getDestinationDelay(r) == 0) {
-              r.signalReceptionStart();
-
+							if (event == Radio.RadioEvent.CARRIER_STARTED && r.isBackscatterTag()) {
+								r.signalCarrierReceptionStart();
+							} else {
+								r.signalReceptionStart();
+							}
 						} else {
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = r;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-                  delayedRadio.signalReceptionStart();
+									delayedRadio.signalReceptionStart();
 								}
 							};
 							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(r));
@@ -302,6 +306,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					radioTransmissionObservable.setChangedAndNotify();
 				}
 				break;
+				case CARRIER_STOPPED:
 				case TRANSMISSION_FINISHED: {
 					/* Remove radio connection */
 
@@ -317,24 +322,32 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					COUNTER_TX++;
 					for (Radio dstRadio : connection.getAllDestinations()) {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
-              dstRadio.signalReceptionEnd();
+							if (event == Radio.RadioEvent.CARRIER_STOPPED && dstRadio.isBackscatterTag()) {
+								dstRadio.signalCarrierReceptionEnd();
+							} else {
+								dstRadio.signalReceptionEnd();
+							}
 						} else {
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							TimeEvent delayedEvent = new TimeEvent(0) {
 								public void execute(long t) {
-                  delayedRadio.signalReceptionEnd();
+									delayedRadio.signalReceptionEnd();
 								}
 							};
 							simulation.scheduleEvent(delayedEvent,
-									simulation.getSimulationTime() + connection.getDestinationDelay(dstRadio));
+							simulation.getSimulationTime() + connection.getDestinationDelay(dstRadio));
 						}
 					}
 					COUNTER_RX += connection.getDestinations().length;
 					COUNTER_INTERFERED += connection.getInterfered().length;
 					for (Radio intRadio : connection.getInterferedNonDestinations()) {
 					  if (intRadio.isInterfered()) {
-              intRadio.signalReceptionEnd();
+						  if (intRadio.isBackscatterTag() && event == Radio.RadioEvent.CARRIER_STOPPED) {
+							  intRadio.signalCarrierReceptionEnd();
+						  } else {
+							  intRadio.signalReceptionEnd();
+						  }
 					  }
 					}
 					

@@ -165,7 +165,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
 			    notifyObservers();
 			    isGeneratingCarrier = true;
 			    isTransmitting = true;
-    		  lastEvent = RadioEvent.TRANSMISSION_STARTED;
+			  lastEvent = RadioEvent.CARRIER_STARTED;
     		  setChanged();
     		  notifyObservers();
     		  return;
@@ -175,7 +175,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     	    if (isGeneratingCarrier) {
 				    isGeneratingCarrier = false;
 				    isTransmitting = false;
-            lastEvent = RadioEvent.TRANSMISSION_FINISHED;
+	        lastEvent = RadioEvent.CARRIER_STOPPED;
             setChanged();
             notifyObservers();
 		        radioOff(); // actually it is a state change, not necessarily to OFF

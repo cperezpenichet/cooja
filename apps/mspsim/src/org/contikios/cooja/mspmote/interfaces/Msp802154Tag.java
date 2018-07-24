@@ -72,6 +72,7 @@ public class Msp802154Tag extends Msp802154Radio {
   private final BackscatterTXRadio radio;
 
   private boolean isListeningCarrier = false;
+  private boolean isReceiving = false;
   
   /* Keeps a record of the transmitted power from the tag */
   private Hashtable<Integer, Hashtable<RadioConnection, Double>> tagTXPower = 
@@ -165,7 +166,7 @@ public class Msp802154Tag extends Msp802154Radio {
    */
   @Override
   public boolean isReceiving() {
-    return false;
+	  return isReceiving;
    }
   
   /*
@@ -177,11 +178,28 @@ public class Msp802154Tag extends Msp802154Radio {
     return -1;
   }
 
+  @Override
+  public void signalCarrierReceptionStart() {
+    isListeningCarrier = true;
+    lastEvent = RadioEvent.CARRIER_LISTENING_STARTED;
+    setChanged();
+    notifyObservers();
+  }
+  
+  @Override
+  public void signalCarrierReceptionEnd() {
+    isListeningCarrier = false;
+    isInterfered = false;
+    lastEvent = RadioEvent.CARRIER_LISTENING_STOPPED;
+    setChanged();
+    notifyObservers();
+  }
+  
   /* Concerns the start of the carrier listening */
   @Override
   public void signalReceptionStart() {
-    isListeningCarrier = true;
-    lastEvent = RadioEvent.CARRIER_LISTENING_STARTED;
+	  isReceiving = true;
+	  lastEvent = RadioEvent.RECEPTION_STARTED;
     setChanged();
     notifyObservers();
   }
@@ -189,9 +207,8 @@ public class Msp802154Tag extends Msp802154Radio {
   /* Concerns the end of the carrier listening */
   @Override
   public void signalReceptionEnd() {
-    isListeningCarrier = false;
-    isInterfered =false;
-    lastEvent = RadioEvent.CARRIER_LISTENING_STOPPED;
+	  isReceiving = false;
+    lastEvent = RadioEvent.RECEPTION_FINISHED;
     setChanged();
     notifyObservers();
   }

@@ -118,6 +118,9 @@ public abstract class Radio extends MoteInterface {
    */
   public abstract void signalReceptionEnd();
 
+  public void signalCarrierReceptionStart() {}
+  public void signalCarrierReceptionEnd() {}
+  
   /**
    * Returns last event at this radio. This method should be used to learn the
    * reason when a radio notifies a change to observers.

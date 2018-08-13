@@ -321,7 +321,7 @@ public class UDGMBS extends UDGM {
    * of the following method. 
    */
   public RadioConnection createConnections(Radio sender) {
-    RadioConnection newConnection;
+	  RadioConnection newConnection;
 
     /* Store the channels to which the tag can transmit */
     HashSet<Integer> tagTXChannels = new HashSet<Integer>();
@@ -376,7 +376,7 @@ public class UDGMBS extends UDGM {
             double Sensitivity_Threshold = A*incidentPowerOfTag_CG + B;
             double incidentPowerOfTag_Sender= friisEquation(sender,r);
             //Sensitivity_Threshold is greater than, but here we compare negative values and therefore sign is lessthan
-            if (incidentPowerOfTag_CG > Sensitivity_Threshold){
+            if (incidentPowerOfTag_Sender > Sensitivity_Threshold){
               //do nothing, automatically added to destination
               System.out.println("-----can receive ----");
             }

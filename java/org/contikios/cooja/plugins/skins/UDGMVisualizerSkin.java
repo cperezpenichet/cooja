@@ -284,6 +284,7 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
         continue;
       }
       
+      /**/  System.out.println("selectedRadioMoteID: " + selectedMote.getID());        
 
       /* Paint transmission and interference range for selected mote */
       Position motePos = selectedMote.getInterfaces().getPosition();
@@ -373,6 +374,9 @@ public class UDGMVisualizerSkin implements VisualizerSkin {
         if (m == selectedMote) {
           continue;
         }
+        
+        /**/    System.out.println("UDGM.m: " + m.getID());      
+
         
         double prob
                 = ((UDGM) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, m.getInterfaces().getRadio());

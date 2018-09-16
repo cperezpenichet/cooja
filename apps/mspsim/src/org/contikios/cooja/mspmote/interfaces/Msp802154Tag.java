@@ -50,7 +50,7 @@ import org.contikios.cooja.RadioConnection;
 import org.contikios.cooja.interfaces.Radio.RadioEvent;
 import org.contikios.cooja.mspmote.MspMoteTimeEvent;
 import org.contikios.cooja.radiomediums.AbstractRadioMedium;
-import org.contikios.cooja.radiomediums.UDGMBS;
+import org.contikios.cooja.radiomediums.UDGMCA;
 
 import se.sics.mspsim.chip.BackscatterTXRadio;
 import se.sics.mspsim.chip.CC2420;

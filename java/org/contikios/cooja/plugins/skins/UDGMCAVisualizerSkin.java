@@ -72,10 +72,10 @@ import org.contikios.cooja.plugins.Visualizer;
 import org.contikios.cooja.plugins.Visualizer.SimulationMenuAction;
 import org.contikios.cooja.plugins.VisualizerSkin;
 import org.contikios.cooja.radiomediums.UDGM;
-import org.contikios.cooja.radiomediums.UDGMBS;
+import org.contikios.cooja.radiomediums.UDGMCA;
 
 /**
- * Visualizer skin for configuring the Unit Disk Graph radio medium for backscatter communication (UDGMBS).
+ * Visualizer skin for configuring the Unit Disk Graph radio medium for backscatter communication (UDGMCA).
  *
  * Allows a user to change the collective TX/interference ranges, and the TX/RX
  * success ratio.
@@ -87,22 +87,22 @@ import org.contikios.cooja.radiomediums.UDGMBS;
  * and Enrico Joerns.
  *
  * @see TrafficVisualizerSkin
- * @see UDGMBS
+ * @see UDGMCA
  * @author George Daglaridis
  * @author Carlos Perez Penichet 
  */
-@ClassDescription("Radio environment (UDGMBS)")
-@SupportedArguments(radioMediums = {UDGMBS.class})
-public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
+@ClassDescription("Radio environment (UDGMCA)")
+@SupportedArguments(radioMediums = {UDGMCA.class})
+public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
 
-  private static final Logger logger = Logger.getLogger(UDGMBSVisualizerSkin.class);
+  private static final Logger logger = Logger.getLogger(UDGMCAVisualizerSkin.class);
 
   private static final Color COLOR_TX = new Color(0, 255, 0, 100);
   private static final Color COLOR_INT = new Color(50, 50, 50, 100);
   
   private Simulation simulation = null;
   private Visualizer visualizer = null;
-  private UDGMBS radioMedium = null;
+  private UDGMCA radioMedium = null;
 
   private JInternalFrame rrFrame;
   //private Box ratioRX, ratioTX, rangeTX, rangeINT;
@@ -113,16 +113,16 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
   @Override
   public void setActive(Simulation simulation, Visualizer vis) {
     super.setActive(simulation, vis);
-    if (!(simulation.getRadioMedium() instanceof UDGMBS)) {
-      logger.fatal("Cannot activate UDGMBS skin for unknown radio medium: " + simulation.getRadioMedium());
+    if (!(simulation.getRadioMedium() instanceof UDGMCA)) {
+      logger.fatal("Cannot activate UDGMCA skin for unknown radio medium: " + simulation.getRadioMedium());
       return;
     }
     this.simulation = simulation;
     this.visualizer = vis;
-    this.radioMedium = (UDGMBS) simulation.getRadioMedium();
+    this.radioMedium = (UDGMCA) simulation.getRadioMedium();
     
     /* Change the title of the visualizer */
-    //getVisualizer().setTitle("Network - UDGMBS");
+    //getVisualizer().setTitle("Network - UDGMCA");
 
     /* Spinner GUI components */
     SpinnerNumberModel backscatterCoefficientModel = new SpinnerNumberModel();
@@ -316,7 +316,12 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
       return;
     }
     
+    /**/System.out.println("selectedMotes: " + selectedMotes);
+
+    
     for (Mote selectedMote : selectedMotes) { 
+      /**/  System.out.println("selectedMote: " + selectedMote.getID());
+
       if (selectedMote.getInterfaces().getRadio() == null) {
         continue;
       }
@@ -393,8 +398,8 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
     public void doAction(Visualizer visualizer, Simulation simulation) {
       VisualizerSkin[] skins = visualizer.getCurrentSkins();
       for (VisualizerSkin skin : skins) {
-        if (skin instanceof UDGMBSVisualizerSkin) {
-          UDGMBSVisualizerSkin vskin = ((UDGMBSVisualizerSkin) skin);
+        if (skin instanceof UDGMCAVisualizerSkin) {
+          UDGMCAVisualizerSkin vskin = ((UDGMCAVisualizerSkin) skin);
           vskin.backCOEF.setVisible(true);
           vskin.updateRatioRangeFrame();
         }
@@ -609,6 +614,9 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPowerMax(channel);
           double distanceMax = radioMedium.calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
           
+          /**/    System.out.println("1.UDGMBS.m: " + m.getID());      
+
+          
           double prob = 0.0;
   
           double distance = selectedRadio.getPosition().getDistanceTo(m.getInterfaces().getPosition());
@@ -653,7 +661,10 @@ public class UDGMBSVisualizerSkin extends UDGMVisualizerSkin {
           continue;
         }
         
-        double  prob = ((UDGMBS) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, 
+        /**/    System.out.println("2.UDGMBS.m: " + m.getID());      
+
+        
+        double  prob = ((UDGMCA) simulation.getRadioMedium()).getSuccessProbability(selectedRadio, 
                            m.getInterfaces().getRadio());
         
         if (prob == 0.0d) {

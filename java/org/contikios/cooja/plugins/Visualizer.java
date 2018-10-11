@@ -122,7 +122,7 @@ import org.contikios.cooja.plugins.skins.PositionVisualizerSkin;
 import org.contikios.cooja.plugins.skins.TrafficVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 import org.contikios.cooja.radiomediums.UDGM;
-import org.contikios.cooja.radiomediums.UDGMBS;
+import org.contikios.cooja.radiomediums.UDGMCA;
 
 /**
  * Simulation visualizer supporting different visualizers
@@ -960,7 +960,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       for (Class<? extends Object> o : radioMediums) {
         if (o.isAssignableFrom(simulation.getRadioMedium().getClass())) {
           /* Custom solution */
-          if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMBS.class) {
+          if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMCA.class) {
             break;
           }
           showMenuItem = true;

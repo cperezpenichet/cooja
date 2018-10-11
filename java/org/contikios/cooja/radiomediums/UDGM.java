@@ -266,6 +266,9 @@ public class UDGM extends AbstractRadioMedium {
   
   public double getRxSuccessProbability(Radio source, Radio dest) {
   	double distance = source.getPosition().getDistanceTo(dest.getPosition());
+  	
+  	/**/System.out.println("UDGM.distance: " + distance);
+
     double distanceSquared = Math.pow(distance,2.0);
     double distanceMax = TRANSMITTING_RANGE * 
     ((double) source.getCurrentOutputPowerIndicator() / (double) source.getOutputPowerIndicatorMax());

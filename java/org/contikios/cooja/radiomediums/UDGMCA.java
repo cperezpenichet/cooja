@@ -54,7 +54,7 @@ import org.contikios.cooja.TimeEvent;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.Radio;
 import org.contikios.cooja.plugins.Visualizer;
-import org.contikios.cooja.plugins.skins.UDGMBSVisualizerSkin;
+import org.contikios.cooja.plugins.skins.UDGMCAVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
 
 /**
@@ -85,9 +85,9 @@ import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
  * @author Carlos Perez Penichet
  */
 
-@ClassDescription("Unit Disk Graph Medium for Backscater Communication (UDGMBS): Distance Loss")
-public class UDGMBS extends UDGM {
-  private static Logger logger = Logger.getLogger(UDGMBS.class);
+@ClassDescription("Unit Disk Graph Medium for Carrier-Assisted Communication (UDGMCA): Distance Loss")
+public class UDGMCA extends UDGM {
+  private static Logger logger = Logger.getLogger(UDGMCA.class);
   
   /* Gain of the transmitting antenna */
   public  double GT = 0;
@@ -105,7 +105,7 @@ public class UDGMBS extends UDGM {
   public final double STH = -86.4;
 
   
-  public UDGMBS(Simulation simulation) {
+  public UDGMCA(Simulation simulation) {
     super(simulation);
   
     /* 
@@ -165,16 +165,16 @@ public class UDGMBS extends UDGM {
     }
     
     /* Remove the UDGMVisualizerSkin since visualization 
-     * is being handled by UDGMBSVisualizerSkin */
+     * is being handled by UDGMCAVisualizerSkin */
     super.removed();
 
     /* Register visualizer skin */
-    Visualizer.registerVisualizerSkin(UDGMBSVisualizerSkin.class);
+    Visualizer.registerVisualizerSkin(UDGMCAVisualizerSkin.class);
       
   }
   
   public void removed() {
-      Visualizer.unregisterVisualizerSkin(UDGMBSVisualizerSkin.class);
+      Visualizer.unregisterVisualizerSkin(UDGMCAVisualizerSkin.class);
   }
   
   /**
@@ -321,7 +321,7 @@ public class UDGMBS extends UDGM {
    * of the following method. 
    */
   public RadioConnection createConnections(Radio sender) {
-	  RadioConnection newConnection;
+    RadioConnection newConnection;
 
     /* Store the channels to which the tag can transmit */
     HashSet<Integer> tagTXChannels = new HashSet<Integer>();
@@ -408,6 +408,7 @@ public class UDGMBS extends UDGM {
             double incidentPowerOfTag_CG= friisEquation(carrierGenerator,r);
             double Sensitivity_Threshold = A*incidentPowerOfTag_CG + B;
             double incidentPowerOfTag_Sender= friisEquation(sender,r);
+            System.out.printf(">>>>>>>>>>>>>>>>> THR: %f, PI: %f", Sensitivity_Threshold, incidentPowerOfTag_Sender);
             //Sensitivity_Threshold is greater than, but here we compare negative values and therefore sign is lessthan
             if (incidentPowerOfTag_Sender > Sensitivity_Threshold){
               //do nothing, automatically added to destination
@@ -545,6 +546,8 @@ public class UDGMBS extends UDGM {
       rxSuccessProbability = super.getRxSuccessProbability(source, dest);
     } else {
       double distance = source.getPosition().getDistanceTo(dest.getPosition());
+      /**/  System.out.println("UDGMCA.distance: " + distance);
+
       double distanceSquared = Math.pow(distance,2.0);
       
       double tagCurrentOutputPowerIndicator = source.getTagCurrentOutputPowerMax(dest.getChannel());
@@ -795,4 +798,4 @@ public class UDGMBS extends UDGM {
   }
 
   
-} /* UDGMBS */
+} /* UDGMCA */

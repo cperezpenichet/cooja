@@ -348,14 +348,31 @@ public class UDGMBS extends UDGM {
             //r.interfereAnyReception();
           } else {
             calculateTagCurrentTxPower(sender, r, newConnection);
+
+          	  if (r.isListeningCarrier()) { // || r.isReceiving()) { // If it was listening to a carrier before, we check if this one interferes
+          		  HashSet<Integer> tx_channels = new HashSet<Integer>();
+          		  tx_channels = getRadioChannels(r);
+          		  int sender_channel = sender.getChannel();
+          		  for (int i = 1; i <= 2; i++) {
+          			  if (tx_channels.contains(sender_channel + i + 2) || 
+          			      tx_channels.contains(sender_channel - i + 2)) {
+          				  newConnection.removeDestination(r);
+          				  newConnection.addInterfered(r);
+          				  r.interfere_anyway = true; //// Ugly hack!!!!!
+          				  r.interfereAnyReception(); //?
+          				  break;
+          			  }
+          		  }
+          	  } //else {
+//  	            // NOTE: the node is only removed from the onlyInterfered ArrayList
+//  	            // and not from the allInterfered ArrayList.
+//    	  		}
           } 
         }
         for (Radio r: newConnection.getInterfered()) {
           if (r.isBackscatterTag()) {
-            // NOTE: the node is only removed only from the onlyInterfered ArrayList
-            // and not from the allInterfered ArrayList.
-            newConnection.addDestination(r);
-            calculateTagCurrentTxPower(sender, r, newConnection);
+	            newConnection.addDestination(r);
+	            calculateTagCurrentTxPower(sender, r, newConnection);
           }
         }
       }  else {
@@ -363,12 +380,28 @@ public class UDGMBS extends UDGM {
          * range the tag is removed from the destinations and added to the interfered.----this is changed now */
         for (Radio r: newConnection.getAllDestinations()) {
           if (r.isBackscatterTag() && r.isListeningCarrier()) {
+//        	  if (r.isReceiving()) { // If this tag is already receiving check that this transmission doesnt interfere
+//        		  for (int i = 1; i <= 2; i++) {
+//        			  if (r.isTXChannelFromActiveTransmitter(sender.getChannel() + i + 2)) { // If this sender causes
+//        				  																	 // channel interference to
+//        				  																	 // this tag
+//        				 double sender_power = friisEquation(sender, r);
+////        				 double tx_power = friisEquation(source, r); // How to find out the source?
+//        				 int CHANNEL_REJECTION[] = {3, 14, 22};
+////        				 if (sender_power >= tx_power + CHANNEL_REJECTION[Math.abs(i)]) {
+////        					newConnection.removeDestination(r); 
+////        				 	continue;
+////        				 }
+//        			  }
+//        		  }
+//        	  }
+
 
             RadioConnection carrier_connection = r.getConnectionFromMaxOutputPower(sender.getChannel());
             if (carrier_connection == null) {
               continue; // There is no carrier generator in the appropriate channel for this sender so we skip this tag.
             }
-
+            
             double B = -64.91;//A and B are negative
             double A = -1.025;
             Radio carrierGenerator = carrier_connection.getSource();
@@ -611,7 +644,7 @@ public class UDGMBS extends UDGM {
          * it is still listening the carrier from another connection keep it signaled. */
         if (dstRadio.isBackscatterTag() && !dstRadio.isListeningCarrier()) {
           if (conn.getSource().isGeneratingCarrier()) {
-            dstRadio.signalReceptionStart();
+            dstRadio.signalCarrierReceptionStart();
           }
         }
         /* If a dstRadio is already receiving a packet transmitted from a tag and a second because of tag which listens to 

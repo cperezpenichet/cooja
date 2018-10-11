@@ -61,6 +61,9 @@ import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
  */
 @ClassDescription("Radio")
 public abstract class Radio extends MoteInterface {
+	  ///// Ugly hack!!!! //////
+	  public boolean interfere_anyway = false;
+	
   private static Logger logger = Logger.getLogger(Radio.class);
 
   

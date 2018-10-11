@@ -74,6 +74,8 @@ public class Msp802154Tag extends Msp802154Radio {
   private boolean isListeningCarrier = false;
   private boolean isReceiving = false;
   
+
+  
   /* Keeps a record of the transmitted power from the tag */
   private Hashtable<Integer, Hashtable<RadioConnection, Double>> tagTXPower = 
                                                 new Hashtable<Integer, Hashtable<RadioConnection, Double>>();
@@ -225,7 +227,8 @@ public class Msp802154Tag extends Msp802154Radio {
         Enumeration<Integer> channels = tagTXPower.keys();
         while (channels.hasMoreElements()) {
           Integer channel = (Integer)channels.nextElement();
-          if (this.getNumberOfConnectionsFromChannel(channel) >= 2) {
+          if (interfere_anyway || this.getNumberOfConnectionsFromChannel(channel) >= 2) {
+        	  interfere_anyway = false;
             isInterfered = true;
             lastEvent = RadioEvent.RECEPTION_INTERFERED;
             setChanged();

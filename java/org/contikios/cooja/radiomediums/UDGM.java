@@ -401,5 +401,14 @@ public class UDGM extends AbstractRadioMedium {
     }
     return true;
   }
+  
+  public DirectedGraphMedium getDirectedGraphMedium() {
+    return dgrm;
+  }
+  
+  public Random getRandom() {
+    return random;
+  }
+  
 
 }

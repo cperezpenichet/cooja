@@ -121,6 +121,8 @@ import org.contikios.cooja.plugins.skins.MoteTypeVisualizerSkin;
 import org.contikios.cooja.plugins.skins.PositionVisualizerSkin;
 import org.contikios.cooja.plugins.skins.TrafficVisualizerSkin;
 import org.contikios.cooja.plugins.skins.UDGMVisualizerSkin;
+import org.contikios.cooja.radiomediums.UDGM;
+import org.contikios.cooja.radiomediums.UDGMCA;
 
 /**
  * Simulation visualizer supporting different visualizers
@@ -246,7 +248,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     super("Network", gui);
     this.gui = gui;
     this.simulation = simulation;
-
+    
     /* Register external visualizers */
     String[] skins = gui.getProjectConfig().getStringArrayValue(Visualizer.class, "SKINS");
 
@@ -702,6 +704,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     /* Create and activate new skin */
     try {
       VisualizerSkin newSkin = skinClass.newInstance();
+
       newSkin.setActive(Visualizer.this.simulation, Visualizer.this);
       currentSkins.add(0, newSkin);
     }
@@ -724,6 +727,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       if (skin.isEmpty()) {
         continue;
       }
+
       Class<? extends VisualizerSkin> skinClass
               = simulation.getCooja().tryLoadClass(this, VisualizerSkin.class, skin);
       generateAndActivateSkin(skinClass);
@@ -781,6 +785,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
 
   public static void unregisterVisualizerSkin(Class<? extends VisualizerSkin> skin) {
     visualizerSkins.remove(skin);
+    
   }
 
   private void handlePopupRequest(Point point) {
@@ -946,7 +951,7 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
     if (skinClass == null) {
       return false;
     }
-
+    
     /* Check if skin depends on any particular radio medium */
     boolean showMenuItem = true;
     if (skinClass.getAnnotation(SupportedArguments.class) != null) {
@@ -954,6 +959,10 @@ public class Visualizer extends VisPlugin implements HasQuickHelp {
       Class<? extends RadioMedium>[] radioMediums = skinClass.getAnnotation(SupportedArguments.class).radioMediums();
       for (Class<? extends Object> o : radioMediums) {
         if (o.isAssignableFrom(simulation.getRadioMedium().getClass())) {
+          /* Custom solution */
+          if (o == UDGM.class && simulation.getRadioMedium().getClass() == UDGMCA.class) {
+            break;
+          }
           showMenuItem = true;
           break;
         }

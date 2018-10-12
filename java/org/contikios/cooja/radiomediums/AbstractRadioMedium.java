@@ -83,7 +83,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	
 	private ArrayList<RadioConnection> activeConnections = new ArrayList<RadioConnection>();
 	
-	private RadioConnection lastConnection = null;
+	protected RadioConnection lastConnection = null;
 	
 	private Simulation simulation = null;
 	
@@ -123,6 +123,14 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 		/* NOTE: toArray([0]) creates array and handles synchronization */
 		return activeConnections.toArray(new RadioConnection[0]);
 	}
+	
+	
+	/**
+   * @return All active connections as an ArrayList
+   */
+	protected ArrayList<RadioConnection> getActiveConnectionsArrayList() {
+    return activeConnections;
+  }
 	
 	/**
 	 * Creates a new connection from given radio.
@@ -234,6 +242,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				case RECEPTION_STARTED:
 				case RECEPTION_INTERFERED:
 				case RECEPTION_FINISHED:
+				case CARRIER_LISTENING_STARTED:
+				case CARRIER_LISTENING_STOPPED:  
 					break;
 
 				case UNKNOWN:
@@ -249,6 +259,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					updateSignalStrengths();
 				}
 				break;
+				case CARRIER_STARTED:
 				case TRANSMISSION_STARTED: {
 					/* Create new radio connection */
 					if (radio.isReceiving()) {
@@ -266,10 +277,14 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					
 					RadioConnection newConnection = createConnections(radio);
 					activeConnections.add(newConnection);
-					
+
 					for (Radio r : newConnection.getAllDestinations()) {
 						if (newConnection.getDestinationDelay(r) == 0) {
-							r.signalReceptionStart();
+							if (event == Radio.RadioEvent.CARRIER_STARTED && r.isBackscatterTag()) {
+								r.signalCarrierReceptionStart();
+							} else {
+								r.signalReceptionStart();
+							}
 						} else {
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = r;
@@ -281,7 +296,9 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							simulation.scheduleEvent(delayedEvent, simulation.getSimulationTime() + newConnection.getDestinationDelay(r));
 							
 						}
-					} /* Update signal strengths */
+					}
+					
+					/* Update signal strengths */
 					updateSignalStrengths();
 					
 					/* Notify observers */
@@ -289,6 +306,7 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 					radioTransmissionObservable.setChangedAndNotify();
 				}
 				break;
+				case CARRIER_STOPPED:
 				case TRANSMISSION_FINISHED: {
 					/* Remove radio connection */
 
@@ -298,15 +316,18 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						logger.fatal("No radio connection found");
 						return;
 					}
-					
+
 					activeConnections.remove(connection);
 					lastConnection = connection;
 					COUNTER_TX++;
 					for (Radio dstRadio : connection.getAllDestinations()) {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
-							dstRadio.signalReceptionEnd();
+							if (event == Radio.RadioEvent.CARRIER_STOPPED && dstRadio.isBackscatterTag()) {
+								dstRadio.signalCarrierReceptionEnd();
+							} else {
+								dstRadio.signalReceptionEnd();
+							}
 						} else {
-							
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							TimeEvent delayedEvent = new TimeEvent(0) {
@@ -315,15 +336,18 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 								}
 							};
 							simulation.scheduleEvent(delayedEvent,
-									simulation.getSimulationTime() + connection.getDestinationDelay(dstRadio));
+							simulation.getSimulationTime() + connection.getDestinationDelay(dstRadio));
 						}
 					}
 					COUNTER_RX += connection.getDestinations().length;
 					COUNTER_INTERFERED += connection.getInterfered().length;
 					for (Radio intRadio : connection.getInterferedNonDestinations()) {
-
 					  if (intRadio.isInterfered()) {
-					    intRadio.signalReceptionEnd();
+						  if (intRadio.isBackscatterTag() && event == Radio.RadioEvent.CARRIER_STOPPED) {
+							  intRadio.signalCarrierReceptionEnd();
+						  } else {
+							  intRadio.signalReceptionEnd();
+						  }
 					  }
 					}
 					
@@ -335,8 +359,8 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 				}
 				break;
 				case CUSTOM_DATA_TRANSMITTED: {
-					
-					/* Connection */
+
+				  /* Connection */
 					RadioConnection connection = getActiveConnectionFrom(radio);
 					if (connection == null) {
 						logger.fatal("No radio connection found");
@@ -356,11 +380,11 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 							/* Radios communicate via radio packets */
 							continue;
 						}
-						
+
+						 
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							((CustomDataRadio) dstRadio).receiveCustomData(data);
 						} else {
-							
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final CustomDataRadio delayedRadio = (CustomDataRadio) dstRadio;
 							final Object delayedData = data;
@@ -406,7 +430,6 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 						if (connection.getDestinationDelay(dstRadio) == 0) {
 							dstRadio.setReceivedPacket(packet);
 						} else {
-							
 							/* EXPERIMENTAL: Simulating propagation delay */
 							final Radio delayedRadio = dstRadio;
 							final RadioPacket delayedPacket = packet;
@@ -574,6 +597,11 @@ public abstract class AbstractRadioMedium extends RadioMedium {
 	public RadioConnection getLastConnection() {
 		return lastConnection;
 	}
+	
+	public Simulation getSimulation() {
+    return simulation;
+  }
+	
 	public Collection<Element> getConfigXML() {
 		Collection<Element> config = new ArrayList<Element>();
 		for(Entry<Radio, Double> ent: baseRssi.entrySet()){

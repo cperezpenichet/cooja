@@ -31,6 +31,8 @@ package org.contikios.cooja.interfaces;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -44,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.contikios.cooja.ClassDescription;
 import org.contikios.cooja.Mote;
 import org.contikios.cooja.MoteInterface;
+import org.contikios.cooja.RadioConnection;
 import org.contikios.cooja.RadioPacket;
 import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
 
@@ -58,8 +61,12 @@ import org.contikios.cooja.contikimote.interfaces.ContikiRadio;
  */
 @ClassDescription("Radio")
 public abstract class Radio extends MoteInterface {
+	  ///// Ugly hack!!!! //////
+	  public boolean interfere_anyway = false;
+	
   private static Logger logger = Logger.getLogger(Radio.class);
 
+  
   /**
    * Events that radios should notify observers about.
    */
@@ -67,8 +74,18 @@ public abstract class Radio extends MoteInterface {
     UNKNOWN, HW_OFF, HW_ON,
     RECEPTION_STARTED, RECEPTION_FINISHED, RECEPTION_INTERFERED,
     TRANSMISSION_STARTED, TRANSMISSION_FINISHED,
-    PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED
+    PACKET_TRANSMITTED, CUSTOM_DATA_TRANSMITTED, CARRIER_STARTED, CARRIER_STOPPED,
+    CARRIER_LISTENING_STARTED, CARRIER_LISTENING_STOPPED
   }
+  
+  /* Output power of CC240 radio transceiver in dBm,(p.51 - cc2420 datasheet) */
+  public final double[] CC2420OutputPower = {
+    -37.92, -32.98, -28.7, -25.0, -21.84, -19.15, 
+    -16.89, -15.0, -13.42, -12.1, -10.98, -10.0, 
+    -9.12, -8.33, -7.63, -7.0, -6.44, -5.94, -5.47, 
+    -5.0, -4.52, -4.03, -3.52, -3.0, -2.47, -1.95, 
+    -1.45, -1.0, -0.61, -0.3, -0.09, 0.0
+  };
 
   /**
    * Register the radio packet that is being received during a connection. This
@@ -104,6 +121,9 @@ public abstract class Radio extends MoteInterface {
    */
   public abstract void signalReceptionEnd();
 
+  public void signalCarrierReceptionStart() {}
+  public void signalCarrierReceptionEnd() {}
+  
   /**
    * Returns last event at this radio. This method should be used to learn the
    * reason when a radio notifies a change to observers.
@@ -111,7 +131,16 @@ public abstract class Radio extends MoteInterface {
    * @return Last radio event
    */
   public abstract RadioEvent getLastEvent();
-
+  
+  /**
+   * Checks if a radio refers to a backscatter tag or to a CC2420 radio.
+   * 
+   * @return True if radio refers to a backscatter tag
+   */
+  public boolean isBackscatterTag() {
+      return false;
+  }
+  
   /**
    * Returns true if this radio is transmitting, or just finished transmitting,
    * data.
@@ -136,7 +165,7 @@ public abstract class Radio extends MoteInterface {
    * @return True if this radio is interfered
    */
   public abstract boolean isInterfered();
-
+  
   /**
    * @return True if the simulated radio transceiver is on
    */
@@ -224,8 +253,113 @@ public abstract class Radio extends MoteInterface {
    * @return Mote
    */
   public abstract Mote getMote();
+  
+  /* Concerning the backscatter communication */
+  
+  /**
+   * Signal that the carrier listening just begun. This method should normally be 
+   * called from the radio medium on interfered radios.
+   * 
+   * @see void carrierListeningEnd()
+   */
+  public void carrierListeningStart() {}
+  
+  /**
+   * Signal that the carrier listening was ended. This method should normally be 
+   * called from the radio medium on interfered radios.
+   * 
+   * @see void carrierListeningStart()
+   */
+  public void carrierListeningEnd() {}
+  
+  /**
+   * Returns true if this radio is generating a carrier, or just finished generating one.
+   * 
+   * @see #isTransmitting()
+   * @return True if radio is generating a carrier.
+   */
+  public boolean isGeneratingCarrier() {
+    return false;
+  }
+  
+  /**
+   * Returns true if this radio is listening a carrier, or just finished listening one.
+   * 
+   * @see #isTransmitting()
+   * @return True if radio is listening the carrier.
+   */
+  public boolean isListeningCarrier() {
+    return false;
+  }
+  
+  /**
+   * Removes the entry that concerns the already finished connection that is given from 
+   * the hashtable of the tag.
+   *  
+   * @param conn
+   */
+  public void updateTagTXPower(RadioConnection conn) {};
+  
+  /**
+   * Keeps a record of the output power of the tag concerning each time the corresponding
+   * connection from which it was produced as well as the appropriate transmission channel 
+   * derived from the carrier generator that created that connection. 
+   * 
+   * @param channel, conn, tagCurrentTXPower
+   */
+  public void putTagTXPower(int channel, RadioConnection conn, double tagCurrentTXPower){};
+  
+  /**
+   * In case there are more than one connections created by carrier generators with the 
+   * same channel this method returns the output power of the tag that corresponds to the 
+   * connection created by the given radio (carrier generator). 
+   * 
+   * @param radio
+   * @param channel
+   */
+  public double getTagCurrentOutputPower(Radio radio, int channel) { return 0.0; }
+  
+  /**
+   * In case there are more than one connections created by carrier generators with the 
+   * same channel this method returns the max output power of the tag that corresponds to the 
+   * connection created by the carrier generator which is closer to the tag. 
 
+   * @param channel
+   */
+  public double getTagCurrentOutputPowerMax(int channel) { return 0.0; }
+  
+  /**
+   * Returns the connection responsible for the tag's maximum output power, in case the carrier 
+   * generators of more than one connections have the same channel.
+   * 
+   * @param channel
+   */
+  public RadioConnection getConnectionFromMaxOutputPower(int channel) { return null; }
+  
+  /**
+   * Returns true if there is at least one active transmitter who serves as a source in one 
+   * of the ongoing connections that correspond to the entry in the tag's hashtable indexed by
+   * the given channel. 
+   * 
+   * @param channel
+   */
+  public boolean isTXChannelFromActiveTransmitter(int channel) { return false; }
+  
+  /**
+   * Returns the number of connections that correspond to the entry in the tag's hashtable indexed
+   * by the given channel. 
+   * 
+   * @param channel
+   */
+  public int getNumberOfConnectionsFromChannel(int channel) { return 0; }
+  
+  /**
+   * Returns true if the tag's hashtable is empty.
+   * @return
+   */
+  public boolean isTagTXPowersEmpty() { return false; }
 
+  
   public JPanel getInterfaceVisualizer() {
     JPanel panel = new JPanel(new BorderLayout());
     Box box = Box.createVerticalBox();

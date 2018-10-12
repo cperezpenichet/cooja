@@ -31,6 +31,7 @@
 package org.contikios.cooja.mspmote.interfaces;
 
 import java.util.Collection;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -42,8 +43,10 @@ import org.contikios.cooja.Simulation;
 import org.contikios.cooja.interfaces.CustomDataRadio;
 import org.contikios.cooja.interfaces.Position;
 import org.contikios.cooja.interfaces.Radio;
+import org.contikios.cooja.interfaces.Radio.RadioEvent;
 import org.contikios.cooja.mspmote.MspMote;
 import org.contikios.cooja.mspmote.MspMoteTimeEvent;
+
 import se.sics.mspsim.chip.CC2420;
 import se.sics.mspsim.chip.ChannelListener;
 import se.sics.mspsim.chip.RFListener;
@@ -67,29 +70,32 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public static final long DELAY_BETWEEN_BYTES =
     (long) (1000.0*Simulation.MILLISECOND/(250000.0/8.0)); /* us. Corresponds to 250kbit/s */
 
-  private RadioEvent lastEvent = RadioEvent.UNKNOWN;
-
+  protected RadioEvent lastEvent = RadioEvent.UNKNOWN;
+  
   protected final MspMote mote;
   protected final Radio802154 radio;
-
-  private boolean isInterfered = false;
-  private boolean isTransmitting = false;
-  private boolean isReceiving = false;
-  private boolean isSynchronized = false;
-
+  
+  protected boolean isInterfered = false;
+  protected boolean isTransmitting = false;
+  protected boolean isReceiving = false;
+  protected boolean isSynchronized = false;
+  private boolean isGeneratingCarrier = false;
+  
   protected byte lastOutgoingByte;
   protected byte lastIncomingByte;
 
-  private RadioPacket lastOutgoingPacket = null;
-  private RadioPacket lastIncomingPacket = null;
+  protected RadioPacket lastOutgoingPacket = null;
+  protected RadioPacket lastIncomingPacket = null;
+  
 
-  public Msp802154Radio(Mote m) {
+  public Msp802154Radio(Mote m) { 
     this.mote = (MspMote)m;
     this.radio = this.mote.getCPU().getChip(Radio802154.class);
+
     if (radio == null) {
       throw new IllegalStateException("Mote is not equipped with an IEEE 802.15.4 radio");
     }
-
+    
     radio.addRFListener(new RFListener() {
       int len = 0;
       int expMpduLen = 0;
@@ -131,7 +137,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
           }
         }
         else if (len == 6) {
-//          System.out.println("## CC2420 Packet of length: " + data + " expected...");
+          //System.out.println("## CC2420 Packet of length: " + data + " expected...");
           expMpduLen = data & 0xFF;
           if ((expMpduLen & 0x80) != 0) {
             logger.error("Outgoing length field is larger than 127: " + expMpduLen);
@@ -150,9 +156,33 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
         }
       }
     }); /* addRFListener */
-
+    
     radio.addOperatingModeListener(new OperatingModeListener() {
       public void modeChanged(Chip source, int mode) {
+    	  if (mode == CC2420.MODE_TEST_CARRIER_ON) {
+			    lastEvent = RadioEvent.HW_ON;
+			    setChanged();
+			    notifyObservers();
+			    isGeneratingCarrier = true;
+			    isTransmitting = true;
+			  lastEvent = RadioEvent.CARRIER_STARTED;
+    		  setChanged();
+    		  notifyObservers();
+    		  return;
+    	  }
+    	
+    	  if ((mode == CC2420.MODE_POWER_OFF) || (mode == CC2420.MODE_TXRX_OFF)) {
+    	    if (isGeneratingCarrier) {
+				    isGeneratingCarrier = false;
+				    isTransmitting = false;
+	        lastEvent = RadioEvent.CARRIER_STOPPED;
+            setChanged();
+            notifyObservers();
+		        radioOff(); // actually it is a state change, not necessarily to OFF
+		        return;
+    	    }
+    	  }
+    	
         if (radio.isReadyToReceive()) {
           lastEvent = RadioEvent.HW_ON;
           setChanged();
@@ -173,9 +203,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     });
   }
 
-
-  private void finishTransmission()
-  {
+  protected void finishTransmission() {
     if (isTransmitting()) {
       //logger.debug("----- 802.15.4 TRANSMISSION FINISHED -----");
       isTransmitting = false;
@@ -203,7 +231,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public RadioPacket getLastPacketReceived() {
     return lastIncomingPacket;
   }
-
+  
   public void setReceivedPacket(RadioPacket packet) {
     /* Note:
      * Only nodes at other abstraction levels deliver full packets.
@@ -219,6 +247,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     /* Delivering packet bytes with delays */
     byte[] packetData = CC2420RadioPacketConverter.fromCoojaToCC2420(packet);
     long deliveryTime = getMote().getSimulation().getSimulationTime();
+
     for (byte b: packetData) {
       if (isInterfered()) {
         b = (byte) 0xFF;
@@ -267,12 +296,15 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     }, mote.getSimulation().getSimulationTime());
 
   }
-
-  /* General radio support */
+  
+  public boolean isGeneratingCarrier() {
+	  return isGeneratingCarrier;
+  }
+ 
   public boolean isTransmitting() {
     return isTransmitting;
   }
-
+  
   public boolean isReceiving() {
     return isReceiving;
   }
@@ -280,9 +312,9 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   public boolean isInterfered() {
     return isInterfered;
   }
-
+  
   public int getChannel() {
-    return radio.getActiveChannel();
+      return radio.getActiveChannel();
   }
 
   public int getFrequency() {
@@ -308,11 +340,11 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     setChanged();
     notifyObservers();
   }
-
+  
   public RadioEvent getLastEvent() {
     return lastEvent;
   }
-
+  
   public void interfereAnyReception() {
     isInterfered = true;
     isReceiving = false;
@@ -323,7 +355,7 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
     setChanged();
     notifyObservers();
   }
-
+  
   public double getCurrentOutputPower() {
     return radio.getOutputPower();
   }
@@ -426,9 +458,10 @@ public class Msp802154Radio extends Radio implements CustomDataRadio {
   }
   
   public boolean canReceiveFrom(CustomDataRadio radio) {
-    if (radio.getClass().equals(this.getClass())) {
+    if ( this.getClass().isAssignableFrom(radio.getClass())) {
       return true;
     }
     return false;
   }
+  
 }

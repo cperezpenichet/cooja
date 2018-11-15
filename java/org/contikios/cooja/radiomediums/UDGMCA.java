@@ -105,7 +105,22 @@ public class UDGMCA extends UDGM {
   /* Derived from the experimental part of the master thesis mentioned above */
   public final double STH = -86.4;
 
-  
+  private int FREQSHIFT = 2;
+
+
+  public int getFREQSHIFT() {
+    return FREQSHIFT;
+  }
+
+  public void setFREQSHIFT(int fREQSHIFT) {
+    FREQSHIFT = fREQSHIFT;
+    for (Radio r: getRegisteredRadios()){
+      if(r.isBackscatterTag()){
+        r.FREQSHIFT = fREQSHIFT;
+      }
+    }
+  }
+
   public UDGMCA(Simulation simulation) {
     super(simulation);
   
@@ -232,7 +247,7 @@ public class UDGMCA extends UDGM {
     double reflectionLoss = BACKSCATTER_COEFFICIENT + ENERGYLOSS;
     /* Current power of the tag in dBm */
     double tagCurrentTXPower = incidentPower - reflectionLoss;
-    tag.putTagTXPower(activeRadio.getChannel() + 2, conn, tagCurrentTXPower);
+    tag.putTagTXPower(activeRadio.getChannel() + FREQSHIFT, conn, tagCurrentTXPower);
     
   } 
   
@@ -284,7 +299,7 @@ public class UDGMCA extends UDGM {
         if (conn.isDestination(radio)) {
           if (conn.getSource().isGeneratingCarrier()) { // TODO It might be interesting to reflect active transmissions as interference too
             if (conn.getSource().getChannel() >=0) {
-              radioChannels.add(conn.getSource().getChannel() + 2);
+              radioChannels.add(conn.getSource().getChannel() + FREQSHIFT);
             }
           }
         }
@@ -305,7 +320,7 @@ public class UDGMCA extends UDGM {
       for (RadioConnection conn : getActiveConnections()) {
         if (conn.isDestination(radio)) {
           if (conn.getSource().isGeneratingCarrier()) {
-            if (conn.getSource().getChannel() == (channel - 2)) {
+            if (conn.getSource().getChannel() == (channel - FREQSHIFT)) {
               return conn.getSource();
             }
           }
@@ -355,8 +370,8 @@ public class UDGMCA extends UDGM {
           		  tx_channels = getRadioChannels(r);
           		  int sender_channel = sender.getChannel();
           		  for (int i = 1; i <= 2; i++) {
-          			  if (tx_channels.contains(sender_channel + i + 2) || 
-          			      tx_channels.contains(sender_channel - i + 2)) {
+          			  if (tx_channels.contains(sender_channel + i + FREQSHIFT) ||
+          			      tx_channels.contains(sender_channel - i + FREQSHIFT)) {
           				  newConnection.removeDestination(r);
           				  newConnection.addInterfered(r);
           				  r.interfere_anyway = true; //// Ugly hack!!!!!
@@ -662,7 +677,7 @@ public class UDGMCA extends UDGM {
          * exist, the tag that is simultaneously accepting their signal gets interfered */
         
         if (conn.getSource().isGeneratingCarrier() && dstRadio.isListeningCarrier()) {
-          if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + 2) >= 2) {
+          if (dstRadio.getNumberOfConnectionsFromChannel(conn.getSource().getChannel() + FREQSHIFT) >= 2) {
             dstRadio.interfereAnyReception();  
           }
         }

@@ -55,7 +55,8 @@ import org.contikios.cooja.radiomediums.UDGMCA;
 import se.sics.mspsim.chip.BackscatterTXRadio;
 import se.sics.mspsim.chip.CC2420;
 import se.sics.mspsim.chip.RFListener;
-
+import se.sics.mspsim.core.Chip;
+import se.sics.mspsim.core.OperatingModeListener;
 
 import org.contikios.cooja.RadioConnection;
 
@@ -76,6 +77,8 @@ public class Msp802154Tag extends Msp802154Radio {
   private boolean isListeningCarrier = false;
   private boolean isReceiving = false;
   
+//  public int FREQSHIFT = 2;
+
 
   
   /* Keeps a record of the transmitted power from the tag */
@@ -87,6 +90,7 @@ public class Msp802154Tag extends Msp802154Radio {
 
   public Msp802154Tag(Mote m) {
     super(m);
+    this.FREQSHIFT = 2;
     this.radio = this.mote.getCPU().getChip(BackscatterTXRadio.class);
     
     if (radio == null) {
@@ -154,6 +158,28 @@ public class Msp802154Tag extends Msp802154Radio {
       }
     }); /* addRFListener */
     
+    radio.addOperatingModeListener(new OperatingModeListener() {
+      public void modeChanged(Chip source, int mode) {
+        if ( (mode == BackscatterTXRadio.MODE_TX_ON) || 
+             (mode == BackscatterTXRadio.MODE_RX_ON)) {
+          lastEvent = RadioEvent.HW_ON;
+          setChanged();
+          notifyObservers();
+//          isTransmitting = true;
+//        lastEvent = RadioEvent.TRANSMISSION_STARTED;
+//          setChanged();
+//          notifyObservers();
+          return;
+        }
+      
+        if ((mode == BackscatterTXRadio.MODE_TXRX_OFF)) {
+          lastEvent = RadioEvent.HW_OFF;
+            setChanged();
+            notifyObservers();
+            return;
+          }
+        }
+    });    
   }
 
   public boolean isBackscatterTag() {
@@ -239,7 +265,7 @@ public class Msp802154Tag extends Msp802154Radio {
   public void updateTagTXPower(RadioConnection conn) {
     lock.lock();
     try {
-      int tagTXChannel = conn.getSource().getChannel()+2;
+      int tagTXChannel = conn.getSource().getChannel()+FREQSHIFT;
       if (tagTXPower.get(tagTXChannel) != null) {
         tagTXPower.get(tagTXChannel).remove(conn);
         if (tagTXPower.get(tagTXChannel).isEmpty()) {
@@ -384,8 +410,8 @@ public class Msp802154Tag extends Msp802154Radio {
    
   @Override
   public boolean isRadioOn() {
-    return true;
-    
+    return (radio.getMode() != BackscatterTXRadio.MODE_TXRX_OFF);
+//    return true;
   }
   
   

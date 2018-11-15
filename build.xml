@@ -105,10 +105,10 @@ The COOJA Simulator
   <target name="run" depends="init, compile, jar, copy configs">
     <java fork="yes" dir="${build}" classname="org.contikios.cooja.Cooja" maxmemory="512m">
       <!--   			For debugging with eclipse                          	-->	
-      <!--
+      
       <jvmarg value="-Xdebug"/>
       <jvmarg value="-Xnoagent"/>
-      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=5556,server=y,suspend=y"/>-->
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=5556,server=y,suspend=y"/>
       <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
       <sysproperty key="user.language" value="en"/>
       <arg line="${args}"/>

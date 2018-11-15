@@ -65,6 +65,8 @@ public abstract class Radio extends MoteInterface {
 	  public boolean interfere_anyway = false;
 	
   private static Logger logger = Logger.getLogger(Radio.class);
+  
+  public int FREQSHIFT = 0;
 
   
   /**

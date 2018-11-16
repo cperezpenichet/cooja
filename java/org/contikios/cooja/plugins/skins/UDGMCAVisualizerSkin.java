@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2013, Swedish Institute of Computer Science, TU Braunscheig
+ * Copyright (c) 2018, Uppsala University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
-//import java.lang.Integer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -83,14 +82,14 @@ import org.contikios.cooja.radiomediums.UDGMCA;
  *
  * To also see radio traffic, this skin can be combined with {@link
  * TrafficVisualizerSkin}.
- *
+ * 
  * This class is an extension of the UDGMVisualizerSkin class written by Fredrik Osterlind
  * and Enrico Joerns.
  *
  * @see TrafficVisualizerSkin
  * @see UDGMCA
  * @author George Daglaridis
- * @author Carlos Perez Penichet
+ * @author Carlos Pérez Penichet 
  */
 @ClassDescription("Radio environment (UDGMCA)")
 @SupportedArguments(radioMediums = {UDGMCA.class})
@@ -106,7 +105,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
   private UDGMCA radioMedium = null;
 
   private JInternalFrame rrFrame;
-  //private Box ratioRX, ratioTX, rangeTX, rangeINT;
   private Box backCOEF;
   private Box freqShift;
 
@@ -128,29 +126,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
     /* Change the title of the visualizer */
     //getVisualizer().setTitle("Network - UDGMCA");
 
-    /* Spinner GUI components */
-//    SpinnerNumberModel transmissionModel = new SpinnerNumberModel();
-//    transmissionModel.setValue(new Double(radioMedium.TRANSMITTING_RANGE));
-//    transmissionModel.setStepSize(new Double(1.0)); // 1m
-//    transmissionModel.setMinimum(new Double(0.0));
-//
-//    SpinnerNumberModel interferenceModel = new SpinnerNumberModel();
-//    interferenceModel.setValue(new Double(radioMedium.INTERFERENCE_RANGE));
-//    interferenceModel.setStepSize(new Double(1.0)); // 1m
-//    interferenceModel.setMinimum(new Double(0.0));
-
-//    SpinnerNumberModel successRatioTxModel = new SpinnerNumberModel();
-//    successRatioTxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_TX));
-//    successRatioTxModel.setStepSize(new Double(0.001)); // 0.1%
-//    successRatioTxModel.setMinimum(new Double(0.0));
-//    successRatioTxModel.setMaximum(new Double(1.0));
-//
-//    SpinnerNumberModel successRatioRxModel = new SpinnerNumberModel();
-//    successRatioRxModel.setValue(new Double(radioMedium.SUCCESS_RATIO_RX));
-//    successRatioRxModel.setStepSize(new Double(0.001)); // 0.1%
-//    successRatioRxModel.setMinimum(new Double(0.0));
-//    successRatioRxModel.setMaximum(new Double(1.0));
-
     SpinnerNumberModel backscatterCoefficientModel = new SpinnerNumberModel();
     backscatterCoefficientModel.setValue(new Double(radioMedium.BACKSCATTER_COEFFICIENT));
     backscatterCoefficientModel.setStepSize(new Double(0.1)); // 0.1%
@@ -164,79 +139,15 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
 
 
     JSpinner.NumberEditor editor;
-//    final JSpinner txRangeSpinner = new JSpinner(transmissionModel);
-//    editor = new JSpinner.NumberEditor(txRangeSpinner, "0m");
-//    txRangeSpinner.setEditor(editor);
-//    final JSpinner interferenceRangeSpinner = new JSpinner(interferenceModel);
-//    editor = new JSpinner.NumberEditor(interferenceRangeSpinner, "0m");
-//    interferenceRangeSpinner.setEditor(editor);
-//    final JSpinner successRatioTxSpinner = new JSpinner(successRatioTxModel);
-//    editor = new JSpinner.NumberEditor(successRatioTxSpinner, "0.0%");
-//    successRatioTxSpinner.setEditor(editor);
-//    final JSpinner successRatioRxSpinner = new JSpinner(successRatioRxModel);
-//    editor = new JSpinner.NumberEditor(successRatioRxSpinner, "0.0%");
-//    successRatioRxSpinner.setEditor(editor);
     final JSpinner backscatterCoefficientSpinner = new JSpinner(backscatterCoefficientModel);
     editor = new JSpinner.NumberEditor(backscatterCoefficientSpinner, "0.0 dBm");
     backscatterCoefficientSpinner.setEditor(editor);
     final JSpinner frequencyShiftModelSpinner = new JSpinner(frequencyShiftModel);
-    editor = new JSpinner.NumberEditor(frequencyShiftModelSpinner, "0 MHz");
+    editor = new JSpinner.NumberEditor(frequencyShiftModelSpinner, "0 Ch");
     frequencyShiftModelSpinner.setEditor(editor);
 
-
-
-
-
-
-
-
-//    ((JSpinner.DefaultEditor) txRangeSpinner.getEditor()).getTextField().setColumns(5);
-//    ((JSpinner.DefaultEditor) interferenceRangeSpinner.getEditor()).getTextField().setColumns(5);
-//    ((JSpinner.DefaultEditor) successRatioTxSpinner.getEditor()).getTextField().setColumns(5);
-//    ((JSpinner.DefaultEditor) successRatioRxSpinner.getEditor()).getTextField().setColumns(5);
-//    txRangeSpinner.setToolTipText("Transmitting range (m)");
-//    interferenceRangeSpinner.setToolTipText("Interference range (m)");
-//    successRatioTxSpinner.setToolTipText("Transmission success ratio (%)");
-//    successRatioRxSpinner.setToolTipText("Reception success ratio (%)");
     backscatterCoefficientSpinner.setToolTipText("Backscatter coefficient (dBm)");
-    frequencyShiftModelSpinner.setToolTipText("Frequency shift (MHz)");
-
-
-//    txRangeSpinner.addChangeListener(new ChangeListener() {
-//      @Override
-//      public void stateChanged(ChangeEvent e) {
-//        radioMedium.setTxRange(((SpinnerNumberModel) txRangeSpinner.getModel())
-//                .getNumber().doubleValue());
-//        visualizer.repaint();
-//      }
-//    });
-//
-//    interferenceRangeSpinner.addChangeListener(new ChangeListener() {
-//      @Override
-//      public void stateChanged(ChangeEvent e) {
-//        radioMedium.setInterferenceRange(((SpinnerNumberModel) interferenceRangeSpinner.getModel())
-//                .getNumber().doubleValue());
-//        visualizer.repaint();
-//      }
-//    });
-
-//    successRatioTxSpinner.addChangeListener(new ChangeListener() {
-//      @Override
-//      public void stateChanged(ChangeEvent e) {
-//        radioMedium.SUCCESS_RATIO_TX = ((SpinnerNumberModel) successRatioTxSpinner.getModel())
-//                .getNumber().doubleValue();
-//        visualizer.repaint();
-//      }
-//    });
-//
-//    successRatioRxSpinner.addChangeListener(new ChangeListener() {
-//      @Override
-//      public void stateChanged(ChangeEvent e) {
-//        radioMedium.SUCCESS_RATIO_RX = ((SpinnerNumberModel) successRatioRxSpinner.getModel())
-//                .getNumber().doubleValue();
-//        visualizer.repaint();
-//      }
-//    });
+    frequencyShiftModelSpinner.setToolTipText("Channel shift (Ch)");
 
     backscatterCoefficientSpinner.addChangeListener(new ChangeListener() {
       @Override
@@ -256,39 +167,16 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
       }
     });
 
-
-
-
-
     /* Register menu actions */
     //visualizer.registerSimulationMenuAction(RangeMenuAction.class);
     visualizer.registerSimulationMenuAction(BackscatterCoefficientMenuAction.class);
     visualizer.registerSimulationMenuAction(FrequencyShiftMenuAction.class);
-
-//    visualizer.registerSimulationMenuAction(SuccessRatioMenuAction.class);
 
     /* UI components */
     JPanel main = new JPanel();
     main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
     main.setBorder(BorderFactory.createEmptyBorder(9, 9, 9, 9));
 
-//    rangeTX = Box.createHorizontalBox();
-//    rangeTX.add(new JLabel("TX range:"));
-//    rangeTX.add(Box.createHorizontalStrut(5));
-//    rangeTX.add(txRangeSpinner);
-//    rangeINT = Box.createHorizontalBox();
-//    rangeINT.add(new JLabel("INT range:"));
-//    rangeINT.add(Box.createHorizontalStrut(5));
-//    rangeINT.add(interferenceRangeSpinner);
-//
-//    ratioTX = Box.createHorizontalBox();
-//    ratioTX.add(new JLabel("TX ratio:"));
-//    ratioTX.add(Box.createHorizontalStrut(5));
-//    ratioTX.add(successRatioTxSpinner);
-//    ratioRX = Box.createHorizontalBox();
-//    ratioRX.add(new JLabel("RX ratio:"));
-//    ratioRX.add(Box.createHorizontalStrut(5));
-//    ratioRX.add(successRatioRxSpinner);
     backCOEF = Box.createHorizontalBox();
     backCOEF.add(new JLabel("Back COEF.:"));
     backCOEF.add(Box.createHorizontalStrut(5));
@@ -298,18 +186,9 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
     freqShift.add(Box.createHorizontalStrut(5));
     freqShift.add(frequencyShiftModelSpinner);
 
-
-//    rangeTX.setVisible(false);
-//    rangeINT.setVisible(false);
-//    ratioTX.setVisible(false);
-//    ratioRX.setVisible(false);
     backCOEF.setVisible(false);
     freqShift.setVisible(false);
 
-//    main.add(rangeTX);
-//    main.add(rangeINT);
-//    main.add(ratioTX);
-//    main.add(ratioRX);
     main.add(backCOEF);
     main.add(freqShift);
 
@@ -329,10 +208,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
       @Override
       public void internalFrameClosing(InternalFrameEvent ife) {
         super.internalFrameClosed(ife);
-//        rangeTX.setVisible(false);
-//        rangeINT.setVisible(false);
-//        ratioTX.setVisible(false);
-//        ratioRX.setVisible(false);
         backCOEF.setVisible(false);
         freqShift.setVisible(false);
         rrFrame.setVisible(false);
@@ -360,11 +235,8 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
     visualizer.getCurrentCanvas().remove(rrFrame);
 
     /* Unregister menu actions */
-    //visualizer.unregisterSimulationMenuAction(RangeMenuAction.class);
     visualizer.unregisterSimulationMenuAction(BackscatterCoefficientMenuAction.class);
     visualizer.unregisterSimulationMenuAction(FrequencyShiftMenuAction.class);
-
-//    visualizer.unregisterSimulationMenuAction(SuccessRatioMenuAction.class);
   }
 
   @Override
@@ -394,11 +266,9 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
          * a carrier generator and paint the Tx and Int ranges of the selectedRadio (tag)
          * that is listening to its carrier. */
 
-//          int tagTxChannel = 0;
         boolean paintRanges = false;
         for(int i=conns.length; i>0; i--) {
           RadioConnection lastConnFromCarrier = conns[i-1];
-//            int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
           if (lastConnFromCarrier.getSource().isGeneratingCarrier()) {
             if (lastConnFromCarrier.isDestination(selectedRadio)) {
               paintRanges = true;
@@ -412,71 +282,14 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
           }
 
           if (paintRanges) {
-            int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
+            int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+radioMedium.getFREQSHIFT();
 
             /* Paint the Tx and Int range of the tag */
             paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
             showProbability(selectedMotes, g, tagTxChannel);
-//              showProbability(selectedMotes, g);
             break;
           }
-
-
-//              if (lastConnFromCarrier.isDestination(selectedRadio) || lastConnFromCarrier.isInterfered(selectedRadio)) {
-//
-//                int carrierChannel = lastConnFromCarrier.getSource().getChannel();
-//                tagTxChannel = carrierChannel+2;
-///**/            System.out.println("tagTxChannel: " + tagTxChannel);
-//
-//                /* Paint the Tx and Int range of the tag */
-//                paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
-//                showProbability(selectedMotes, g, tagTxChannel);
-//                break;
-//              }
         }
-        //TODO: Consider to move this call within the if statement above
-//          showProbability(selectedMotes, g, tagTxChannel);
-//          showProbability(selectedMotes, g);
-
-
-
-
-//        int tagTxChannel = 0;
-//        if (conns.length >= 1) {
-//          RadioConnection lastConnFromCarrier = conns[conns.length-1];
-//          int carrierChannel = lastConnFromCarrier.getSource().getChannel();
-//          /* In case the last connection started has a tag as a source*/
-//          if (carrierChannel >= 0) {
-//  /**/      System.out.println("carrierChannel: " + carrierChannel);
-//            tagTxChannel = carrierChannel+2;
-//
-//  /**/      System.out.println("tagTxChannel: " + tagTxChannel);
-//
-//            /* Paint the Tx and Int range of the tag */
-//            paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
-//            showProbability(selectedMotes, g, tagTxChannel);
-//          }
-//        }
-
-///**/      System.out.println("1.lenght of conns: " + conns.length);
-//
-//        for (int i=conns.length; i>0; i--) {
-///**/      System.out.println("2.lenght of conns: " + conns.length);
-///**/      System.out.println("i: " + i);
-//          RadioConnection lastConnFromCarrier = conns[i-1];
-//          if (lastConnFromCarrier.getSource().isGeneratingCarrier()) {
-//            if (lastConnFromCarrier.isDestination(selectedRadio)) {
-//              int carrierChannel = lastConnFromCarrier.getSource().getChannel();
-//              tagTxChannel = carrierChannel+2;
-///**/          System.out.println("tagTxChannel: " + tagTxChannel);
-//
-//              /* Paint the Tx and Int range of the tag */
-//              paintTxAndIxRanges(g, selectedRadio, tagTxChannel);
-//            }
-//            break;
-//          }
-//        }
-//        showProbability(selectedMotes, g, tagTxChannel);
       } else if (selectedRadio.isGeneratingCarrier()) {
         super.paintBeforeMotes(g);
 
@@ -487,9 +300,7 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
           if (conn.getSource() == selectedRadio) {
             for (Radio r : conn.getAllDestinations()) {
               if (conn.getDestinationDelay(r) == 0 ) {
-//              if (r.isBackscatterTag() && r.isTransmitting()) {
-//                int carrierChannel = conn.getSource().getChannel();
-                int tagTxChannel = conn.getSource().getChannel()+2;
+                int tagTxChannel = conn.getSource().getChannel()+radioMedium.getFREQSHIFT();
 
                 /* Paint the TX and INT range of each tag */
                 paintTxAndIxRanges(g, r, tagTxChannel);
@@ -506,8 +317,7 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
           if (conn.getSource() == selectedRadio) {
             for (Radio r : conn.getInterferedNonDestinations()) {
               if (r.isBackscatterTag()) {//&& r.isTransmitting()) {
-   //                int carrierChannel = conn.getSource().getChannel();
-                int tagTxChannel = conn.getSource().getChannel()+2;
+                int tagTxChannel = conn.getSource().getChannel()+radioMedium.getFREQSHIFT();
 
                 /* Paint the TX and INT range of each tag */
                 paintTxAndIxRanges(g, r, tagTxChannel);
@@ -547,7 +357,7 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
           /* Last connection among the active ones that was created by a carrier
            * generator. */
           RadioConnection lastConnFromCarrier = conns[i-1];
-          int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+2;
+          int tagTxChannel = lastConnFromCarrier.getSource().getChannel()+radioMedium.getFREQSHIFT();
           RadioConnection connFromMaxPower = null;
           if (lastConnFromCarrier.getSource().isGeneratingCarrier()) {
             if (lastConnFromCarrier.isDestination(selectedRadio)) {
@@ -589,58 +399,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
     }
 
   } /* paintAfterMotes */
-
-//  public static class RangeMenuAction implements SimulationMenuAction {
-//
-//    @Override
-//    public boolean isEnabled(Visualizer visualizer, Simulation simulation) {
-//      return true;
-//    }
-//
-//    @Override
-//    public String getDescription(Visualizer visualizer, Simulation simulation) {
-//      return "Change transmission ranges for tag";
-//    }
-//
-//    @Override
-//    public void doAction(Visualizer visualizer, Simulation simulation) {
-//      VisualizerSkin[] skins = visualizer.getCurrentSkins();
-//      for (VisualizerSkin skin : skins) {
-//        if (skin instanceof UDGMCAVisualizerSkin) {
-//          UDGMCAVisualizerSkin vskin = ((UDGMCAVisualizerSkin) skin);
-//          vskin.rangeTX.setVisible(true);
-//          vskin.rangeINT.setVisible(true);
-//          vskin.updateRatioRangeFrame();
-//        }
-//      }
-//    }
-//  };
-
-//  public static class SuccessRatioMenuAction implements SimulationMenuAction {
-//
-//    @Override
-//    public boolean isEnabled(Visualizer visualizer, Simulation simulation) {
-//      return true;
-//    }
-//
-//    @Override
-//    public String getDescription(Visualizer visualizer, Simulation simulation) {
-//      return "Change TX/RX success ratio for tag";
-//    }
-//
-//    @Override
-//    public void doAction(Visualizer visualizer, Simulation simulation) {
-//      VisualizerSkin[] skins = visualizer.getCurrentSkins();
-//      for (VisualizerSkin skin : skins) {
-//        if (skin instanceof UDGMCAVisualizerSkin) {
-//          UDGMCAVisualizerSkin vskin = ((UDGMCAVisualizerSkin) skin);
-//          vskin.ratioTX.setVisible(true);
-//          vskin.ratioRX.setVisible(true);
-//          vskin.updateRatioRangeFrame();
-//        }
-//      }
-//    }
-//  };
 
   public static class BackscatterCoefficientMenuAction implements SimulationMenuAction {
 
@@ -726,7 +484,7 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
    * @param radio
    * @param channel
    */
-  private void paintTxAndIxRanges(Graphics g, Radio radio, int tagTxChanel) {
+  private void paintTxAndIxRanges(Graphics g, Radio radio, int tagTxChannel) {
     Set<Mote> selectedMotes = visualizer.getSelectedMotes();
 
     Area intRangeArea = new Area();
@@ -746,11 +504,11 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
     for (Mote selectedMote : selectedMotes) {
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
       if (selectedRadio.isBackscatterTag()) {
-        tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPowerMax(tagTxChanel);
+        tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPowerMax(tagTxChannel);
       } else {
         /* Tag's output power given the specific active module (active transmitter or carrier generator) */
         /* In case two active modules operate*/
-        tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPower(selectedRadio, tagTxChanel);
+        tagCurrentOutputPowerIndicator = radio.getTagCurrentOutputPower(selectedRadio, tagTxChannel);
       }
     }
 
@@ -806,24 +564,25 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
      * that is listening to the its carrier, TX ranges with the same color.
      */
     int txColor = 0;
-
+    int defaultTXColor = COLOR_TX.getRGB();
     /* Use only one of the sixteen 802.15.4 channels */
-    if (carrierColor.get(tagTxChanel) !=null) {
-       txColor = carrierColor.get(tagTxChanel);
-    } else {
-      int defaultTXColor = COLOR_TX.getRGB();
+    if (tagTxChannel < 11 || tagTxChannel > 26) {
       txColor = defaultTXColor;
+    } else {
+      if (carrierColor.get(tagTxChannel) != null) {
+         txColor = carrierColor.get(tagTxChannel);
+      } else {
+        txColor = defaultTXColor;
+      }
     }
 
-    if (radio.getNumberOfConnectionsFromChannel(tagTxChanel) != 0) {
+    if (radio.getNumberOfConnectionsFromChannel(tagTxChannel) != 0) {
 
       Graphics2D g2d = (Graphics2D) g;
 
-//        g2d.setColor(Color.WHITE);
-//        g2d.fill(intRangeArea); // fill the circle with color
       if (!radio.isTagTXPowersEmpty()) {
-        if (radio.isTXChannelFromActiveTransmitter(tagTxChanel) ||
-                radio.getNumberOfConnectionsFromChannel(tagTxChanel) >= 2) {
+        if (radio.isTXChannelFromActiveTransmitter(tagTxChannel) ||
+                radio.getNumberOfConnectionsFromChannel(tagTxChannel) >= 2) {
 
           if (radio.isTransmitting()) {
             /*
@@ -889,9 +648,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
       Mote selectedMote = selectedMotes.toArray(new Mote[0])[0];
       Radio selectedRadio = selectedMote.getInterfaces().getRadio();
 
-//      double tagCurrentOutputPowerIndicator = selectedRadio.getTagCurrentOutputPowerMax(channel);
-//      double distanceMax = radioMedium.calculateTagTransmissionRange(tagCurrentOutputPowerIndicator);
-//
       for (Mote m : simulation.getMotes()) {
         if (m == selectedMote) {
           continue;
@@ -967,49 +723,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
 
   } /* showProbability */
 
-//  /**
-//   * From the given set of motes paint the carrier generator (selectedMote), which is currently
-//   * selected.
-//   *
-//   * @param selectedMotes
-//   * @param selectedMote
-//   * @param g
-//   */
-//  private void paintCarrierColor(Set<Mote> selectedMotes, Mote selectedMote, Graphics g) {
-///**/ System.out.println("paintCarrierColor");
-//    /* Get the position of the carrier generator */
-//    Position carrierPos = selectedMote.getInterfaces().getPosition();
-//
-//    Point pixelCoordin = visualizer.transformPositionToPixel(carrierPos);
-//    int xi = pixelCoordin.x;
-//    int yi = pixelCoordin.y;
-//
-//    Radio selectedRadio  = selectedMote.getInterfaces().getRadio();
-//    int txColor = carrierColor.get(selectedRadio.getChannel()+2);
-//
-//    if (selectedMotes.contains(selectedMote)) {
-///**/            System.out.println("UDGMCA.getSelectedMotes().contains(mote)");
-//      /* If mote is selected, highlight with red circle
-//       and semitransparent gray overlay */
-//      g.setColor(new Color(51, 102, 255));
-//      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-//                   2 * Visualizer.MOTE_RADIUS);
-//      g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
-//                   2 * Visualizer.MOTE_RADIUS + 2);
-//
-//      g.setColor(new Color(txColor, true));
-//      g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-//                 2 * Visualizer.MOTE_RADIUS);
-//
-//    } else {
-//      g.setColor(Color.BLACK);
-//      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-//                 2 * Visualizer.MOTE_RADIUS);
-//    }
-//
-//
-//  } /* paintCarrierColor */
-
   /**
    * From the given set of motes paint the carrier generator (radio), whose carrier the selectedMote
    * (tag) is listening to.
@@ -1022,7 +735,6 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
   private void paintCarrierColor(Set<Mote> selectedMotes, Mote selectedMote, Radio radio, Graphics g) {
 
     Radio selectedRadio  = selectedMote.getInterfaces().getRadio();
-//    int txColor = carrierColor.get(radio.getChannel()+2);
 
     Radio tag = null;
     Radio paintedRadio = null;
@@ -1047,28 +759,29 @@ public class UDGMCAVisualizerSkin extends UDGMVisualizerSkin {
      /* If mote is selected, highlight with red circle
        and semitransparent gray overlay */
       g.setColor(new Color(51, 102, 255));
-      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-              2 * Visualizer.MOTE_RADIUS);
-      g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2,
-              2 * Visualizer.MOTE_RADIUS + 2);
-
-      if (tag.isTXChannelFromActiveTransmitter(paintedRadio.getChannel()+2) ||
-              tag.getNumberOfConnectionsFromChannel(paintedRadio.getChannel()+2) >= 2) {
+      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS);
+      g.drawOval(xi - Visualizer.MOTE_RADIUS - 1, yi - Visualizer.MOTE_RADIUS - 1, 2 * Visualizer.MOTE_RADIUS + 2, 2 * Visualizer.MOTE_RADIUS + 2);
+      
+      int tagTxChannel = paintedRadio.getChannel()+radioMedium.getFREQSHIFT();
+      
+      if (tag.isTXChannelFromActiveTransmitter(tagTxChannel) ||
+              tag.getNumberOfConnectionsFromChannel(tagTxChannel) >= 2) {
 
         g.setColor(new Color(128, 128, 128, 128));
-        g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-                2 * Visualizer.MOTE_RADIUS);
-
+        g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS);
       } else {
-        int txColor = carrierColor.get(paintedRadio.getChannel()+2);
-        g.setColor(new Color(txColor, true));
-        g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-                2 * Visualizer.MOTE_RADIUS);
+        if (tagTxChannel < 11 || tagTxChannel > 26) {
+          g.setColor(Color.BLACK);
+          g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS);
+        } else {
+          int txColor = carrierColor.get(tagTxChannel);
+          g.setColor(new Color(txColor, true));
+          g.fillOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS);
+        }
       }
     } else {
       g.setColor(Color.BLACK);
-      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS,
-              2 * Visualizer.MOTE_RADIUS);
+      g.drawOval(xi - Visualizer.MOTE_RADIUS, yi - Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS, 2 * Visualizer.MOTE_RADIUS);
     }
 
   } /* paintCarrierColor */

@@ -395,56 +395,58 @@ public class UDGMCA extends UDGM {
         /* In case the sender transmits a packet and the tag is within its TX
          * range the tag is removed from the destinations and added to the interfered.----this is changed now */
         for (Radio r: newConnection.getAllDestinations()) {
-          if (r.isBackscatterTag() && r.isListeningCarrier()) {
-//        	  if (r.isReceiving()) { // If this tag is already receiving check that this transmission doesnt interfere
-//        		  for (int i = 1; i <= 2; i++) {
-//        			  if (r.isTXChannelFromActiveTransmitter(sender.getChannel() + i + 2)) { // If this sender causes
-//        				  																	 // channel interference to
-//        				  																	 // this tag
-//        				 double sender_power = friisEquation(sender, r);
-////        				 double tx_power = friisEquation(source, r); // How to find out the source?
-//        				 int CHANNEL_REJECTION[] = {3, 14, 22};
-////        				 if (sender_power >= tx_power + CHANNEL_REJECTION[Math.abs(i)]) {
-////        					newConnection.removeDestination(r); 
-////        				 	continue;
-////        				 }
-//        			  }
-//        		  }
-//        	  }
-
-
-            RadioConnection carrier_connection = r.getConnectionFromMaxOutputPower(sender.getChannel());
-            if (carrier_connection == null) {
-              continue; // There is no carrier generator in the appropriate channel for this sender so we skip this tag.
-            }
-            
-            double B = -64.91;//A and B are negative
-            double A = -1.025;
-            Radio carrierGenerator = carrier_connection.getSource();
-            double incidentPowerOfTag_CG= friisEquation(carrierGenerator,r);
-            double Sensitivity_Threshold = A*incidentPowerOfTag_CG + B;
-            double incidentPowerOfTag_Sender= friisEquation(sender,r);
-            //System.out.printf(">>>>>>>>>>>>>>>>> THR: %f, PI: %f", Sensitivity_Threshold, incidentPowerOfTag_Sender);
-            //Sensitivity_Threshold is greater than, but here we compare negative values and therefore sign is lessthan
-            if (incidentPowerOfTag_Sender > Sensitivity_Threshold){
-              //do nothing, automatically added to destination
-              //System.out.println("-----can receive ----");
-            }
-            else if(incidentPowerOfTag_Sender > (Sensitivity_Threshold - 3)) {
-              newConnection.removeDestination(r);
-              //System.out.println("-----Interfered -----");
-            }
-            else {
-              newConnection.removeDestination(r);
-              newConnection.addInterfered(r);
-              //System.out.println("-----cannot receive ----");
-            }
-          }
-          else{
-            newConnection.removeDestination(r);
-            /* tag (r) is added to Interfered but without setting any flag since the tag
-               has no receiving capabilities. */
-            newConnection.addInterfered(r);
+          if (r.isBackscatterTag()) {
+        	  if (r.isListeningCarrier()) {
+	//        	  if (r.isReceiving()) { // If this tag is already receiving check that this transmission doesnt interfere
+	//        		  for (int i = 1; i <= 2; i++) {
+	//        			  if (r.isTXChannelFromActiveTransmitter(sender.getChannel() + i + 2)) { // If this sender causes
+	//        				  																	 // channel interference to
+	//        				  																	 // this tag
+	//        				 double sender_power = friisEquation(sender, r);
+	////        				 double tx_power = friisEquation(source, r); // How to find out the source?
+	//        				 int CHANNEL_REJECTION[] = {3, 14, 22};
+	////        				 if (sender_power >= tx_power + CHANNEL_REJECTION[Math.abs(i)]) {
+	////        					newConnection.removeDestination(r); 
+	////        				 	continue;
+	////        				 }
+	//        			  }
+	//        		  }
+	//        	  }
+	
+	
+	            RadioConnection carrier_connection = r.getConnectionFromMaxOutputPower(sender.getChannel());
+	            if (carrier_connection == null) {
+	              continue; // There is no carrier generator in the appropriate channel for this sender so we skip this tag.
+	            }
+	            
+	            double B = -64.91;//A and B are negative
+	            double A = -1.025;
+	            Radio carrierGenerator = carrier_connection.getSource();
+	            double incidentPowerOfTag_CG= friisEquation(carrierGenerator,r);
+	            double Sensitivity_Threshold = A*incidentPowerOfTag_CG + B;
+	            double incidentPowerOfTag_Sender= friisEquation(sender,r);
+	            //System.out.printf(">>>>>>>>>>>>>>>>> THR: %f, PI: %f", Sensitivity_Threshold, incidentPowerOfTag_Sender);
+	            //Sensitivity_Threshold is greater than, but here we compare negative values and therefore sign is lessthan
+	            if (incidentPowerOfTag_Sender > Sensitivity_Threshold){
+	              //do nothing, automatically added to destination
+	              //System.out.println("-----can receive ----");
+	            }
+	            else if(incidentPowerOfTag_Sender > (Sensitivity_Threshold - 3)) {
+	              newConnection.removeDestination(r);
+	              //System.out.println("-----Interfered -----");
+	            }
+	            else {
+	              newConnection.removeDestination(r);
+	              newConnection.addInterfered(r);
+	              //System.out.println("-----cannot receive ----");
+	            }
+	          }
+	          else{
+	            newConnection.removeDestination(r);
+	            /* tag (r) is added to Interfered but without setting any flag since the tag
+	               has no receiving capabilities. */
+	            newConnection.addInterfered(r);
+	          }
           }
         }
       }
